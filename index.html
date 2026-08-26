@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura — Red Social Privada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 25%, #f3e5f5 50%, #e8eaf6 75%, #e3f2fd 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2d1b30;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.65);
+            box-shadow: 0 8px 32px rgba(180,120,150,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .glass-strong {
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.7);
+            box-shadow: 0 12px 40px rgba(180,120,150,0.15), inset 0 1px 0 rgba(255,255,255,0.7);
+        }
+
+        .glass-dark {
+            background: rgba(255,255,255,0.35);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .glass-hover:hover {
+            background: rgba(255,255,255,0.78);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 48px rgba(180,100,140,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(236,64,122,0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(236,64,122,0.45);
+        }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.7);
+            transform: translateY(-1px);
+        }
+
+        .avatar-ring {
+            border: 2.5px solid rgba(236,64,122,0.4);
+            padding: 2px;
+        }
+
+        .input-glass {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(200,180,200,0.3);
+            transition: all 0.3s ease;
+        }
+        .input-glass:focus {
+            background: rgba(255,255,255,0.75);
+            border-color: #ec407a;
+            box-shadow: 0 0 0 3px rgba(236,64,122,0.12);
+            outline: none;
+        }
+
+        .cloud-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(ellipse at 10% 20%, rgba(248,187,208,0.6) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(179,157,219,0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255,224,178,0.3) 0%, transparent 60%);
+            filter: blur(60px);
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+        .notif-pulse::after {
+            content: ''; position: absolute; inset: -3px; border-radius: 50%;
+            border: 2px solid #ec407a; animation: pulse-ring 1.5s ease-out infinite;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: rgba(180,140,160,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen antialiased relative">
+    <div class="cloud-bg"></div>
+
+    <!-- ========================== AUTH SCREEN ========================== -->
+    <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display:none;">
+        <div class="absolute inset-0 bg-gradient-to-br from-pink-200/80 via-purple-100/60 to-blue-100/60 backdrop-blur-sm"></div>
+
+        <div class="relative glass-strong rounded-3xl p-8 max-w-md w-full slide-up space-y-6">
+            <!-- Logo -->
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-400 to-purple-500 flex items-center justify-center shadow-lg shadow-pink-500/25">
+                    <span class="text-white text-2xl font-display font-bold">A</span>
+                </div>
+                <h1 class="text-2xl font-display font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Bienvenido a Aura</h1>
+                <p class="text-xs opacity-60">Red Social Privada & Aprendizaje Compartido</p>
+            </div>
+
+            <!-- Toggle Login / Register -->
+            <div class="flex items-center bg-black/5 p-1 rounded-2xl">
+                <button onclick="setAuthMode('login')" id="authTabLogin" class="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-white shadow-sm text-pink-600">Iniciar Sesión</button>
+                <button onclick="setAuthMode('register')" id="authTabRegister" class="flex-1 py-2 rounded-xl text-xs font-semibold transition-all opacity-60">Crear Cuenta</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40"></i>
+                        <input type="email" id="loginEmail" placeholder="tu@correo.com" class="input-glass w-full pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40"></i>
+                        <input type="password" id="loginPassword" placeholder="••••••••" class="input-glass w-full pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                    </div>
+                </div>
+                <button onclick="handleLogin()" class="btn-primary w-full py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    Iniciar Sesión
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="space-y-3" style="display:none;">
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Tu Nombre</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40"></i>
+                        <input type="text" id="registerName" placeholder="Ej: Ángel" class="input-glass w-full pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40"></i>
+                        <input type="email" id="registerEmail" placeholder="tu@correo.com" class="input-glass w-full pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40"></i>
+                        <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" class="input-glass w-full pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold opacity-60 uppercase tracking-wider mb-1 block">Foto de Perfil</label>
+                    <div class="flex items-center gap-3">
+                        <img id="registerAvatarPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" class="w-12 h-12 rounded-xl object-cover border-2 border-pink-300/50">
+                        <label class="btn-ghost px-4 py-2 rounded-xl text-xs cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                            <span>Subir Foto</span>
+                            <input type="file" id="registerAvatarFile" accept="image/*" class="hidden" onchange="handleRegisterAvatarSelect(event)">
+                        </label>
+                    </div>
+                </div>
+                <button onclick="handleRegister()" class="btn-primary w-full py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    Crear mi Cuenta
+                </button>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="pt-3 border-t border-black/5">
+                <p class="text-[10px] font-semibold uppercase tracking-wider opacity-40 mb-2.5 text-center">Acceso Rápido de Prueba</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="quickLogin('sofia')" class="glass p-2.5 rounded-xl flex items-center gap-2 hover:bg-white/60 transition-all cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" class="w-8 h-8 rounded-lg object-cover">
+                        <div class="text-left">
+                            <p class="text-xs font-bold text-pink-600">Sofía</p>
+                            <p class="text-[9px] opacity-50">sofia@aura.app</p>
+                        </div>
+                    </button>
+                    <button onclick="quickLogin('mateo')" class="glass p-2.5 rounded-xl flex items-center gap-2 hover:bg-white/60 transition-all cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" class="w-8 h-8 rounded-lg object-cover">
+                        <div class="text-left">
+                            <p class="text-xs font-bold text-purple-600">Mateo</p>
+                            <p class="text-[9px] opacity-50">mateo@aura.app</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================== MAIN APP ========================== -->
+    <div id="mainApp" class="relative z-10 max-w-2xl mx-auto px-4 pt-5 pb-24">
+
+        <!-- HEADER -->
+        <header class="glass-strong rounded-2xl p-3.5 mb-5 flex items-center justify-between fade-in">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-500 via-rose-400 to-purple-500 flex items-center justify-center text-white shadow-md shadow-pink-500/20 font-display font-bold text-base">A</div>
+                <div>
+                    <h1 class="text-base font-display font-bold tracking-tight flex items-center gap-1.5">
+                        Aura
+                        <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 font-mono font-medium">v3.0</span>
+                    </h1>
+                    <p class="text-[10px] opacity-50">Red Social Privada</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <!-- Notifications -->
+                <button onclick="openNotifications()" class="relative glass p-2 rounded-xl hover:bg-white/60 transition-all cursor-pointer" title="Notificaciones">
+                    <i data-lucide="bell" class="w-4 h-4 opacity-70"></i>
+                    <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm shadow-pink-500/30">0</span>
+                </button>
+
+                <!-- Theme -->
+                <button onclick="toggleTheme()" class="glass p-2 rounded-xl hover:bg-white/60 transition-all cursor-pointer" title="Cambiar tema">
+                    <i data-lucide="sun" class="w-4 h-4 opacity-70" id="themeIcon"></i>
+                </button>
+
+                <!-- User Profile -->
+                <button onclick="openProfileMenu()" class="flex items-center gap-2 glass p-1.5 pr-3 rounded-xl hover:bg-white/60 transition-all cursor-pointer">
+                    <img id="headerAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" class="w-7 h-7 rounded-lg object-cover">
+                    <span id="headerName" class="text-xs font-semibold text-pink-700">Sofía</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 opacity-40"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- TABS -->
+        <div class="flex items-center justify-between mb-5 fade-in">
+            <nav class="glass p-1 rounded-xl flex items-center gap-0.5">
+                <button onclick="switchTab('feed')" id="tabFeed" class="tab-btn active flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white shadow-sm">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-500"></i> Diario
+                </button>
+                <button onclick="switchTab('habits')" id="tabHabits" class="tab-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-60 hover:opacity-90">
+                    <i data-lucide="target" class="w-3.5 h-3.5"></i> Metas
+                </button>
+                <button onclick="switchTab('bitacora')" id="tabBitacora" class="tab-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-60 hover:opacity-90">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Galería
+                </button>
+            </nav>
+
+            <div class="glass px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-medium">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i>
+                <span id="streakCount" class="font-bold text-orange-600">12 días</span>
+            </div>
+        </div>
+
+        <!-- ===== TAB: FEED ===== -->
+        <main id="viewFeed" class="space-y-5">
+
+            <!-- Bible Verse -->
+            <section class="glass-strong rounded-2xl p-5 fade-in">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 rounded-xl bg-gradient-to-br from-pink-100 to-purple-100">
+                            <i data-lucide="book-open" class="w-4 h-4 text-pink-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-[9px] uppercase tracking-widest font-semibold opacity-40">Pasaje del Día</p>
+                            <p class="text-xs font-semibold opacity-80" id="verseDate"></p>
+                        </div>
+                    </div>
+                    <button onclick="shuffleVerse()" class="btn-ghost px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="shuffle" class="w-3 h-3"></i> Cambiar
+                    </button>
+                </div>
+                <div class="pl-4 border-l-2 border-pink-400/50 my-3">
+                    <blockquote id="verseText" class="text-sm font-display font-medium italic leading-relaxed opacity-85"></blockquote>
+                    <p id="verseRef" class="text-[11px] font-bold text-pink-600/80 mt-1.5"></p>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-black/5">
+                    <span class="text-[10px] opacity-50 font-medium">Estado de lectura:</span>
+                    <div class="flex gap-1.5" id="verseStatusContainer"></div>
+                </div>
+            </section>
+
+            <!-- Create Post -->
+            <section class="glass-strong rounded-2xl p-5 fade-in">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <img id="postAvatar" src="" class="w-8 h-8 rounded-xl object-cover avatar-ring">
+                    <div>
+                        <p class="text-xs font-bold">¿Qué aprendiste hoy?</p>
+                        <p class="text-[10px] opacity-50" id="postAsLabel">Publicando como: Sofía</p>
+                    </div>
+                </div>
+                <textarea id="postInput" rows="2" placeholder="Comparte un dato curioso, reflexión o descubrimiento..." class="input-glass w-full p-3.5 rounded-xl text-xs resize-none mb-3"></textarea>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <label class="btn-ghost px-2.5 py-1.5 rounded-lg text-[11px] cursor-pointer flex items-center gap-1">
+                            <i data-lucide="image-plus" class="w-3.5 h-3.5 text-blue-500"></i> Foto
+                            <input type="file" id="postPhotoInput" accept="image/*" class="hidden" onchange="handlePostPhoto(event)">
+                        </label>
+                        <button onclick="toggleRecording()" id="recBtn" class="btn-ghost px-2.5 py-1.5 rounded-lg text-[11px] cursor-pointer flex items-center gap-1">
+                            <i data-lucide="mic" class="w-3.5 h-3.5 text-rose-500"></i> <span id="recLabel">Voz</span>
+                        </button>
+                    </div>
+                    <button onclick="submitPost()" class="btn-primary px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="send-horizontal" class="w-3.5 h-3.5"></i> Publicar
+                    </button>
+                </div>
+                <div id="postPhotoPreview" class="hidden mt-3 relative inline-block rounded-xl overflow-hidden max-w-[200px]">
+                    <img id="postPhotoImg" src="" class="w-full h-auto rounded-xl">
+                    <button onclick="removePostPhoto()" class="absolute top-1.5 right-1.5 bg-black/50 text-white p-1 rounded-full text-xs hover:bg-black/70"><i data-lucide="x" class="w-3 h-3"></i></button>
+                </div>
+            </section>
+
+            <!-- Feed -->
+            <div class="space-y-4" id="feedList"></div>
+        </main>
+
+        <!-- ===== TAB: HABITS ===== -->
+        <section id="viewHabits" class="hidden space-y-5">
+            <div class="glass-strong rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-base font-display font-bold">Metas & Hábitos</h2>
+                        <p class="text-[10px] opacity-50">Progreso diario compartido</p>
+                    </div>
+                    <button onclick="addHabit()" class="btn-ghost px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nueva Meta
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="habitsContainer"></div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: BITACORA ===== -->
+        <section id="viewBitacora" class="hidden space-y-5">
+            <div class="glass-strong rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-base font-display font-bold">Bitácora & Galería</h2>
+                        <p class="text-[10px] opacity-50">Archivo multimedia</p>
+                    </div>
+                    <div class="glass p-0.5 rounded-lg flex gap-0.5 text-[11px]">
+                        <button onclick="filterGallery('all')" id="fAll" class="px-2.5 py-1 rounded-md font-semibold bg-white shadow-sm">Todos</button>
+                        <button onclick="filterGallery('photos')" id="fPhotos" class="px-2.5 py-1 rounded-md opacity-60 hover:opacity-100">Fotos</button>
+                        <button onclick="filterGallery('audio')" id="fAudio" class="px-2.5 py-1 rounded-md opacity-60 hover:opacity-100">Audios</button>
+                    </div>
+                </div>
+                <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== PROFILE MENU MODAL ===== -->
+    <div id="profileMenuModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-strong rounded-2xl p-6 max-w-sm w-full slide-up space-y-5">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-base flex items-center gap-2">
+                    <i data-lucide="user-circle" class="w-5 h-5 text-pink-500"></i> Mi Perfil
+                </h3>
+                <button onclick="closeProfileMenu()" class="p-1.5 rounded-lg glass hover:bg-white/60 transition-all cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
+            </div>
+
+            <!-- Current User Card -->
+            <div class="glass rounded-xl p-4 flex items-center gap-3">
+                <img id="profileAvatar" src="" class="w-14 h-14 rounded-xl object-cover avatar-ring">
+                <div>
+                    <p id="profileName" class="font-display font-bold text-sm"></p>
+                    <p id="profileEmail" class="text-[11px] opacity-50"></p>
+                    <p class="text-[10px] text-pink-600 font-medium mt-0.5">🟢 En línea</p>
+                </div>
+            </div>
+
+            <!-- Edit Profile -->
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-semibold opacity-50 uppercase tracking-wider">Nombre</label>
+                    <input type="text" id="editName" class="input-glass w-full px-3.5 py-2 rounded-xl text-xs mt-1">
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold opacity-50 uppercase tracking-wider">Foto de Perfil</label>
+                    <div class="flex items-center gap-2 mt-1">
+                        <label class="btn-ghost px-3 py-1.5 rounded-xl text-xs cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Subir Foto
+                            <input type="file" id="editAvatarFile" accept="image/*" class="hidden" onchange="handleEditAvatar(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="saveProfile()" class="btn-primary flex-1 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Guardar
+                </button>
+                <button onclick="handleLogout()" class="btn-ghost flex-1 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer text-rose-600">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NOTIFICATIONS MODAL ===== -->
+    <div id="notifModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-strong rounded-2xl p-6 max-w-sm w-full slide-up space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-base flex items-center gap-2">
+                    <i data-lucide="bell" class="w-5 h-5 text-pink-500"></i> Notificaciones
+                </h3>
+                <button onclick="closeNotifications()" class="p-1.5 rounded-lg glass hover:bg-white/60 transition-all cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
+            </div>
+            <div id="notifList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+        </div>
+    </div>
+
+
+    <script>
+    /* ===== DATA & STATE ===== */
+    const PROFILES_DB = {
+        sofia: { id:'sofia', name:'Sofía', email:'sofia@aura.app', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80', password:'sofia123' },
+        mateo: { id:'mateo', name:'Mateo', email:'mateo@aura.app', avatar:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', password:'mateo123' }
+    };
+
+    const VERSES = [
+        { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6-7" },
+        { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105" },
+        { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
+        { text: "El amor es sufrido, es benigno; el amor no tiene envidia.", ref: "1 Corintios 13:4" },
+        { text: "Confía en el Señor con todo tu corazón, y no te apoyes en tu propia prudencia.", ref: "Proverbios 3:5" },
+        { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz.", ref: "Jeremías 29:11" }
+    ];
+
+    let currentUser = null;
+    let registeredUsers = JSON.parse(localStorage.getItem('aura_users')) || {};
+    let entries = JSON.parse(localStorage.getItem('aura_entries3')) || [
+        { id:101, userId:'sofia', userName:'Sofía', userAvatar:PROFILES_DB.sofia.avatar, time:'Hoy, 09:30', text:'¿Sabías que el orégano contiene carvacrol, un compuesto con potentes propiedades antimicrobianas? ¡Lo leí en un artículo científico!', photo:'https://images.unsplash.com/photo-1509358217858-a4f22782e4e8?auto=format&fit=crop&w=600&q=80', likes:{'❤️':2,'💡':3}, comments:[{id:1,userName:'Mateo',userAvatar:PROFILES_DB.mateo.avatar,text:'¡Increíble dato!',time:'Hace 15 min'}] },
+        { id:102, userId:'mateo', userName:'Mateo', userAvatar:PROFILES_DB.mateo.avatar, time:'Ayer, 20:15', text:'Dato curioso bíblico: La palabra "Amén" aparece en casi todos los idiomas sin traducirse, conservando su raíz hebrea que significa "así sea".', photo:null, likes:{'🙌':4,'❤️':1}, comments:[] }
+    ];
+    let habits = JSON.parse(localStorage.getItem('aura_habits3')) || [
+        {id:1,userId:'sofia',text:'Lectura bíblica (15 min)',done:true},{id:2,userId:'sofia',text:'Anotar un dato curioso',done:true},{id:3,userId:'sofia',text:'Tomar 2L de agua',done:false},
+        {id:4,userId:'mateo',text:'Lectura bíblica (15 min)',done:true},{id:5,userId:'mateo',text:'Resolver 1 reto de código',done:false},{id:6,userId:'mateo',text:'Ejercicio 30 min',done:false}
+    ];
+    let notifications = JSON.parse(localStorage.getItem('aura_notifs3')) || [];
+    let verseChecked = { sofia:true, mateo:false };
+    let currentVerseIdx = 0;
+    let postPhotoData = null;
+
+    function save() {
+        localStorage.setItem('aura_entries3', JSON.stringify(entries));
+        localStorage.setItem('aura_habits3', JSON.stringify(habits));
+        localStorage.setItem('aura_notifs3', JSON.stringify(notifications));
+        localStorage.setItem('aura_users', JSON.stringify(registeredUsers));
+    }
+
+    /* ===== INIT ===== */
+    window.onload = function() {
+        lucide.createIcons();
+        const saved = localStorage.getItem('aura_current_user3');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+            showApp();
+        } else {
+            showAuth();
+        }
+    };
+
+    function showAuth() {
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        lucide.createIcons();
+    }
+
+    function showApp() {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        updateHeader();
+        setVerseDate();
+        renderVerse();
+        renderVerseStatus();
+        renderFeed();
+        renderHabits();
+        renderGallery();
+        updateNotifBadge();
+        lucide.createIcons();
+    }
+
+    /* ===== AUTH ===== */
+    function setAuthMode(mode) {
+        const login = document.getElementById('loginForm');
+        const reg = document.getElementById('registerForm');
+        const tabL = document.getElementById('authTabLogin');
+        const tabR = document.getElementById('authTabRegister');
+        if (mode === 'login') {
+            login.style.display = 'block'; reg.style.display = 'none';
+            tabL.className = 'flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-white shadow-sm text-pink-600';
+            tabR.className = 'flex-1 py-2 rounded-xl text-xs font-semibold transition-all opacity-60';
+        } else {
+            login.style.display = 'none'; reg.style.display = 'block';
+            tabR.className = 'flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-white shadow-sm text-pink-600';
+            tabL.className = 'flex-1 py-2 rounded-xl text-xs font-semibold transition-all opacity-60';
+        }
+        lucide.createIcons();
+    }
+
+    let registerAvatarData = null;
+    function handleRegisterAvatarSelect(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = ev => { registerAvatarData = ev.target.result; document.getElementById('registerAvatarPreview').src = registerAvatarData; };
+        r.readAsDataURL(f);
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pw = document.getElementById('loginPassword').value.trim();
+        if (!email) return alert('Ingresa tu correo electrónico');
+
+        // Check preset profiles
+        for (const key of Object.keys(PROFILES_DB)) {
+            const p = PROFILES_DB[key];
+            if (p.email === email) { quickLogin(key); return; }
+        }
+        // Check registered users
+        if (registeredUsers[email]) {
+            const u = registeredUsers[email];
+            if (pw && u.password !== pw) return alert('Contraseña incorrecta');
+            currentUser = { id: u.id, name: u.name, email: u.email, avatar: u.avatar };
+            localStorage.setItem('aura_current_user3', JSON.stringify(currentUser));
+            showApp();
+            return;
+        }
+
+        // Auto-create account
+        const name = email.split('@')[0];
+        currentUser = { id: 'user_' + Date.now(), name, email, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + name };
+        registeredUsers[email] = { ...currentUser, password: pw || '123456' };
+        save();
+        localStorage.setItem('aura_current_user3', JSON.stringify(currentUser));
+        showApp();
+    }
+
+    function handleRegister() {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const pw = document.getElementById('registerPassword').value.trim();
+        if (!name || !email) return alert('Completa nombre y correo');
+        if (pw.length < 6) return alert('La contraseña debe tener al menos 6 caracteres');
+
+        const avatar = registerAvatarData || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + name;
+        currentUser = { id: 'user_' + Date.now(), name, email, avatar };
+        registeredUsers[email] = { ...currentUser, password: pw };
+        save();
+        localStorage.setItem('aura_current_user3', JSON.stringify(currentUser));
+        showApp();
+    }
+
+    function quickLogin(key) {
+        const p = PROFILES_DB[key];
+        currentUser = { id: p.id, name: p.name, email: p.email, avatar: p.avatar };
+        localStorage.setItem('aura_current_user3', JSON.stringify(currentUser));
+        showApp();
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('aura_current_user3');
+        currentUser = null;
+        closeProfileMenu();
+        showAuth();
+    }
+
+    /* ===== HEADER & PROFILE ===== */
+    function updateHeader() {
+        document.getElementById('headerAvatar').src = currentUser.avatar;
+        document.getElementById('headerName').innerText = currentUser.name;
+        document.getElementById('postAvatar').src = currentUser.avatar;
+        document.getElementById('postAsLabel').innerText = 'Publicando como: ' + currentUser.name;
+    }
+
+    function openProfileMenu() {
+        document.getElementById('profileAvatar').src = currentUser.avatar;
+        document.getElementById('profileName').innerText = currentUser.name;
+        document.getElementById('profileEmail').innerText = currentUser.email;
+        document.getElementById('editName').value = currentUser.name;
+        document.getElementById('profileMenuModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeProfileMenu() { document.getElementById('profileMenuModal').classList.add('hidden'); }
+
+    function handleEditAvatar(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = ev => {
+            currentUser.avatar = ev.target.result;
+            document.getElementById('profileAvatar').src = currentUser.avatar;
+        };
+        r.readAsDataURL(f);
+    }
+
+    function saveProfile() {
+        const name = document.getElementById('editName').value.trim();
+        if (name) currentUser.name = name;
+        localStorage.setItem('aura_current_user3', JSON.stringify(currentUser));
+        if (registeredUsers[currentUser.email]) {
+            registeredUsers[currentUser.email].name = currentUser.name;
+            registeredUsers[currentUser.email].avatar = currentUser.avatar;
+            save();
+        }
+        updateHeader();
+        closeProfileMenu();
+        renderFeed();
+    }
+
+    /* ===== TABS ===== */
+    function switchTab(tab) {
+        ['viewFeed','viewHabits','viewBitacora'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['tabFeed','tabHabits','tabBitacora'].forEach(id => {
+            document.getElementById(id).className = 'tab-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-60 hover:opacity-90';
+        });
+        const map = { feed:['viewFeed','tabFeed'], habits:['viewHabits','tabHabits'], bitacora:['viewBitacora','tabBitacora'] };
+        document.getElementById(map[tab][0]).classList.remove('hidden');
+        document.getElementById(map[tab][1]).className = 'tab-btn active flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white shadow-sm';
+        if (tab === 'bitacora') renderGallery();
+        lucide.createIcons();
+    }
+
+    /* ===== VERSE ===== */
+    function setVerseDate() {
+        const d = new Date();
+        const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+        const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        document.getElementById('verseDate').innerText = `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`;
+    }
+    function renderVerse() {
+        const v = VERSES[currentVerseIdx];
+        document.getElementById('verseText').innerText = '"' + v.text + '"';
+        document.getElementById('verseRef').innerText = '— ' + v.ref;
+    }
+    function shuffleVerse() { currentVerseIdx = (currentVerseIdx + 1) % VERSES.length; renderVerse(); }
+    function renderVerseStatus() {
+        const c = document.getElementById('verseStatusContainer'); c.innerHTML = '';
+        ['sofia','mateo'].forEach(k => {
+            const p = PROFILES_DB[k]; const ok = verseChecked[k];
+            const b = document.createElement('button');
+            b.onclick = () => { verseChecked[k] = !verseChecked[k]; renderVerseStatus(); };
+            b.className = ok ? 'flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-100/70 text-emerald-700 border border-emerald-200/50 cursor-pointer' : 'flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium glass opacity-50 hover:opacity-80 cursor-pointer';
+            b.innerHTML = ok ? `<i data-lucide="check-circle-2" class="w-3 h-3"></i>${p.name}` : `<i data-lucide="circle" class="w-3 h-3"></i>${p.name}`;
+            c.appendChild(b);
+        });
+        lucide.createIcons();
+    }
+
+    /* ===== POST ===== */
+    function handlePostPhoto(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = ev => { postPhotoData = ev.target.result; document.getElementById('postPhotoImg').src = postPhotoData; document.getElementById('postPhotoPreview').classList.remove('hidden'); };
+        r.readAsDataURL(f);
+    }
+    function removePostPhoto() { postPhotoData = null; document.getElementById('postPhotoPreview').classList.add('hidden'); document.getElementById('postPhotoInput').value = ''; }
+
+    function toggleRecording() { alert('🎙️ La grabación de voz funciona desde dispositivos con micrófono habilitado.'); }
+
+    function submitPost() {
+        const text = document.getElementById('postInput').value.trim();
+        if (!text && !postPhotoData) return;
+        entries.unshift({
+            id: Date.now(), userId: currentUser.id, userName: currentUser.name, userAvatar: currentUser.avatar,
+            time: 'Hace un momento', text: text || '📸 Compartió una foto', photo: postPhotoData, likes: {'❤️':0}, comments: []
+        });
+        document.getElementById('postInput').value = '';
+        removePostPhoto();
+        save(); renderFeed();
+    }
+
+    function renderFeed() {
+        const list = document.getElementById('feedList'); list.innerHTML = '';
+        entries.forEach(e => {
+            const isOwner = e.userId === 'sofia';
+            const comments = e.comments || [];
+            let commentsHtml = comments.map(c => `
+                <div class="flex items-start gap-2 p-2 rounded-lg glass-dark">
+                    <img src="${c.userAvatar}" class="w-5 h-5 rounded-md object-cover mt-0.5">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between"><span class="text-[10px] font-bold">${c.userName}</span><span class="text-[8px] opacity-40">${c.time}</span></div>
+                        <p class="text-[11px] opacity-85 mt-0.5">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            const card = document.createElement('article');
+            card.className = 'glass-strong glass-hover rounded-2xl p-5 transition-all space-y-3 fade-in cursor-default';
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <img src="${e.userAvatar}" class="w-8 h-8 rounded-xl object-cover avatar-ring">
+                        <div>
+                            <h4 class="text-xs font-bold ${isOwner ? 'text-pink-600' : 'text-purple-600'}">${e.userName}</h4>
+                            <p class="text-[9px] opacity-40">${e.time}</p>
+                        </div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded-full glass text-[10px] font-medium opacity-60">💡 Dato</span>
+                </div>
+                <p class="text-xs leading-relaxed opacity-85">${e.text}</p>
+                ${e.photo ? `<div class="rounded-xl overflow-hidden max-h-56"><img src="${e.photo}" class="w-full h-auto object-cover rounded-xl"></div>` : ''}
+                <div class="flex items-center justify-between pt-2.5 border-t border-black/5 text-xs">
+                    <div class="flex items-center gap-1">
+                        <button onclick="react(${e.id},'❤️')" class="glass px-2 py-1 rounded-lg hover:bg-white/60 transition-all cursor-pointer text-[11px]">❤️ ${e.likes['❤️']||0}</button>
+                        <button onclick="react(${e.id},'💡')" class="glass px-2 py-1 rounded-lg hover:bg-white/60 transition-all cursor-pointer text-[11px]">💡 ${e.likes['💡']||0}</button>
+                        <button onclick="react(${e.id},'🙌')" class="glass px-2 py-1 rounded-lg hover:bg-white/60 transition-all cursor-pointer text-[11px]">🙌 ${e.likes['🙌']||0}</button>
+                        <button onclick="toggleComments(${e.id})" class="glass px-2 py-1 rounded-lg hover:bg-white/60 transition-all cursor-pointer text-[11px] flex items-center gap-1"><i data-lucide="message-circle" class="w-3 h-3"></i>${comments.length}</button>
+                    </div>
+                    <button onclick="this.innerHTML='<i data-lucide=\\'check\\' class=\\'w-3 h-3\\'></i> Guardado'; lucide.createIcons();" class="opacity-50 hover:opacity-100 flex items-center gap-1 text-[11px] cursor-pointer"><i data-lucide="bookmark" class="w-3 h-3"></i></button>
+                </div>
+                <div id="comments_${e.id}" class="hidden pt-2 border-t border-black/5 space-y-2">
+                    <div class="space-y-1.5 max-h-40 overflow-y-auto">${commentsHtml || '<p class="text-[10px] opacity-40 py-1">Aún no hay comentarios</p>'}</div>
+                    <div class="flex gap-2">
+                        <input type="text" id="ci_${e.id}" placeholder="Escribe un comentario..." class="input-glass flex-1 px-3 py-1.5 rounded-lg text-[11px]">
+                        <button onclick="postComment(${e.id})" class="btn-primary px-3 py-1.5 rounded-lg text-[11px] cursor-pointer">Enviar</button>
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+        lucide.createIcons();
+    }
+
+    function react(id, emoji) {
+        const e = entries.find(x => x.id === id); if (!e) return;
+        e.likes[emoji] = (e.likes[emoji]||0) + 1;
+        const target = e.userId === currentUser.id ? Object.keys(PROFILES_DB).find(k => k !== currentUser.id) : e.userId;
+        if (target) addNotif(target, `${currentUser.name} reaccionó ${emoji} a tu publicación`, currentUser.avatar);
+        save(); renderFeed();
+    }
+
+    function toggleComments(id) { document.getElementById('comments_' + id)?.classList.toggle('hidden'); }
+
+    function postComment(id) {
+        const input = document.getElementById('ci_' + id);
+        const text = input.value.trim(); if (!text) return;
+        const e = entries.find(x => x.id === id); if (!e) return;
+        if (!e.comments) e.comments = [];
+        e.comments.push({ id: Date.now(), userName: currentUser.name, userAvatar: currentUser.avatar, text, time: 'Ahora' });
+        const target = e.userId === currentUser.id ? Object.keys(PROFILES_DB).find(k => k !== currentUser.id) : e.userId;
+        if (target) addNotif(target, `${currentUser.name}: "${text}"`, currentUser.avatar);
+        save(); renderFeed();
+    }
+
+    /* ===== HABITS ===== */
+    function renderHabits() {
+        const c = document.getElementById('habitsContainer'); c.innerHTML = '';
+        ['sofia','mateo'].forEach(k => {
+            const p = PROFILES_DB[k];
+            const list = habits.filter(h => h.userId === k);
+            const done = list.filter(h => h.done).length;
+            const pct = list.length ? Math.round(done/list.length*100) : 0;
+            const col = document.createElement('div');
+            col.className = 'glass rounded-xl p-4 space-y-3';
+            col.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2"><img src="${p.avatar}" class="w-5 h-5 rounded-md object-cover"><span class="text-xs font-bold">${p.name}</span></div>
+                    <span class="text-[11px] font-mono font-bold ${pct>=50?'text-emerald-600':'text-pink-600'}">${done}/${list.length} (${pct}%)</span>
+                </div>
+                ${list.map(h => `
+                    <div class="flex items-center justify-between p-2 rounded-lg glass-dark">
+                        <label class="flex items-center gap-2 text-[11px] font-medium cursor-pointer flex-1">
+                            <input type="checkbox" ${h.done?'checked':''} onchange="toggleHabit(${h.id})" class="w-3.5 h-3.5 rounded accent-pink-500">
+                            <span class="${h.done?'line-through opacity-40':''}">${h.text}</span>
+                        </label>
+                        <button onclick="deleteHabit(${h.id})" class="opacity-30 hover:opacity-80 p-1 cursor-pointer"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                `).join('')}
+            `;
+            c.appendChild(col);
+        });
+        lucide.createIcons();
+    }
+
+    function toggleHabit(id) { const h = habits.find(x => x.id === id); if (h) { h.done = !h.done; save(); renderHabits(); } }
+    function deleteHabit(id) { habits = habits.filter(h => h.id !== id); save(); renderHabits(); }
+    function addHabit() {
+        const text = prompt('Nueva meta para ' + currentUser.name + ':');
+        if (text) { habits.push({ id: Date.now(), userId: currentUser.id, text, done: false }); save(); renderHabits(); }
+    }
+
+    /* ===== GALLERY ===== */
+    function renderGallery(filter='all') {
+        const g = document.getElementById('galleryGrid'); g.innerHTML = '';
+        ['fAll','fPhotos','fAudio'].forEach(id => document.getElementById(id).className = 'px-2.5 py-1 rounded-md opacity-60 hover:opacity-100');
+        document.getElementById({all:'fAll',photos:'fPhotos',audio:'fAudio'}[filter]).className = 'px-2.5 py-1 rounded-md font-semibold bg-white shadow-sm';
+        let items = entries;
+        if (filter === 'photos') items = entries.filter(e => e.photo);
+        if (items.length === 0) { g.innerHTML = '<p class="col-span-full text-center py-8 text-xs opacity-40">Sin contenido para este filtro</p>'; return; }
+        items.forEach(e => {
+            const d = document.createElement('div');
+            d.className = 'glass rounded-xl p-3 space-y-2';
+            d.innerHTML = `
+                <div class="flex items-center justify-between text-[10px]">
+                    <span class="font-bold ${e.userId==='sofia'?'text-pink-600':'text-purple-600'}">${e.userName}</span>
+                    <span class="opacity-40">${e.time}</span>
+                </div>
+                ${e.photo ? `<img src="${e.photo}" class="w-full h-28 object-cover rounded-lg">` : ''}
+                <p class="text-[11px] opacity-80 line-clamp-2">${e.text}</p>
+            `;
+            g.appendChild(d);
+        });
+    }
+    function filterGallery(f) { renderGallery(f); }
+
+    /* ===== NOTIFICATIONS ===== */
+    function addNotif(userId, text, avatar) {
+        notifications.unshift({ id: Date.now(), userId, text, avatar, time: 'Ahora', read: false });
+        save(); updateNotifBadge();
+    }
+    function updateNotifBadge() {
+        const b = document.getElementById('notifBadge');
+        const count = notifications.filter(n => !n.read && (n.userId === currentUser?.id)).length;
+        if (count > 0) { b.innerText = count; b.classList.remove('hidden'); } else { b.classList.add('hidden'); }
+    }
+    function openNotifications() {
+        const list = document.getElementById('notifList'); list.innerHTML = '';
+        const mine = notifications.filter(n => n.userId === currentUser?.id);
+        if (mine.length === 0) { list.innerHTML = '<p class="text-xs text-center py-6 opacity-40">Sin notificaciones</p>'; }
+        else { mine.forEach(n => {
+            n.read = true;
+            const d = document.createElement('div');
+            d.className = 'flex items-center gap-2.5 p-2.5 rounded-xl glass-dark';
+            d.innerHTML = `<img src="${n.avatar}" class="w-7 h-7 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-medium opacity-85">${n.text}</p><p class="text-[9px] opacity-40 mt-0.5">${n.time}</p></div>`;
+            list.appendChild(d);
+        }); }
+        save(); updateNotifBadge();
+        document.getElementById('notifModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeNotifications() { document.getElementById('notifModal').classList.add('hidden'); }
+
+    function toggleTheme() { /* Future dark mode toggle */ }
+    </script>
+</body>
+</html>
