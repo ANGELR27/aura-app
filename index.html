@@ -1240,14 +1240,16 @@
 
             <!-- Notifications & Actions -->
             <div class="space-y-3 pt-2 border-t border-pink-200/40 dark:border-orange-500/20">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-bold">Notificaciones Push</p>
-                        <p class="text-[10px] opacity-60">Alertas de mensajes y fotos</p>
+                <div class="space-y-1.5 p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-pink-200/40 dark:border-orange-500/20">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold">Estado de Notificaciones</p>
+                            <p id="notifPermStatusLabel" class="text-[10px] opacity-75 mt-0.5"></p>
+                        </div>
+                        <button onclick="testNotificationNow()" class="tactile-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-orange-400 cursor-pointer flex items-center gap-1">
+                            <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i> Probar 🔔
+                        </button>
                     </div>
-                    <button onclick="forceEnableNotifications()" class="tactile-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-orange-400 cursor-pointer">
-                        Activar 🔔
-                    </button>
                 </div>
 
                 <div class="flex items-center justify-between">
@@ -1486,6 +1488,26 @@
         }
     }
 
+    /* ===== CHAT SCROLL TO BOTTOM HELPER ===== */
+    function scrollChatToBottom(forceInstant = false) {
+        const list = document.getElementById('chatMessagesList');
+        if (!list) return;
+        if (forceInstant) {
+            list.scrollTop = list.scrollHeight;
+        } else {
+            list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+        }
+        requestAnimationFrame(() => {
+            if (list) list.scrollTop = list.scrollHeight;
+        });
+        setTimeout(() => {
+            if (list) list.scrollTop = list.scrollHeight;
+        }, 120);
+        setTimeout(() => {
+            if (list) list.scrollTop = list.scrollHeight;
+        }, 350);
+    }
+
     /* ===== NATIVE DEVICE NOTIFICATIONS (Service Worker & Web Push) ===== */
     function checkNotificationBanner() {
         const banner = document.getElementById('notifBanner');
@@ -1495,6 +1517,37 @@
         } else {
             banner.classList.add('hidden');
         }
+        updateNotificationSettingsStatus();
+    }
+
+    function updateNotificationSettingsStatus() {
+        const statusEl = document.getElementById('notifPermStatusLabel');
+        if (!statusEl) return;
+        if (!('Notification' in window)) {
+            statusEl.innerHTML = '<span class="text-rose-400 font-bold">No soportado en este navegador</span>';
+        } else if (Notification.permission === 'granted') {
+            statusEl.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Activas y Permitidas ✓</span>';
+        } else if (Notification.permission === 'denied') {
+            statusEl.innerHTML = '<span class="text-rose-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Bloqueadas en el navegador</span>';
+        } else {
+            statusEl.innerHTML = '<span class="text-amber-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Pendiente de permiso</span>';
+        }
+    }
+
+    async function testNotificationNow() {
+        triggerHaptic();
+        if (!('Notification' in window)) {
+            return toast('Tu navegador no soporta notificaciones nativas', 'error');
+        }
+        if (Notification.permission !== 'granted') {
+            const res = await Notification.requestPermission();
+            checkNotificationBanner();
+            if (res !== 'granted') {
+                return toast('Debes permitir las notificaciones en el navegador', 'error');
+            }
+        }
+        toast('Enviando notificación de prueba... 🔔', 'info');
+        await sendNativeNotification('Prueba de Aura 💕', '¡Las notificaciones están funcionando perfectamente en tu dispositivo! ✨');
     }
 
     async function forceEnableNotifications() {
@@ -1502,13 +1555,13 @@
         triggerHaptic();
         try {
             const res = await Notification.requestPermission();
+            checkNotificationBanner();
             if (res === 'granted') {
-                checkNotificationBanner();
                 toast('¡Notificaciones activadas con éxito! 🔔', 'success');
                 confetti({ particleCount: 30, spread: 60 });
-                sendNativeNotification('Aura Conectada', 'Notificaciones activadas correctamente 💕');
+                await sendNativeNotification('Aura Conectada 💕', 'Notificaciones activadas y listas para recibir mensajes ✨');
             } else {
-                toast('Permiso de notificaciones denegado', 'info');
+                toast('Permiso de notificaciones no concedido', 'info');
             }
         } catch(e) {
             console.warn(e);
@@ -1522,7 +1575,7 @@
         }
     }
 
-    function sendNativeNotification(title, body, icon) {
+    async function sendNativeNotification(title, body, icon) {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
@@ -1541,7 +1594,7 @@
             tag: 'aura-msg-' + Date.now(),
             renotify: true,
             vibrate: [200, 100, 200],
-            data: { url: window.location.origin + window.location.pathname },
+            data: { url: window.location.href },
             actions: isMsg ? [
                 { action: 'reply', type: 'text', title: '💌 Responder', placeholder: 'Escribe un mensaje...' },
                 { action: 'open_chat', title: '💬 Ver Chat' }
@@ -1550,29 +1603,20 @@
             ]
         };
 
-        // 1. Post to Service Worker (background reliability & quick reply support)
-        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({
-                type: 'SHOW_NOTIFICATION',
-                title: title,
-                body: body,
-                icon: iconUrl,
-                tag: notifOptions.tag,
-                actions: notifOptions.actions
-            });
-        }
-
-        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-            navigator.serviceWorker.ready.then(reg => {
-                try {
-                    reg.showNotification(title, notifOptions);
-                } catch(e) {
-                    console.warn('reg.showNotification:', e);
+        // 1. Primary: ServiceWorker Registration Notification (Standard for PWAs & Android Background)
+        if ('serviceWorker' in navigator) {
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                if (reg && reg.showNotification) {
+                    await reg.showNotification(title, notifOptions);
+                    return;
                 }
-            });
+            } catch(e) {
+                console.warn('SW showNotification fallback:', e);
+            }
         }
 
-        // 2. Standard fallback
+        // 2. Fallback: Window Notification constructor
         try {
             const notif = new Notification(title, notifOptions);
             notif.onclick = () => { 
@@ -1582,7 +1626,7 @@
             };
             setTimeout(() => notif.close(), 6000);
         } catch(e) {
-            console.warn('Notification constructor fallback:', e);
+            console.warn('Window Notification fallback error:', e);
         }
     }
 
@@ -1827,13 +1871,15 @@
         if (tab === 'chat') {
             document.getElementById('dockChatBadge')?.classList.add('hidden');
             loadChatMessages();
+            scrollChatToBottom(true);
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         if (tab === 'profile') renderFacebookProfile();
         if (tab === 'gallery') loadGallery();
         if (tab === 'habits') loadHabits();
         if (tab === 'bible') loadBibleChapter(currentBibleBookId, currentBibleChapter);
         lucide.createIcons();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     /* ===== BIBLE DAILY VERSE & READER LINK ===== */
@@ -3126,9 +3172,7 @@
 
         list.innerHTML = html;
         lucide.createIcons();
-        setTimeout(() => {
-            list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
-        }, 50);
+        scrollChatToBottom(false);
     }
 
     function insertChatEmoji(emoji) {
