@@ -3390,15 +3390,18 @@
                 // Check Quoted Reply
                 let rawText = m.text || '';
                 let replyQuoteHtml = '';
-                const replyMatch = rawText.match(/^\[REPLY:([^|]+)\|([^\]]+)\]([\s\S]*)$/);
+                const replyMatch = rawText.match(/^\[REPLY:([^|]+)\|([\s\S]*?)\]([\s\S]*)$/);
                 if (replyMatch) {
                     const qAuthor = replyMatch[1];
                     const qPreview = replyMatch[2];
                     rawText = replyMatch[3];
                     replyQuoteHtml = `
-                        <div class="mb-1 p-1.5 px-2.5 rounded-xl text-[10.5px] bg-black/10 dark:bg-white/10 border-l-2 ${isMe ? 'border-white/80 text-white/90' : 'border-pink-500 dark:border-orange-400 text-neutral-800 dark:text-neutral-200'}">
-                            <p class="font-bold text-[9px] opacity-90">${escapeHtml(qAuthor)}</p>
-                            <p class="truncate opacity-75 text-[10px]">${escapeHtml(qPreview)}</p>
+                        <div class="mb-1.5 p-1.5 px-2.5 rounded-xl text-[10.5px] ${isMe ? 'bg-white/20 text-white border-l-2 border-white' : 'bg-pink-500/10 dark:bg-orange-500/10 border-l-2 border-pink-500 dark:border-orange-400 text-neutral-800 dark:text-neutral-100'} backdrop-blur-sm shadow-xs space-y-0.5 select-none">
+                            <div class="flex items-center gap-1 font-bold text-[9.5px] ${isMe ? 'text-white' : 'text-pink-600 dark:text-orange-400'}">
+                                <i data-lucide="reply" class="w-2.5 h-2.5"></i>
+                                <span>${escapeHtml(qAuthor)}</span>
+                            </div>
+                            <p class="truncate opacity-85 text-[10px] leading-tight">${escapeHtml(qPreview)}</p>
                         </div>
                     `;
                 }
