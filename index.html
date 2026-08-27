@@ -254,6 +254,27 @@
         .record-pulse { animation: pulseRec 1.2s ease-in-out infinite; }
         @keyframes pulseRec { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 
+        /* Chat Auto-fade Scrollbar */
+        #chatMessagesList {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(234, 88, 12, 0.25) transparent;
+        }
+        #chatMessagesList::-webkit-scrollbar {
+            width: 4px;
+        }
+        #chatMessagesList::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #chatMessagesList::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 9999px;
+            transition: background 0.3s ease;
+        }
+        #chatMessagesList:hover::-webkit-scrollbar-thumb,
+        #chatMessagesList:active::-webkit-scrollbar-thumb {
+            background: rgba(234, 88, 12, 0.35);
+        }
+
         /* Story Floating Reactions & Comments */
         @keyframes floatReaction {
             0% { transform: translateY(0) scale(0.6) rotate(0deg); opacity: 0; }
@@ -673,8 +694,8 @@
         </section>
 
         <!-- ========================== VIEW: CHAT PRIVADO (Ángel & Roxana) ========================== -->
-        <section id="viewChat" class="hidden fade-in" style="overflow:hidden;">
-            <div class="glass-card rounded-[2.5rem] p-4 sm:p-5 shadow-2xl flex flex-col border border-pink-200/50 dark:border-orange-500/20" style="height:calc(100vh - 160px); max-height:680px;">
+        <section id="viewChat" class="hidden fade-in mb-24" style="overflow:hidden;">
+            <div class="glass-card rounded-[2.5rem] p-4 sm:p-5 shadow-2xl flex flex-col border border-pink-200/50 dark:border-orange-500/20" style="height:calc(100vh - 225px); max-height:620px; min-height:420px;">
                 <!-- Chat Partner Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-pink-200/40 dark:border-orange-500/20 px-1">
                     <div class="flex items-center gap-3">
@@ -2795,27 +2816,32 @@
 
             if (isAudio) {
                 const match = m.text.match(/^\[AUDIO:?(\d+)?\](.*)$/);
-                const duration = match && match[1] ? `${match[1]}s` : 'Nota de voz';
+                const rawDuration = match && match[1] ? parseInt(match[1]) : 0;
+                const durationMins = Math.floor(rawDuration / 60);
+                const durationSecs = rawDuration % 60;
+                const durationStr = rawDuration > 0 ? `${durationMins}:${durationSecs < 10 ? '0' : ''}${durationSecs}` : '0:03';
                 const audioData = match ? match[2] : m.text.replace('[AUDIO]', '');
 
                 contentHtml = `
-                    <div class="flex items-center gap-2.5 py-1">
-                        <button onclick="togglePlayVoiceNote(this, '${audioData}')" class="w-8 h-8 rounded-full ${isMe ? 'bg-white/20 text-white' : 'bg-pink-500 dark:bg-orange-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0 shadow-sm" title="Reproducir audio">
-                            <i data-lucide="play" class="w-4 h-4 voice-play-icon"></i>
+                    <div class="flex items-center gap-3 py-1 px-0.5">
+                        <button onclick="togglePlayVoiceNote(this, '${audioData}')" class="w-10 h-10 rounded-full ${isMe ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-gradient-to-tr from-pink-500 to-rose-500 dark:from-orange-500 dark:to-amber-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all flex-shrink-0 shadow-md" title="Reproducir">
+                            <i data-lucide="play" class="w-4.5 h-4.5 voice-play-icon ml-0.5"></i>
                         </button>
-                        <div class="flex-1 min-w-[110px] space-y-1">
-                            <div class="flex items-center gap-0.5 h-3 opacity-85">
+                        <div class="flex-1 flex flex-col justify-center gap-1 min-w-[125px]">
+                            <!-- Centered sound bars -->
+                            <div class="flex items-center gap-1 h-4 opacity-90">
                                 <span class="w-1 h-2 bg-current rounded-full"></span>
-                                <span class="w-1 h-3 bg-current rounded-full animate-pulse"></span>
-                                <span class="w-1 h-1.5 bg-current rounded-full"></span>
                                 <span class="w-1 h-3.5 bg-current rounded-full"></span>
-                                <span class="w-1 h-2 bg-current rounded-full animate-pulse"></span>
+                                <span class="w-1 h-2 bg-current rounded-full"></span>
+                                <span class="w-1 h-4.5 bg-current rounded-full animate-pulse"></span>
+                                <span class="w-1 h-3 bg-current rounded-full"></span>
                                 <span class="w-1 h-4 bg-current rounded-full"></span>
-                                <span class="w-1 h-2.5 bg-current rounded-full"></span>
-                                <span class="w-1 h-1 bg-current rounded-full"></span>
+                                <span class="w-1 h-2 bg-current rounded-full"></span>
+                                <span class="w-1 h-3 bg-current rounded-full"></span>
+                                <span class="w-1 h-1.5 bg-current rounded-full"></span>
                             </div>
-                            <div class="flex justify-between items-center text-[9px] ${isMe ? 'text-white/80' : 'opacity-60'} font-mono">
-                                <span>🎙️ Nota de voz (${duration})</span>
+                            <div class="text-[9px] ${isMe ? 'text-white/75' : 'opacity-55'} font-mono">
+                                <span>${durationStr}</span>
                             </div>
                         </div>
                     </div>
@@ -2853,7 +2879,9 @@
 
         list.innerHTML = html;
         lucide.createIcons();
-        list.scrollTop = list.scrollHeight;
+        setTimeout(() => {
+            list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+        }, 50);
     }
 
     function insertChatEmoji(emoji) {
