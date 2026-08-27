@@ -2456,12 +2456,15 @@
 
     function getPartnerProfile() {
         const profiles = Object.values(allProfiles);
-        const partner = profiles.find(p => p.id !== currentUser.id);
+        let partner = profiles.find(p => p.id && p.id !== currentUser.id && p.email !== currentUser.email);
         if (partner) return partner;
+
+        const myName = (currentUser.name || '').toLowerCase();
+        const isAngel = myName.includes('angel') || (currentUser.email || '').includes('angel');
         return {
-            id: currentUser.name === 'Ángel' ? 'roxana_id' : 'angel_id',
-            name: currentUser.name === 'Ángel' ? 'Roxana' : 'Ángel',
-            avatar_url: currentUser.name === 'Ángel' 
+            id: isAngel ? 'roxana_id' : 'angel_id',
+            name: isAngel ? 'Roxana' : 'Ángel',
+            avatar_url: isAngel 
                 ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
                 : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80'
         };
@@ -2474,21 +2477,21 @@
         if (nameEl) nameEl.innerText = partner.name;
         if (avEl) avEl.src = partner.avatar_url;
 
-        let messages = [];
+        let serverMessages = [];
 
-        // 1. Try querying messages table
+        // 1. Query remote 'messages' table
         try {
-            const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: true }).limit(80);
+            const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: true }).limit(100);
             if (!error && data && data.length > 0) {
-                messages = messages.concat(data);
+                serverMessages = serverMessages.concat(data);
             }
         } catch(e) {
             console.warn("Messages query error:", e);
         }
 
-        // 2. Dual fallback query on posts table with [CHAT] tag
+        // 2. Query remote 'posts' table with [CHAT] tag
         try {
-            const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(80);
+            const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(100);
             if (!postErr && chatPosts && chatPosts.length > 0) {
                 const mapped = chatPosts.filter(p => p.text?.includes('[CHAT]')).map(p => ({
                     id: p.id,
@@ -2496,27 +2499,28 @@
                     text: p.text.replace(/^\[CHAT\]\s*/, ''),
                     created_at: p.created_at
                 }));
-                messages = messages.concat(mapped);
+                serverMessages = serverMessages.concat(mapped);
             }
         } catch(e) {
             console.warn("Chat posts query:", e);
         }
 
-        // 3. Fallback to local storage cache if offline
+        // 3. Merge with local cached messages so messages are NEVER lost
         const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
-        messages = messages.concat(localChat);
+        const combined = [...localChat, ...currentChatMessages, ...serverMessages];
 
-        // 4. Deduplicate and sort
+        // 4. Deduplicate by unique key (id or content+time)
         const seen = new Set();
-        currentChatMessages = messages.filter(m => {
-            const key = m.id || (m.sender_id + '_' + m.created_at + '_' + m.text);
+        currentChatMessages = combined.filter(m => {
+            if (!m || !m.text) return false;
+            const key = m.id || (m.sender_id + '_' + m.text);
             if (seen.has(key)) return false;
             seen.add(key);
             return true;
         }).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-        // Save local backup
-        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-60)));
+        // Save persistent local storage
+        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));
 
         renderChatMessages();
     }
@@ -2524,8 +2528,8 @@
     function renderChatMessages() {
         const list = document.getElementById('chatMessagesList');
         if (!list) return;
-        
-        if (currentChatMessages.length === 0) {
+
+        if (!currentChatMessages || currentChatMessages.length === 0) {
             list.innerHTML = `
                 <div class="text-center py-14 space-y-2">
                     <div class="w-12 h-12 rounded-full mx-auto bg-pink-100 dark:bg-orange-950/60 text-pink-500 dark:text-orange-400 flex items-center justify-center text-2xl shadow-sm">💌</div>
@@ -2540,8 +2544,9 @@
         let html = '';
 
         currentChatMessages.forEach(m => {
-            const isMe = (m.sender_id === currentUser.id || m.user_id === currentUser.id);
-            const timeStr = new Date(m.created_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const isMe = (m.sender_id === currentUser.id || m.user_id === currentUser.id || m.sender_id === 'me');
+            const msgDate = m.created_at ? new Date(m.created_at) : new Date();
+            const timeStr = msgDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 
             if (isMe) {
                 html += `
@@ -2591,7 +2596,7 @@
 
     async function handleSendChatMessage(customText) {
         const input = document.getElementById('chatInput');
-        const text = customText || input?.value.trim();
+        const text = (customText || input?.value || '').trim();
         if (!text) return;
         if (!customText && input) input.value = '';
 
@@ -2600,16 +2605,18 @@
 
         const partner = getPartnerProfile();
         const tempMsg = {
-            id: 'temp_' + Date.now(),
+            id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             sender_id: currentUser.id,
             text: text,
             created_at: new Date().toISOString()
         };
+
+        // Add to local state immediately
         currentChatMessages.push(tempMsg);
-        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-60)));
+        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));
         renderChatMessages();
 
-        // 1. Insert into 'messages' table
+        // 1. Insert into remote 'messages' table
         try {
             await sb.from('messages').insert({
                 sender_id: currentUser.id,
@@ -2620,7 +2627,7 @@
             console.warn("Messages insert error:", e);
         }
 
-        // 2. Dual fallback on 'posts' table with [CHAT]
+        // 2. Dual fallback on remote 'posts' table with [CHAT] tag
         try {
             await sb.from('posts').insert({
                 user_id: currentUser.id,
@@ -2632,12 +2639,13 @@
             console.warn("Chat post insert error:", e);
         }
 
-        setTimeout(() => loadChatMessages(), 600);
+        // Re-sync with server after short delay
+        setTimeout(() => loadChatMessages(), 1000);
     }
 
     function escapeHtml(text) {
         const div = document.createElement('div');
-        div.innerText = text;
+        div.innerText = text || '';
         return div.innerHTML;
     }
 
