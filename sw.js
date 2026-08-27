@@ -1,12 +1,20 @@
 // Aura App - Service Worker for Background Notifications & PWA
-const CACHE_NAME = 'aura-cache-v2';
+const CACHE_NAME = 'aura-cache-v4';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
+    event.waitUntil(
+        caches.keys().then((keyList) => {
+            return Promise.all(keyList.map((key) => {
+                if (key !== CACHE_NAME) {
+                    return caches.delete(key);
+                }
+            }));
+        }).then(() => clients.claim())
+    );
 });
 
 // Handle incoming notification message from main page
@@ -24,8 +32,8 @@ self.addEventListener('message', (event) => {
             vibrate: [200, 100, 200],
             data: { url: self.registration.scope },
             actions: [
-                { action: 'open_chat', title: '💬 Abrir Chat' },
-                { action: 'reply', title: '💌 Responder', type: 'text', placeholder: 'Escribe tu respuesta...' }
+                { action: 'reply', title: 'Responder', type: 'text', placeholder: 'Escribe tu respuesta...' },
+                { action: 'open_chat', title: 'Abrir Chat' }
             ]
         });
     }

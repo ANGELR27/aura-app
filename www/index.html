@@ -1746,7 +1746,7 @@
         }
     }
 
-    async function sendNativeNotification(title, body, icon) {
+    async function sendNativeNotification(title, body, icon, isMsg = true) {
         playNotificationSound();
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
@@ -1757,7 +1757,6 @@
         }
 
         const iconUrl = icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>';
-        const isMsg = title.includes('Mensaje') || title.includes('Chat') || title.includes('💬') || title.includes('Nota');
         const notifOptions = {
             body: body,
             icon: iconUrl,
@@ -1767,10 +1766,10 @@
             vibrate: [200, 100, 200],
             data: { url: window.location.href },
             actions: isMsg ? [
-                { action: 'reply', type: 'text', title: '💌 Responder', placeholder: 'Escribe un mensaje...' },
-                { action: 'open_chat', title: '💬 Ver Chat' }
+                { action: 'reply', type: 'text', title: 'Responder', placeholder: 'Escribe tu respuesta...' },
+                { action: 'open_chat', title: 'Abrir Chat' }
             ] : [
-                { action: 'open_app', title: '✨ Abrir Aura' }
+                { action: 'open_app', title: 'Abrir Aura' }
             ]
         };
 
@@ -1808,8 +1807,9 @@
 
         // Register Service Worker & Interactive Notifications Listener
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=4.4').then(reg => {
                 console.log('SW Registered:', reg.scope);
+                reg.update();
             }).catch(e => console.warn('SW err:', e));
 
             navigator.serviceWorker.addEventListener('message', event => {
