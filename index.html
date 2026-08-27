@@ -468,7 +468,7 @@
                             <i data-lucide="camera" class="w-6 h-6"></i>
                         </div>
                         <span class="text-[10px] font-bold opacity-75">Subir foto</span>
-                        <input type="file" id="storyFileInput" accept="image/*" class="hidden" onchange="prepareStoryModal(event)">
+                        <input type="file" id="storyFileInput" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
                     </label>
                     <div id="dynamicStories" class="flex items-center gap-3"></div>
                 </div>
@@ -1827,59 +1827,56 @@
     }
 
     /* ===== STORIES & MOMENTS (24h) ===== */
-    let pendingStoryBase64 = null;
+    /* ===== STORIES & MOMENTS (24h) ===== */
+    async function handleStoryUpload(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-    async function prepareStoryModal(e) {
-        const file = e.target.files[0]; if (!file) return;
-        toast('Cargando foto...', 'info');
-        pendingStoryBase64 = await compressImageFile(file, 1080, 0.85);
-        document.getElementById('storyPreviewImg').src = pendingStoryBase64;
-        document.getElementById('storyCaptionInput').value = '';
-        document.getElementById('storyUploadModal').classList.remove('hidden');
-        document.getElementById('storyFileInput').value = '';
-        lucide.createIcons();
-    }
+        toast('Procesando foto... 📸', 'info');
+        triggerHaptic();
 
-    function closeStoryUploadModal() {
-        pendingStoryBase64 = null;
-        document.getElementById('storyUploadModal').classList.add('hidden');
-    }
-
-    async function submitStoryModal() {
-        if (!pendingStoryBase64) return;
-        const caption = document.getElementById('storyCaptionInput').value.trim() || 'Momento del día ✨';
-        const btn = document.getElementById('btnSubmitStory');
-        btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Compartiendo...';
-
-        // 1. Insert into remote 'stories' table
         try {
-            await sb.from('stories').insert({
-                user_id: currentUser.id,
-                photo_url: pendingStoryBase64,
-                caption: caption
-            });
-        } catch(err) {
-            console.warn("Story cloud table insert:", err);
-        }
+            const compressedBase64 = await compressImageFile(file, 1080, 0.85);
+            if (!compressedBase64) {
+                return toast('No se pudo procesar la foto', 'error');
+            }
 
-        // 2. Also insert into remote 'posts' table with [STORY] tag to guarantee 100% remote cloud sync across all devices
-        try {
-            await sb.from('posts').insert({
-                user_id: currentUser.id,
-                text: `[STORY] ${caption}`,
-                photo_url: pendingStoryBase64,
-                audio_url: null,
-                reactions: {}
-            });
-        } catch(err) {
-            console.warn("Story cloud post insert:", err);
-        }
+            toast('Publicando en la nube... ✨', 'info');
 
-        btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Compartir';
-        closeStoryUploadModal();
-        await loadStories();
-        toast('¡Momento compartido en la nube! 📸', 'success');
-        confetti({ particleCount: 35, spread: 60 });
+            // 1. Insert into remote 'stories' table
+            try {
+                await sb.from('stories').insert({
+                    user_id: currentUser.id,
+                    photo_url: compressedBase64,
+                    caption: 'Momento compartido ✨'
+                });
+            } catch(err) {
+                console.warn("Story cloud table insert:", err);
+            }
+
+            // 2. Also insert into remote 'posts' table with [STORY] tag to guarantee 100% remote cloud sync across all devices
+            try {
+                await sb.from('posts').insert({
+                    user_id: currentUser.id,
+                    text: '[STORY] Momento compartido ✨',
+                    photo_url: compressedBase64,
+                    audio_url: null,
+                    reactions: {}
+                });
+            } catch(err) {
+                console.warn("Story cloud post insert:", err);
+            }
+
+            // Reset file input value so user can re-upload anytime
+            e.target.value = '';
+
+            await loadStories();
+            toast('¡Historia publicada con éxito! 📸', 'success');
+            confetti({ particleCount: 40, spread: 65 });
+        } catch(err) {
+            console.error("Story upload error:", err);
+            toast('Error al publicar historia', 'error');
+        }
     }
 
     async function loadStories() {
