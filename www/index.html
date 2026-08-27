@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aura">
-    <meta name="theme-color" content="#f43f7d">
+    <meta name="theme-color" content="#f43f7d" id="themeColorMeta">
     <link rel="icon" type="image/svg+xml" href="https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d">
     <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d">
     <!-- Tailwind CSS -->
@@ -28,6 +28,7 @@
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -52,23 +53,41 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #fdf0f4 0%, #fbe4ee 20%, #f3e8f9 50%, #eaf0fb 80%, #f6effa 100%);
-            background-attachment: fixed;
             min-height: 100vh;
-            color: #2e1d32;
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            transition: background 0.4s ease, color 0.3s ease;
         }
 
-        /* ===== Pinterest Luxe Glassmorphism ===== */
+        /* ===== Light Theme (Rose Gold & Lavender) ===== */
+        body:not(.dark) {
+            background: linear-gradient(135deg, #fdf0f4 0%, #fbe4ee 20%, #f3e8f9 50%, #eaf0fb 80%, #f6effa 100%);
+            background-attachment: fixed;
+            color: #2e1d32;
+        }
+
+        /* ===== Dark Theme (Mate Charcoal & Warm Terracotta Orange Glow) ===== */
+        body.dark {
+            background: linear-gradient(135deg, #0e0d10 0%, #16141a 35%, #1c1822 70%, #121016 100%);
+            background-attachment: fixed;
+            color: #f5edf7;
+        }
+
+        /* Glassmorphism Classes */
         .glass {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(28px) saturate(190%);
             -webkit-backdrop-filter: blur(28px) saturate(190%);
             border: 1px solid rgba(255, 255, 255, 0.75);
-            box-shadow: 0 10px 35px -5px rgba(220, 140, 180, 0.12), 
-                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 35px -5px rgba(220, 140, 180, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        .dark .glass {
+            background: rgba(24, 21, 29, 0.75);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border: 1px solid rgba(249, 115, 22, 0.15);
+            box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .glass-card {
@@ -76,8 +95,14 @@
             backdrop-filter: blur(32px) saturate(200%);
             -webkit-backdrop-filter: blur(32px) saturate(200%);
             border: 1px solid rgba(255, 255, 255, 0.85);
-            box-shadow: 0 14px 45px -8px rgba(210, 130, 170, 0.14),
-                        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+            box-shadow: 0 14px 45px -8px rgba(210, 130, 170, 0.14), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+        }
+        .dark .glass-card {
+            background: rgba(28, 24, 34, 0.82);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            box-shadow: 0 14px 45px -8px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.07);
         }
 
         .glass-subtle {
@@ -86,14 +111,27 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
+        .dark .glass-subtle {
+            background: rgba(38, 33, 46, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
         .glass-hover {
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .glass-hover:hover {
-            background: rgba(255, 255, 255, 0.88);
             transform: translateY(-2px);
+        }
+        body:not(.dark) .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.88);
             box-shadow: 0 20px 50px -10px rgba(220, 120, 170, 0.22);
+        }
+        body.dark .glass-hover:hover {
+            background: rgba(34, 29, 42, 0.9);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
+            border-color: rgba(249, 115, 22, 0.35);
         }
 
         .glass-dock {
@@ -101,10 +139,17 @@
             backdrop-filter: blur(36px) saturate(210%);
             -webkit-backdrop-filter: blur(36px) saturate(210%);
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 20px 50px -10px rgba(180, 100, 150, 0.25),
-                        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 50px -10px rgba(180, 100, 150, 0.25), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+        }
+        .dark .glass-dock {
+            background: rgba(20, 17, 25, 0.88);
+            backdrop-filter: blur(36px) saturate(210%);
+            -webkit-backdrop-filter: blur(36px) saturate(210%);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.08);
         }
 
+        /* Buttons */
         .btn-gradient {
             background: linear-gradient(135deg, #f43f7d 0%, #d946ef 50%, #8b5cf6 100%);
             color: #ffffff;
@@ -113,9 +158,12 @@
             box-shadow: 0 8px 25px -4px rgba(244, 63, 125, 0.45);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .dark .btn-gradient {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+            box-shadow: 0 8px 25px -4px rgba(249, 115, 22, 0.45);
+        }
         .btn-gradient:hover {
             transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 12px 30px -4px rgba(244, 63, 125, 0.6);
         }
         .btn-gradient:active {
             transform: translateY(0) scale(0.98);
@@ -127,8 +175,12 @@
             border: 1px solid rgba(255, 255, 255, 0.7);
             transition: all 0.25s ease;
         }
+        .dark .btn-ghost-pill {
+            background: rgba(40, 35, 48, 0.65);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            color: #fed7aa;
+        }
         .btn-ghost-pill:hover {
-            background: rgba(255, 255, 255, 0.9);
             transform: translateY(-1.5px);
         }
 
@@ -138,11 +190,21 @@
             border: 1.5px solid rgba(230, 210, 225, 0.6);
             transition: all 0.3s ease;
         }
+        .dark .input-glass-luxe {
+            background: rgba(30, 26, 36, 0.85);
+            border: 1.5px solid rgba(249, 115, 22, 0.25);
+            color: #fff;
+        }
         .input-glass-luxe:focus {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             border-color: #f43f7d;
             box-shadow: 0 0 0 4px rgba(244, 63, 125, 0.15);
             outline: none;
+        }
+        .dark .input-glass-luxe:focus {
+            background: rgba(38, 33, 46, 0.95);
+            border-color: #f97316;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
         }
 
         .story-ring-active {
@@ -151,52 +213,30 @@
             border-radius: 9999px;
             box-shadow: 0 4px 15px rgba(244, 63, 125, 0.3);
         }
-
-        /* ===== Highlights & Annotations in Bible Reader ===== */
-        .highlight-yellow {
-            background: linear-gradient(120deg, rgba(254, 240, 138, 0.7) 0%, rgba(253, 224, 71, 0.6) 100%);
-            border-bottom: 2px solid #eab308;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-        .highlight-pink {
-            background: linear-gradient(120deg, rgba(254, 205, 220, 0.75) 0%, rgba(244, 114, 182, 0.5) 100%);
-            border-bottom: 2px solid #ec4899;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-        .highlight-green {
-            background: linear-gradient(120deg, rgba(187, 247, 208, 0.75) 0%, rgba(134, 239, 172, 0.5) 100%);
-            border-bottom: 2px solid #22c55e;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-        .highlight-blue {
-            background: linear-gradient(120deg, rgba(186, 230, 253, 0.75) 0%, rgba(125, 211, 252, 0.5) 100%);
-            border-bottom: 2px solid #0284c7;
-            border-radius: 4px;
-            padding: 2px 4px;
+        .dark .story-ring-active {
+            background: linear-gradient(135deg, #f97316, #fb923c, #ea580c);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
         }
 
-        .verse-focus-ring {
-            animation: pulseFocus 2.5s ease-out;
-        }
-        @keyframes pulseFocus {
-            0% { background-color: rgba(244, 63, 125, 0.25); transform: scale(1.02); }
-            100% { background-color: transparent; transform: scale(1); }
-        }
+        /* Highlights */
+        .highlight-yellow { background: rgba(254, 240, 138, 0.7); border-bottom: 2px solid #eab308; border-radius: 4px; padding: 2px 4px; }
+        .dark .highlight-yellow { background: rgba(234, 179, 8, 0.35); border-bottom: 2px solid #facc15; }
+        .highlight-pink { background: rgba(254, 205, 220, 0.75); border-bottom: 2px solid #ec4899; border-radius: 4px; padding: 2px 4px; }
+        .dark .highlight-pink { background: rgba(244, 63, 125, 0.35); border-bottom: 2px solid #fb7185; }
+        .highlight-green { background: rgba(187, 247, 208, 0.75); border-bottom: 2px solid #22c55e; border-radius: 4px; padding: 2px 4px; }
+        .dark .highlight-green { background: rgba(34, 197, 94, 0.35); border-bottom: 2px solid #4ade80; }
+        .highlight-blue { background: rgba(186, 230, 253, 0.75); border-bottom: 2px solid #0284c7; border-radius: 4px; padding: 2px 4px; }
+        .dark .highlight-blue { background: rgba(14, 165, 233, 0.35); border-bottom: 2px solid #38bdf8; }
 
-        /* Ambient floating orbs */
-        .ambient-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(75px);
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
-        }
+        .verse-focus-ring { animation: pulseFocus 2.5s ease-out; }
+        @keyframes pulseFocus { 0% { background-color: rgba(244, 63, 125, 0.25); } 100% { background-color: transparent; } }
+
+        /* Ambient Orbs */
+        .ambient-orb { position: fixed; border-radius: 50%; filter: blur(75px); pointer-events: none; z-index: 0; opacity: 0.5; }
         .orb-1 { width: 380px; height: 380px; top: -80px; left: -80px; background: radial-gradient(circle, #fecddc, #f472b6); }
+        .dark .orb-1 { background: radial-gradient(circle, #7c2d12, #ea580c); opacity: 0.35; }
         .orb-2 { width: 420px; height: 420px; bottom: 10%; right: -100px; background: radial-gradient(circle, #e9d5ff, #c084fc); }
+        .dark .orb-2 { background: radial-gradient(circle, #4c1d95, #7c3aed); opacity: 0.25; }
 
         .fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -204,36 +244,19 @@
         .slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(35px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        .spinner {
-            border: 2.5px solid rgba(244, 63, 125, 0.2);
-            border-top: 2.5px solid #f43f7d;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
+        .spinner { border: 2.5px solid rgba(244, 63, 125, 0.2); border-top: 2.5px solid #f43f7d; border-radius: 50%; width: 18px; height: 18px; animation: spin 0.8s linear infinite; display: inline-block; }
+        .dark .spinner { border-color: rgba(249, 115, 22, 0.2); border-top-color: #f97316; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .pulse-live {
-            width: 8px; height: 8px; border-radius: 50%; background: #10b981;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            animation: pulseEmerald 2s infinite;
-        }
-        @keyframes pulseEmerald {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
+        .pulse-live { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulseEmerald 2s infinite; }
+        @keyframes pulseEmerald { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
         .record-pulse { animation: pulseRec 1.2s ease-in-out infinite; }
-        @keyframes pulseRec {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.15); opacity: 0.8; }
-        }
+        @keyframes pulseRec { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: rgba(220, 160, 190, 0.35); border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.35); }
     </style>
 </head>
 <body class="min-h-screen antialiased relative">
@@ -244,16 +267,16 @@
     <div id="toastContainer" class="fixed top-4 right-4 left-4 sm:left-auto sm:w-80 z-[120] space-y-2 pointer-events-none"></div>
 
     <!-- ========================== LOADING SPINNER ========================== -->
-    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-100/90 via-purple-50/90 to-blue-50/90 backdrop-blur-md">
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-100/90 via-purple-50/90 to-blue-50/90 dark:from-neutral-950/95 dark:via-neutral-900/95 dark:to-neutral-950/95 backdrop-blur-md">
         <div class="text-center space-y-4 slide-up">
             <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center shadow-xl">
-                <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
-                    <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                <div class="w-full h-full rounded-full bg-white dark:bg-neutral-900 flex items-center justify-center">
+                    <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
                 </div>
             </div>
             <div class="flex items-center justify-center gap-2">
                 <div class="spinner"></div>
-                <p class="text-xs font-bold text-pink-900/70">Conectando con Aura...</p>
+                <p class="text-xs font-bold text-pink-900/70 dark:text-orange-300">Conectando con Aura...</p>
             </div>
         </div>
     </div>
@@ -263,34 +286,34 @@
         <div class="glass-card rounded-[2.5rem] p-7 sm:p-9 max-w-md w-full slide-up space-y-6 my-auto">
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center">
-                    <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
-                        <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                    <div class="w-full h-full rounded-full bg-white dark:bg-neutral-900 flex items-center justify-center">
+                        <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
                     </div>
                 </div>
-                <h1 class="text-2xl font-display font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 bg-clip-text text-transparent">Aura</h1>
-                <p class="text-xs font-medium text-pink-950/60 flex items-center justify-center gap-1.5">
+                <h1 class="text-2xl font-display font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 dark:from-orange-400 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent">Aura</h1>
+                <p class="text-xs font-medium text-pink-950/60 dark:text-orange-200/60 flex items-center justify-center gap-1.5">
                     <span class="pulse-live"></span> Red Social Privada & Estudio Bíblico
                 </p>
             </div>
 
-            <div class="flex items-center bg-black/5 p-1 rounded-2xl glass-subtle">
-                <button onclick="setAuthMode('login')" id="authTabLogin" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600">Iniciar Sesión</button>
-                <button onclick="setAuthMode('register')" id="authTabRegister" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950">Crear Cuenta</button>
+            <div class="flex items-center bg-black/5 dark:bg-white/5 p-1 rounded-2xl glass-subtle">
+                <button onclick="setAuthMode('login')" id="authTabLogin" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white dark:bg-neutral-800 shadow-sm text-pink-600 dark:text-orange-400">Iniciar Sesión</button>
+                <button onclick="setAuthMode('register')" id="authTabRegister" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 dark:text-orange-200/60 hover:text-pink-950">Crear Cuenta</button>
             </div>
 
             <!-- Login Form -->
             <div id="loginForm" class="space-y-3.5">
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <label class="text-[11px] font-bold text-pink-950/60 dark:text-orange-300/70 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
                     <div class="relative">
-                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 dark:text-orange-400"></i>
                         <input type="email" id="loginEmail" placeholder="tu@correo.com" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <label class="text-[11px] font-bold text-pink-950/60 dark:text-orange-300/70 uppercase tracking-wider mb-1 block">Contraseña</label>
                     <div class="relative">
-                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 dark:text-orange-400"></i>
                         <input type="password" id="loginPassword" placeholder="••••••••" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
                     </div>
                 </div>
@@ -302,23 +325,23 @@
             <!-- Register Form -->
             <div id="registerForm" class="space-y-3.5" style="display:none;">
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Tu Nombre</label>
+                    <label class="text-[11px] font-bold text-pink-950/60 dark:text-orange-300/70 uppercase tracking-wider mb-1 block">Tu Nombre</label>
                     <div class="relative">
-                        <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 dark:text-orange-400"></i>
                         <input type="text" id="registerName" placeholder="Ej: Roxana" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <label class="text-[11px] font-bold text-pink-950/60 dark:text-orange-300/70 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
                     <div class="relative">
-                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 dark:text-orange-400"></i>
                         <input type="email" id="registerEmail" placeholder="tu@correo.com" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <label class="text-[11px] font-bold text-pink-950/60 dark:text-orange-300/70 uppercase tracking-wider mb-1 block">Contraseña</label>
                     <div class="relative">
-                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 dark:text-orange-400"></i>
                         <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
                     </div>
                 </div>
@@ -328,25 +351,25 @@
             </div>
 
             <!-- Quick Access -->
-            <div class="pt-4 border-t border-pink-200/50">
-                <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-900/40 mb-3 text-center">Acceso Rápido en 1 Clic</p>
+            <div class="pt-4 border-t border-pink-200/50 dark:border-orange-500/20">
+                <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-900/40 dark:text-orange-400/50 mb-3 text-center">Acceso Rápido en 1 Clic</p>
                 <div class="grid grid-cols-2 gap-2.5">
-                    <button onclick="quickLogin('roxana@aura.app','roxana123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 transition-all cursor-pointer text-left group">
+                    <button onclick="quickLogin('roxana@aura.app','roxana123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 dark:hover:bg-neutral-800 transition-all cursor-pointer text-left group">
                         <div class="w-9 h-9 rounded-xl overflow-hidden story-ring-active flex-shrink-0">
                             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-full h-full object-cover">
                         </div>
                         <div class="truncate">
-                            <p class="text-xs font-bold text-pink-600 group-hover:text-pink-700">Roxana</p>
-                            <p class="text-[9px] text-pink-950/50 truncate">Ella</p>
+                            <p class="text-xs font-bold text-pink-600 dark:text-orange-400 group-hover:underline">Roxana</p>
+                            <p class="text-[9px] opacity-60 truncate">Ella</p>
                         </div>
                     </button>
-                    <button onclick="quickLogin('angel@aura.app','angel123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 transition-all cursor-pointer text-left group">
+                    <button onclick="quickLogin('angel@aura.app','angel123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 dark:hover:bg-neutral-800 transition-all cursor-pointer text-left group">
                         <div class="w-9 h-9 rounded-xl overflow-hidden story-ring-active flex-shrink-0">
                             <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" class="w-full h-full object-cover">
                         </div>
                         <div class="truncate">
-                            <p class="text-xs font-bold text-purple-600 group-hover:text-purple-700">Ángel</p>
-                            <p class="text-[9px] text-pink-950/50 truncate">Él</p>
+                            <p class="text-xs font-bold text-purple-600 dark:text-amber-400 group-hover:underline">Ángel</p>
+                            <p class="text-[9px] opacity-60 truncate">Él</p>
                         </div>
                     </button>
                 </div>
@@ -361,29 +384,35 @@
         <header class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
             <div class="flex items-center gap-2.5 sm:gap-3">
                 <div class="w-10 h-10 rounded-2xl story-ring-active flex items-center justify-center flex-shrink-0 shadow-md">
-                    <div class="w-full h-full rounded-xl bg-white flex items-center justify-center">
-                        <span class="font-display font-black text-lg bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                    <div class="w-full h-full rounded-xl bg-white dark:bg-neutral-900 flex items-center justify-center">
+                        <span class="font-display font-black text-lg bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
                     </div>
                 </div>
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <h1 class="text-base sm:text-lg font-display font-extrabold tracking-tight text-pink-950">Aura</h1>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100/80 text-pink-600 font-bold border border-pink-200/60">v4.0</span>
+                        <h1 class="text-base sm:text-lg font-display font-extrabold tracking-tight">Aura</h1>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100 dark:bg-orange-950/80 text-pink-600 dark:text-orange-400 font-bold border border-pink-200/60 dark:border-orange-500/30">v4.2</span>
                     </div>
-                    <p class="text-[10px] text-pink-950/50 font-medium flex items-center gap-1.5">
-                        <span class="pulse-live"></span> Conectado en la nube
+                    <p class="text-[10px] opacity-60 font-medium flex items-center gap-1.5">
+                        <span class="pulse-live"></span> En vivo en la nube
                     </p>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="loadPosts(); triggerHaptic();" class="glass p-2.5 rounded-xl hover:bg-white transition-all cursor-pointer text-pink-700" title="Actualizar">
+                <!-- Theme Mode Switcher (Light / Dark Mate Naranja) -->
+                <button onclick="toggleThemeMode()" class="glass p-2.5 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-pink-700 dark:text-orange-400" title="Cambiar Tema (Claro / Oscuro Mate Naranja)">
+                    <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+
+                <button onclick="loadPosts(); triggerHaptic();" class="glass p-2.5 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-pink-700 dark:text-orange-400" title="Actualizar">
                     <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                 </button>
-                <button onclick="openProfileMenu()" class="flex items-center gap-2 glass p-1.5 pr-3 rounded-2xl hover:bg-white transition-all cursor-pointer border border-white/80 shadow-sm">
-                    <img id="headerAvatar" src="" class="w-7 h-7 rounded-xl object-cover border border-pink-300">
-                    <span id="headerName" class="text-xs font-bold text-pink-900 max-w-[80px] truncate"></span>
-                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-pink-400"></i>
+                <button onclick="openProfileMenu()" class="flex items-center gap-2 glass p-1.5 pr-3 rounded-2xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer border border-white/80 dark:border-white/10 shadow-sm">
+                    <img id="headerAvatar" src="" class="w-7 h-7 rounded-xl object-cover border border-pink-300 dark:border-orange-400">
+                    <span id="headerName" class="text-xs font-bold max-w-[80px] truncate"></span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60"></i>
                 </button>
             </div>
         </header>
@@ -394,17 +423,17 @@
             <!-- Stories Moments Bar -->
             <section class="glass-card rounded-[2rem] p-3.5 fade-in">
                 <div class="flex items-center justify-between mb-2.5 px-1">
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-pink-950/50 flex items-center gap-1.5">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
                         <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día
                     </span>
-                    <span class="text-[10px] font-bold text-pink-600/70">Hoy</span>
+                    <span class="text-[10px] font-bold text-pink-600 dark:text-orange-400">Hoy</span>
                 </div>
                 <div class="flex items-center gap-3 overflow-x-auto pb-1 pt-1 px-1 scrollbar-none" id="storiesList">
                     <label class="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
-                        <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 flex items-center justify-center text-pink-500 group-hover:scale-105 transition-all shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 dark:border-orange-400 flex items-center justify-center text-pink-500 dark:text-orange-400 group-hover:scale-105 transition-all shadow-sm">
                             <i data-lucide="plus" class="w-6 h-6"></i>
                         </div>
-                        <span class="text-[10px] font-bold text-pink-950/70">Subir foto</span>
+                        <span class="text-[10px] font-bold opacity-75">Subir foto</span>
                         <input type="file" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
                     </label>
                     <div id="dynamicStories" class="flex items-center gap-3"></div>
@@ -413,32 +442,32 @@
 
             <!-- Versículo del Día Interactivo (Clic abre el pasaje completo) -->
             <section class="glass-card rounded-[2.2rem] p-5 sm:p-6 fade-in relative overflow-hidden group cursor-pointer" onclick="openVerseInBibleReader(currentVerseData)" title="Toca para leer el capítulo completo">
-                <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-gradient-to-tr from-pink-300/30 to-purple-300/30 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-gradient-to-tr from-pink-300/30 to-purple-300/30 dark:from-orange-500/15 dark:to-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
                 
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shadow-sm">
+                        <div class="w-8 h-8 rounded-xl bg-pink-100 dark:bg-orange-900/60 text-pink-600 dark:text-orange-400 flex items-center justify-center shadow-sm">
                             <i data-lucide="book-open" class="w-4 h-4"></i>
                         </div>
                         <div>
-                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-pink-900/40">Pasaje Bíblico del Día</p>
-                            <p class="text-xs font-bold text-pink-950" id="verseDate"></p>
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold opacity-50">Pasaje Bíblico del Día</p>
+                            <p class="text-xs font-bold" id="verseDate"></p>
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="event.stopPropagation(); shuffleVerse();" class="btn-ghost-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-pink-700 flex items-center gap-1.5 cursor-pointer">
+                        <button type="button" onclick="event.stopPropagation(); shuffleVerse();" class="btn-ghost-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-pink-700 dark:text-orange-300 flex items-center gap-1.5 cursor-pointer">
                             <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Cambiar
                         </button>
                     </div>
                 </div>
 
-                <div class="pl-4 border-l-2.5 border-pink-400/60 my-3.5 py-1">
-                    <blockquote id="verseText" class="text-xs sm:text-sm font-serif italic leading-relaxed text-pink-950/90"></blockquote>
-                    <p id="verseRef" class="text-[11px] font-extrabold text-pink-600 mt-2 flex items-center gap-1"></p>
+                <div class="pl-4 border-l-2.5 border-pink-400/60 dark:border-orange-500/60 my-3.5 py-1">
+                    <blockquote id="verseText" class="text-xs sm:text-sm font-serif italic leading-relaxed opacity-90"></blockquote>
+                    <p id="verseRef" class="text-[11px] font-extrabold text-pink-600 dark:text-orange-400 mt-2 flex items-center gap-1"></p>
                 </div>
 
-                <div class="flex items-center justify-between pt-3 border-t border-pink-200/40">
-                    <span class="text-[11px] font-bold text-pink-600 flex items-center gap-1 group-hover:underline">
+                <div class="flex items-center justify-between pt-3 border-t border-pink-200/40 dark:border-orange-500/20">
+                    <span class="text-[11px] font-bold text-pink-600 dark:text-orange-400 flex items-center gap-1 group-hover:underline">
                         <i data-lucide="book" class="w-3.5 h-3.5"></i> Toca para leer capítulo completo
                     </span>
                     <div class="flex gap-2" id="verseStatusButtons" onclick="event.stopPropagation()"></div>
@@ -450,44 +479,50 @@
                 <div class="flex items-center gap-3 mb-3.5">
                     <img id="postAvatar" src="" class="w-9 h-9 rounded-2xl object-cover story-ring-active shadow-sm">
                     <div>
-                        <p class="text-xs sm:text-sm font-extrabold text-pink-950">¿Qué descubriste o aprendiste hoy?</p>
-                        <p class="text-[10px] font-medium text-pink-600" id="postAsLabel"></p>
+                        <p class="text-xs sm:text-sm font-extrabold">¿Qué descubriste o aprendiste hoy?</p>
+                        <p class="text-[10px] font-medium text-pink-600 dark:text-orange-400" id="postAsLabel"></p>
                     </div>
                 </div>
 
-                <textarea id="postInput" rows="3" placeholder="Comparte un dato curioso, reflexión, pasaje o momento lindo para leer juntos..." class="input-glass-luxe w-full p-4 rounded-2xl text-xs sm:text-sm resize-none mb-3 font-medium placeholder:text-pink-900/35"></textarea>
+                <textarea id="postInput" rows="3" placeholder="Comparte un dato curioso, reflexión, pasaje o momento lindo para leer juntos..." class="input-glass-luxe w-full p-4 rounded-2xl text-xs sm:text-sm resize-none mb-3 font-medium placeholder:opacity-40"></textarea>
 
                 <!-- Voice Recording Bar -->
-                <div id="voiceRecorderBar" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-rose-300/60 animate-pulse">
+                <div id="voiceRecorderBar" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-rose-300/60 dark:border-orange-400/60 animate-pulse">
                     <div class="flex items-center gap-2.5">
                         <span class="w-3 h-3 rounded-full bg-rose-500 record-pulse"></span>
-                        <span class="text-xs font-bold text-rose-600">Grabando Nota de Voz...</span>
-                        <span id="recordTimer" class="text-xs font-mono font-bold text-rose-700">00:00</span>
+                        <span class="text-xs font-bold text-rose-600 dark:text-orange-400">Grabando Nota de Voz...</span>
+                        <span id="recordTimer" class="text-xs font-mono font-bold">00:00</span>
                     </div>
                     <button onclick="stopRecordingAudio()" class="px-3 py-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer">
                         Listo
                     </button>
                 </div>
 
-                <div id="audioPreviewContainer" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-pink-300">
-                    <div class="flex items-center gap-2 text-pink-700">
+                <div id="audioPreviewContainer" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-pink-300 dark:border-orange-500">
+                    <div class="flex items-center gap-2 text-pink-700 dark:text-orange-400">
                         <i data-lucide="mic" class="w-4 h-4"></i>
                         <span class="text-xs font-bold">Nota de voz lista</span>
                         <audio id="audioPreviewElement" controls class="h-8 max-w-[180px] sm:max-w-xs"></audio>
                     </div>
-                    <button onclick="discardRecordedAudio()" class="p-1 text-pink-400 hover:text-rose-600 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button onclick="discardRecordedAudio()" class="p-1 opacity-50 hover:opacity-100 hover:text-rose-500 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+
+                <!-- Photo Preview Thumbnail -->
+                <div id="postPhotoPreview" class="hidden mb-3 relative inline-block rounded-2xl overflow-hidden max-w-[220px] shadow-md border border-pink-200 dark:border-orange-500/30">
+                    <img id="postPhotoImg" src="" class="w-full h-auto rounded-2xl object-cover max-h-48">
+                    <button onclick="removePostPhoto()" class="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white p-1.5 rounded-full text-xs cursor-pointer"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                 </div>
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center gap-2">
-                        <label class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-pink-700 cursor-pointer flex items-center gap-1.5">
-                            <i data-lucide="image" class="w-4 h-4 text-pink-500"></i>
+                        <label class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-pink-700 dark:text-orange-300 cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="image" class="w-4 h-4 text-pink-500 dark:text-orange-400"></i>
                             <span>Foto</span>
                             <input type="file" id="postPhotoInput" accept="image/*" class="hidden" onchange="handlePostPhoto(event)">
                         </label>
-                        <button type="button" onclick="startRecordingAudio()" id="btnVoiceRecord" class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-purple-700 cursor-pointer flex items-center gap-1.5">
-                            <i data-lucide="mic" class="w-4 h-4 text-purple-500"></i>
+                        <button type="button" onclick="startRecordingAudio()" id="btnVoiceRecord" class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-purple-700 dark:text-amber-300 cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="mic" class="w-4 h-4 text-purple-500 dark:text-amber-400"></i>
                             <span>Voz</span>
                         </button>
                     </div>
@@ -496,73 +531,56 @@
                         <span>Publicar</span>
                     </button>
                 </div>
-
-                <div id="postPhotoPreview" class="hidden mt-3 relative inline-block rounded-2xl overflow-hidden max-w-[220px] shadow-md">
-                    <img id="postPhotoImg" src="" class="w-full h-auto rounded-2xl object-cover">
-                    <button onclick="removePostPhoto()" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-full text-xs cursor-pointer"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                </div>
             </section>
 
             <!-- Feed list -->
             <div class="space-y-4" id="feedList"></div>
         </main>
 
-        <!-- ========================== VIEW: BIBLE READER & STUDY (BIBLIA) ========================== -->
+        <!-- ========================== VIEW: BIBLE READER & STUDY ========================== -->
         <section id="viewBible" class="hidden space-y-5 fade-in">
-            <!-- Reader Header Controls -->
             <div class="glass-card rounded-[2.2rem] p-4 sm:p-5 shadow-xl shadow-pink-500/5">
                 <div class="flex items-center justify-between mb-3">
-                    <!-- Book and Chapter Selector Button -->
-                    <button onclick="openBookSelectorModal()" class="glass px-4 py-2 rounded-2xl flex items-center gap-2 text-xs sm:text-sm font-extrabold text-pink-950 hover:bg-white transition-all cursor-pointer border border-pink-200/60 shadow-sm">
-                        <i data-lucide="book-marked" class="w-4 h-4 text-pink-500"></i>
+                    <button onclick="openBookSelectorModal()" class="glass px-4 py-2 rounded-2xl flex items-center gap-2 text-xs sm:text-sm font-extrabold hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer border border-pink-200/60 dark:border-orange-500/30 shadow-sm">
+                        <i data-lucide="book-marked" class="w-4 h-4 text-pink-500 dark:text-orange-400"></i>
                         <span id="bibleCurrentBookLabel">Filipenses 4</span>
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-pink-400"></i>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60"></i>
                     </button>
 
-                    <!-- Text Size & Version controls -->
                     <div class="flex items-center gap-1.5">
-                        <button onclick="changeFontSize(-1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold text-pink-900 cursor-pointer" title="Reducir letra">A-</button>
-                        <button onclick="changeFontSize(1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold text-pink-900 cursor-pointer" title="Aumentar letra">A+</button>
-                        <span class="text-[10px] px-2 py-1 rounded-xl bg-pink-100 text-pink-700 font-extrabold">RVR1960</span>
+                        <button onclick="changeFontSize(-1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer" title="Reducir letra">A-</button>
+                        <button onclick="changeFontSize(1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer" title="Aumentar letra">A+</button>
+                        <span class="text-[10px] px-2 py-1 rounded-xl bg-pink-100 dark:bg-orange-950 text-pink-700 dark:text-orange-400 font-extrabold">RVR1960</span>
                     </div>
                 </div>
 
-                <!-- Chapter Fast Stepper -->
-                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 text-xs font-bold">
-                    <button onclick="prevChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 cursor-pointer">
+                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 dark:border-orange-500/20 text-xs font-bold">
+                    <button onclick="prevChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 dark:text-orange-300 cursor-pointer">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i> Cap. Anterior
                     </button>
-                    <span id="chapterIndicator" class="text-pink-950/60 font-semibold text-[11px]">Capítulo 4</span>
-                    <button onclick="nextChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 cursor-pointer">
+                    <span id="chapterIndicator" class="opacity-60 font-semibold text-[11px]">Capítulo 4</span>
+                    <button onclick="nextChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 dark:text-orange-300 cursor-pointer">
                         Cap. Siguiente <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Chapter Verses Text Reader Card -->
             <div class="glass-card rounded-[2.5rem] p-6 sm:p-8 space-y-4 shadow-xl">
-                <div class="text-center pb-3 border-b border-pink-200/50">
-                    <h2 id="bibleTitleHeading" class="text-xl sm:text-2xl font-serif font-bold text-pink-950">Filipenses 4</h2>
-                    <p class="text-[11px] font-medium text-pink-900/50 mt-0.5">Toca cualquier versículo para resaltar, estudiar o compartir ✨</p>
+                <div class="text-center pb-3 border-b border-pink-200/50 dark:border-orange-500/20">
+                    <h2 id="bibleTitleHeading" class="text-xl sm:text-2xl font-serif font-bold">Filipenses 4</h2>
+                    <p class="text-[11px] font-medium opacity-50 mt-0.5">Toca cualquier versículo para resaltar, estudiar o compartir ✨</p>
                 </div>
 
-                <!-- Text Content Area -->
-                <div id="bibleVersesContent" class="space-y-3 font-serif text-sm sm:text-base leading-relaxed text-pink-950/90" style="font-size: 16px;">
-                    <div class="text-center py-12">
-                        <div class="spinner mx-auto"></div>
-                        <p class="text-xs font-sans font-semibold text-pink-900/50 mt-3">Cargando pasaje bíblico...</p>
-                    </div>
-                </div>
+                <div id="bibleVersesContent" class="space-y-3 font-serif text-sm sm:text-base leading-relaxed" style="font-size: 16px;"></div>
 
-                <!-- Bottom Navigation Buttons -->
-                <div class="flex items-center justify-between pt-6 border-t border-pink-200/40">
-                    <button onclick="prevChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                <div class="flex items-center justify-between pt-6 border-t border-pink-200/40 dark:border-orange-500/20">
+                    <button onclick="prevChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 dark:text-orange-300 flex items-center gap-1 cursor-pointer">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i> Anterior
                     </button>
-                    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="glass px-3 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="glass px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1 cursor-pointer">
                         <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> Arriba
                     </button>
-                    <button onclick="nextChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                    <button onclick="nextChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 dark:text-orange-300 flex items-center gap-1 cursor-pointer">
                         Siguiente <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -574,10 +592,10 @@
             <div class="glass-card rounded-[2.2rem] p-5 sm:p-6 shadow-xl shadow-pink-500/5">
                 <div class="flex items-center justify-between mb-5">
                     <div>
-                        <h2 class="text-base sm:text-lg font-display font-extrabold text-pink-950">Metas & Hábitos Compartidos</h2>
-                        <p class="text-[11px] font-medium text-pink-900/50">Progreso diario sincronizado en vivo</p>
+                        <h2 class="text-base sm:text-lg font-display font-extrabold">Metas & Hábitos Compartidos</h2>
+                        <p class="text-[11px] font-medium opacity-60">Progreso diario sincronizado en vivo</p>
                     </div>
-                    <button onclick="addHabit()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
+                    <button onclick="openNewHabitModal()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
                         <i data-lucide="plus" class="w-4 h-4"></i> Nueva Meta
                     </button>
                 </div>
@@ -590,8 +608,8 @@
             <div class="glass-card rounded-[2.2rem] p-5 sm:p-6 shadow-xl shadow-pink-500/5">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-base sm:text-lg font-display font-extrabold text-pink-950">Galería de Recuerdos</h2>
-                        <p class="text-[11px] font-medium text-pink-900/50">Álbum multimedia de todas las fotos compartidas</p>
+                        <h2 class="text-base sm:text-lg font-display font-extrabold">Galería de Recuerdos</h2>
+                        <p class="text-[11px] font-medium opacity-60">Álbum multimedia de todas las fotos compartidas</p>
                     </div>
                 </div>
                 <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
@@ -600,97 +618,116 @@
 
         <!-- ========================== FLOATING iOS GLASS DOCK ========================== -->
         <nav class="fixed bottom-4 left-4 right-4 max-w-lg mx-auto glass-dock rounded-[2rem] p-2 flex items-center justify-around z-40 shadow-2xl">
-            <button onclick="switchTab('feed')" id="dockFeed" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold">
+            <button onclick="switchTab('feed')" id="dockFeed" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 dark:text-orange-400 bg-pink-100/70 dark:bg-orange-950/70 font-bold">
                 <i data-lucide="sparkles" class="w-5 h-5"></i>
                 <span class="text-[10px]">Diario</span>
             </button>
-            <button onclick="switchTab('bible')" id="dockBible" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="switchTab('bible')" id="dockBible" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
                 <i data-lucide="book-open" class="w-5 h-5"></i>
                 <span class="text-[10px]">Biblia</span>
             </button>
-            <button onclick="switchTab('gallery')" id="dockGallery" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="switchTab('gallery')" id="dockGallery" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
                 <i data-lucide="image" class="w-5 h-5"></i>
                 <span class="text-[10px]">Galería</span>
             </button>
-            <button onclick="switchTab('habits')" id="dockHabits" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="switchTab('habits')" id="dockHabits" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
                 <i data-lucide="target" class="w-5 h-5"></i>
                 <span class="text-[10px]">Metas</span>
             </button>
-            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="text-[10px]">Perfil</span>
             </button>
         </nav>
     </div>
 
-    <!-- ========================== BIBLE VERSE TOOLBAR MODAL / DRAWER ========================== -->
-    <div id="verseToolbarModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
-        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-4 shadow-2xl">
+    <!-- ========================== CUSTOM GLASS MODAL: NUEVA META ========================== -->
+    <div id="newHabitModal" class="fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-4 shadow-2xl border border-pink-200/60 dark:border-orange-500/30">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-pink-500"></span>
-                    <h4 id="verseToolbarHeading" class="font-display font-extrabold text-sm text-pink-950">Versículo</h4>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-pink-100 dark:bg-orange-950 text-pink-600 dark:text-orange-400 flex items-center justify-center">
+                        <i data-lucide="target" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-base">Nueva Meta Diaria</h3>
                 </div>
-                <button onclick="closeVerseToolbar()" class="p-1.5 rounded-xl glass hover:bg-white cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-900"></i></button>
+                <button onclick="closeNewHabitModal()" class="p-1.5 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
             </div>
-
-            <p id="verseToolbarSnippet" class="text-xs font-serif italic text-pink-950/80 bg-pink-50/60 p-3 rounded-xl line-clamp-2"></p>
-
-            <!-- Color Highlighters -->
             <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider text-pink-900/50 mb-2">Subrayar / Resaltar con color</p>
-                <div class="flex items-center justify-around gap-2">
-                    <button onclick="applyVerseHighlight('yellow')" class="w-8 h-8 rounded-full bg-yellow-300 border-2 border-yellow-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Amarillo"></button>
-                    <button onclick="applyVerseHighlight('pink')" class="w-8 h-8 rounded-full bg-pink-300 border-2 border-pink-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Rosa"></button>
-                    <button onclick="applyVerseHighlight('green')" class="w-8 h-8 rounded-full bg-emerald-300 border-2 border-emerald-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Verde"></button>
-                    <button onclick="applyVerseHighlight('blue')" class="w-8 h-8 rounded-full bg-sky-300 border-2 border-sky-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Azul"></button>
-                    <button onclick="applyVerseHighlight('none')" class="w-8 h-8 rounded-full bg-white border border-pink-300 flex items-center justify-center text-pink-400 active:scale-90 transition-all cursor-pointer" title="Quitar subrayado"><i data-lucide="eraser" class="w-4 h-4"></i></button>
-                </div>
+                <label class="text-[11px] font-bold opacity-60 uppercase tracking-wider mb-1 block">¿Qué meta compartirán hoy?</label>
+                <input type="text" id="newHabitInput" placeholder="Ej: Lectura bíblica juntos (15 min)" class="input-glass-luxe w-full px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium" onkeypress="if(event.key==='Enter')confirmAddHabit()">
             </div>
-
-            <!-- Add Note -->
-            <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider text-pink-900/50 mb-1.5">Nota de estudio personal</p>
-                <textarea id="verseNoteInput" rows="2" placeholder="Escribe tu reflexión o apunte sobre este versículo..." class="input-glass-luxe w-full p-3 rounded-xl text-xs resize-none"></textarea>
-            </div>
-
-            <!-- Action buttons -->
-            <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="saveVerseStudyNote()" class="btn-gradient py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-                    <i data-lucide="check" class="w-4 h-4"></i> Guardar Nota
-                </button>
-                <button onclick="shareVerseToFeed()" class="btn-ghost-pill py-2.5 rounded-xl text-xs font-bold text-pink-700 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <i data-lucide="share-2" class="w-4 h-4 text-pink-500"></i> Publicar en Diario
+            <div class="flex gap-2 pt-1">
+                <button onclick="closeNewHabitModal()" class="btn-ghost-pill flex-1 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancelar</button>
+                <button onclick="confirmAddHabit()" class="btn-gradient flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer shadow-md">
+                    <i data-lucide="check" class="w-4 h-4"></i> Guardar Meta
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ========================== BIBLE BOOK & CHAPTER SELECTOR MODAL ========================== -->
+    <!-- ========================== BIBLE VERSE TOOLBAR MODAL ========================== -->
+    <div id="verseToolbarModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-pink-500 dark:bg-orange-500"></span>
+                    <h4 id="verseToolbarHeading" class="font-display font-extrabold text-sm">Versículo</h4>
+                </div>
+                <button onclick="closeVerseToolbar()" class="p-1.5 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
+            </div>
+
+            <p id="verseToolbarSnippet" class="text-xs font-serif italic opacity-85 p-3 rounded-xl glass-subtle line-clamp-2"></p>
+
+            <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-50 mb-2">Subrayar con color</p>
+                <div class="flex items-center justify-around gap-2">
+                    <button onclick="applyVerseHighlight('yellow')" class="w-8 h-8 rounded-full bg-yellow-300 border-2 border-yellow-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Amarillo"></button>
+                    <button onclick="applyVerseHighlight('pink')" class="w-8 h-8 rounded-full bg-pink-300 border-2 border-pink-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Rosa"></button>
+                    <button onclick="applyVerseHighlight('green')" class="w-8 h-8 rounded-full bg-emerald-300 border-2 border-emerald-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Verde"></button>
+                    <button onclick="applyVerseHighlight('blue')" class="w-8 h-8 rounded-full bg-sky-300 border-2 border-sky-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Azul"></button>
+                    <button onclick="applyVerseHighlight('none')" class="w-8 h-8 rounded-full bg-white dark:bg-neutral-800 border border-pink-300 dark:border-orange-500/40 flex items-center justify-center text-pink-500 dark:text-orange-400 active:scale-90 transition-all cursor-pointer" title="Quitar"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-50 mb-1.5">Nota de estudio personal</p>
+                <textarea id="verseNoteInput" rows="2" placeholder="Escribe tu reflexión o apunte..." class="input-glass-luxe w-full p-3 rounded-xl text-xs resize-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="saveVerseStudyNote()" class="btn-gradient py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                    <i data-lucide="check" class="w-4 h-4"></i> Guardar Nota
+                </button>
+                <button onclick="shareVerseToFeed()" class="btn-ghost-pill py-2.5 rounded-xl text-xs font-bold text-pink-700 dark:text-orange-300 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i data-lucide="share-2" class="w-4 h-4 text-pink-500 dark:text-orange-400"></i> Publicar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== BIBLE BOOK & CHAPTER SELECTOR ========================== -->
     <div id="bibleBookSelectorModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="glass-card rounded-[2.5rem] p-6 max-w-md w-full max-h-[85vh] flex flex-col slide-up shadow-2xl">
-            <div class="flex items-center justify-between pb-3 border-b border-pink-200/50">
-                <h3 class="font-display font-extrabold text-base text-pink-950 flex items-center gap-2">
-                    <i data-lucide="book" class="w-4 h-4 text-pink-500"></i> Elegir Libro y Capítulo
+            <div class="flex items-center justify-between pb-3 border-b border-pink-200/50 dark:border-orange-500/20">
+                <h3 class="font-display font-extrabold text-base flex items-center gap-2">
+                    <i data-lucide="book" class="w-4 h-4 text-pink-500 dark:text-orange-400"></i> Elegir Libro y Capítulo
                 </h3>
-                <button onclick="closeBookSelectorModal()" class="p-1.5 rounded-xl glass hover:bg-white cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-900"></i></button>
+                <button onclick="closeBookSelectorModal()" class="p-1.5 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
             </div>
 
-            <!-- Testament Toggle -->
-            <div class="flex items-center bg-black/5 p-1 rounded-2xl glass-subtle my-3">
-                <button onclick="filterBibleTestament('all')" id="tabTestamentAll" class="flex-1 py-1.5 rounded-xl text-xs font-bold bg-white text-pink-600 shadow-sm">Todos</button>
-                <button onclick="filterBibleTestament('nt')" id="tabTestamentNT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60">Nuevo Testamento</button>
-                <button onclick="filterBibleTestament('ot')" id="tabTestamentOT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60">Antiguo Testamento</button>
+            <div class="flex items-center bg-black/5 dark:bg-white/5 p-1 rounded-2xl glass-subtle my-3">
+                <button onclick="filterBibleTestament('all')" id="tabTestamentAll" class="flex-1 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-neutral-800 text-pink-600 dark:text-orange-400 shadow-sm">Todos</button>
+                <button onclick="filterBibleTestament('nt')" id="tabTestamentNT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold opacity-60">Nuevo Test.</button>
+                <button onclick="filterBibleTestament('ot')" id="tabTestamentOT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold opacity-60">Antiguo Test.</button>
             </div>
 
-            <!-- Books Grid -->
             <div class="overflow-y-auto flex-1 pr-1 space-y-2" id="booksListContainer"></div>
 
-            <!-- Chapter Picker Section (Shown when book is selected) -->
-            <div id="chaptersPickerContainer" class="hidden pt-3 border-t border-pink-200/50 space-y-2">
+            <div id="chaptersPickerContainer" class="hidden pt-3 border-t border-pink-200/50 dark:border-orange-500/20 space-y-2">
                 <div class="flex items-center justify-between">
-                    <span id="selectedBookHeading" class="text-xs font-extrabold text-pink-950">Capítulos:</span>
-                    <button onclick="backToBooksList()" class="text-[11px] font-bold text-pink-600 hover:underline">← Cambiar libro</button>
+                    <span id="selectedBookHeading" class="text-xs font-extrabold">Capítulos:</span>
+                    <button onclick="backToBooksList()" class="text-[11px] font-bold text-pink-600 dark:text-orange-400 hover:underline">← Cambiar libro</button>
                 </div>
                 <div id="chaptersGrid" class="grid grid-cols-6 gap-2 max-h-40 overflow-y-auto pr-1"></div>
             </div>
@@ -701,18 +738,18 @@
     <div id="profileMenuModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="glass-card rounded-[2.2rem] p-6 sm:p-7 max-w-sm w-full slide-up space-y-5">
             <div class="flex items-center justify-between">
-                <h3 class="font-display font-extrabold text-base sm:text-lg text-pink-950 flex items-center gap-2">
-                    <i data-lucide="user-circle" class="w-5 h-5 text-pink-500"></i> Mi Perfil
+                <h3 class="font-display font-extrabold text-base sm:text-lg flex items-center gap-2">
+                    <i data-lucide="user-circle" class="w-5 h-5 text-pink-500 dark:text-orange-400"></i> Mi Perfil
                 </h3>
-                <button onclick="closeProfileMenu()" class="p-2 rounded-xl glass hover:bg-white transition-all cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-800"></i></button>
+                <button onclick="closeProfileMenu()" class="p-2 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
             </div>
 
-            <div class="glass rounded-2xl p-4 flex items-center gap-3.5 border border-pink-200/50">
+            <div class="glass rounded-2xl p-4 flex items-center gap-3.5 border border-pink-200/50 dark:border-orange-500/20">
                 <img id="profileAvatar" src="" class="w-14 h-14 rounded-2xl object-cover story-ring-active shadow-md">
                 <div class="truncate">
-                    <p id="profileName" class="font-display font-extrabold text-sm text-pink-950"></p>
-                    <p id="profileEmail" class="text-[11px] text-pink-950/50 font-medium truncate"></p>
-                    <p class="text-[10px] text-emerald-600 font-bold mt-0.5 flex items-center gap-1.5">
+                    <p id="profileName" class="font-display font-extrabold text-sm"></p>
+                    <p id="profileEmail" class="text-[11px] opacity-60 font-medium truncate"></p>
+                    <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1.5">
                         <span class="pulse-live"></span> Sesión activa en la nube
                     </p>
                 </div>
@@ -720,13 +757,13 @@
 
             <div class="space-y-3">
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider">Cambiar Nombre</label>
+                    <label class="text-[11px] font-bold opacity-60 uppercase tracking-wider">Cambiar Nombre</label>
                     <input type="text" id="editName" class="input-glass-luxe w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold mt-1">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider">Foto de Perfil</label>
+                    <label class="text-[11px] font-bold opacity-60 uppercase tracking-wider">Foto de Perfil</label>
                     <div class="mt-1">
-                        <label class="btn-ghost-pill px-4 py-2.5 rounded-xl text-xs font-bold text-pink-700 cursor-pointer flex items-center justify-center gap-2">
+                        <label class="btn-ghost-pill px-4 py-2.5 rounded-xl text-xs font-bold text-pink-700 dark:text-orange-300 cursor-pointer flex items-center justify-center gap-2">
                             <i data-lucide="camera" class="w-4 h-4"></i> Subir Nueva Foto
                             <input type="file" id="editAvatarFile" accept="image/*" class="hidden" onchange="handleEditAvatar(event)">
                         </label>
@@ -738,7 +775,7 @@
                 <button onclick="saveProfile()" class="btn-gradient flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
                     <i data-lucide="check" class="w-4 h-4"></i> Guardar
                 </button>
-                <button onclick="handleLogout()" class="btn-ghost-pill flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-rose-600 hover:bg-rose-50">
+                <button onclick="handleLogout()" class="btn-ghost-pill flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-rose-600 hover:bg-rose-50 dark:hover:bg-neutral-800">
                     <i data-lucide="log-out" class="w-4 h-4"></i> Salir
                 </button>
             </div>
@@ -772,9 +809,8 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyaGljZmp1Z2NsY2NodmNremt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODIxMjEsImV4cCI6MjEwMzM1ODEyMX0.CTjIV7Gpr20u60byAFkH1v9D5onuNVA5pBOyqrfbYMg';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* ===== BIBLE BOOKS DATA (Reina Valera 1960) ===== */
+    /* ===== BIBLE BOOKS DATA ===== */
     const BIBLE_BOOKS = [
-        // Antiguo Testamento (1-39)
         { id: 1, name: "Génesis", chapters: 50, test: "ot" },
         { id: 2, name: "Éxodo", chapters: 40, test: "ot" },
         { id: 3, name: "Levítico", chapters: 27, test: "ot" },
@@ -814,7 +850,6 @@
         { id: 37, name: "Hageo", chapters: 2, test: "ot" },
         { id: 38, name: "Zacarías", chapters: 14, test: "ot" },
         { id: 39, name: "Malaquías", chapters: 4, test: "ot" },
-        // Nuevo Testamento (40-66)
         { id: 40, name: "Mateo", chapters: 28, test: "nt" },
         { id: 41, name: "Marcos", chapters: 16, test: "nt" },
         { id: 42, name: "Lucas", chapters: 24, test: "nt" },
@@ -848,13 +883,13 @@
     let currentUser = null;
     let allProfiles = {};
     let postPhotoFile = null;
+    let postPhotoBase64 = null;
     let recordedAudioBlob = null;
     let mediaRecorder = null;
     let audioChunks = [];
     let recordInterval = null;
     let recordSeconds = 0;
 
-    // Daily Verses Catalog with direct chapter mapping
     const DAILY_VERSES = [
         { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6-7", bookId: 50, chapter: 4, verseNum: 6 },
         { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105", bookId: 19, chapter: 119, verseNum: 105 },
@@ -868,19 +903,76 @@
     let currentVerseData = DAILY_VERSES[0];
     let verseReadStatus = { roxana: true, angel: false };
 
-    // Bible Reader State
-    let currentBibleBookId = 50; // Filipenses
+    let currentBibleBookId = 50;
     let currentBibleChapter = 4;
     let targetHighlightVerse = null;
     let bibleFontSize = 16;
     let bibleNotesAndHighlights = JSON.parse(localStorage.getItem('aura_bible_notes') || '{}');
-    let activeVerseSelection = null; // { bookId, chapter, verse, text }
+    let activeVerseSelection = null;
+
+    /* ===== THEME MODE (Claro / Oscuro Mate Naranja) ===== */
+    function initTheme() {
+        const savedTheme = localStorage.getItem('aura_theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeColorMeta')?.setAttribute('content', '#0e0d10');
+        } else {
+            document.body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
+            document.getElementById('themeColorMeta')?.setAttribute('content', '#f43f7d');
+        }
+    }
+
+    function toggleThemeMode() {
+        const isDark = document.body.classList.toggle('dark');
+        document.documentElement.classList.toggle('dark', isDark);
+        localStorage.setItem('aura_theme', isDark ? 'dark' : 'light');
+        document.getElementById('themeColorMeta')?.setAttribute('content', isDark ? '#0e0d10' : '#f43f7d');
+        toast(isDark ? 'Tema Oscuro Mate Naranja activado 🌙' : 'Tema Claro activado ☀️', 'info');
+        triggerHaptic();
+        lucide.createIcons();
+    }
+
+    /* ===== IMAGE COMPRESSOR HELPER ===== */
+    function compressImageFile(file, maxWidth = 1200, quality = 0.82) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth || height > maxWidth) {
+                        if (width > height) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        } else {
+                            width = Math.round((width * maxWidth) / height);
+                            height = maxWidth;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(dataUrl);
+                };
+                img.onerror = () => resolve(event.target.result);
+            };
+            reader.onerror = () => resolve(null);
+        });
+    }
 
     /* ===== TOAST NOTIFICATIONS ===== */
     function toast(msg, type = 'info') {
         const colors = { info: 'bg-blue-500', success: 'bg-emerald-500', error: 'bg-rose-500' };
         const el = document.createElement('div');
-        el.className = `glass-card rounded-2xl px-4 py-3 text-xs font-bold text-pink-950 flex items-center gap-2.5 shadow-2xl border border-pink-200/60 pointer-events-auto fade-in`;
+        el.className = `glass-card rounded-2xl px-4 py-3 text-xs font-bold flex items-center gap-2.5 shadow-2xl border border-pink-200/60 dark:border-orange-500/30 pointer-events-auto fade-in`;
         el.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${colors[type]} flex-shrink-0"></span><span>${msg}</span>`;
         document.getElementById('toastContainer').appendChild(el);
         setTimeout(() => {
@@ -897,6 +989,7 @@
 
     /* ===== INIT ===== */
     window.onload = async function() {
+        initTheme();
         lucide.createIcons();
         const savedUser = localStorage.getItem('aura_cloud_user');
         if (savedUser) {
@@ -941,12 +1034,12 @@
         const tabR = document.getElementById('authTabRegister');
         if (mode === 'login') {
             login.style.display = 'block'; reg.style.display = 'none';
-            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600';
-            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950';
+            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white dark:bg-neutral-800 shadow-sm text-pink-600 dark:text-orange-400';
+            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all opacity-60';
         } else {
             login.style.display = 'none'; reg.style.display = 'block';
-            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600';
-            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950';
+            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white dark:bg-neutral-800 shadow-sm text-pink-600 dark:text-orange-400';
+            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all opacity-60';
         }
         lucide.createIcons();
     }
@@ -1008,7 +1101,7 @@
 
     async function quickLogin(email, pw) {
         const { data, error } = await sb.from('profiles').select('*').eq('email', email).single();
-        if (error || !data) return toast('Perfil no encontrado en Supabase. Asegúrate de ejecutar el SQL en Supabase.', 'error');
+        if (error || !data) return toast('Perfil no encontrado en Supabase.', 'error');
         if (data.password !== pw) return toast('Contraseña incorrecta', 'error');
 
         currentUser = data;
@@ -1056,13 +1149,10 @@
     async function handleEditAvatar(e) {
         const file = e.target.files[0]; if (!file) return;
         toast('Subiendo nueva foto...', 'info');
-        const path = `avatars/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
-        const { error: upErr } = await sb.storage.from('photos').upload(path, file);
-        if (upErr) return toast('Error: ' + upErr.message, 'error');
-        const { data } = sb.storage.from('photos').getPublicUrl(path);
-        currentUser.avatar_url = data.publicUrl;
+        const compressedBase64 = await compressImageFile(file, 400, 0.85);
+        currentUser.avatar_url = compressedBase64;
         document.getElementById('profileAvatar').src = currentUser.avatar_url;
-        toast('Foto actualizada ✨', 'success');
+        toast('Foto lista. Haz clic en Guardar ✨', 'success');
     }
 
     async function saveProfile() {
@@ -1085,12 +1175,12 @@
         document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
 
         ['dockFeed', 'dockBible', 'dockGallery', 'dockHabits'].forEach(id => {
-            document.getElementById(id).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium';
+            document.getElementById(id).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium';
         });
 
         const map = { feed: 'dockFeed', bible: 'dockBible', gallery: 'dockGallery', habits: 'dockHabits' };
         if (map[tab]) {
-            document.getElementById(map[tab]).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold shadow-sm';
+            document.getElementById(map[tab]).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 dark:text-orange-400 bg-pink-100/70 dark:bg-orange-950/70 font-bold shadow-sm';
         }
 
         if (tab === 'gallery') loadGallery();
@@ -1132,15 +1222,14 @@
                 if (verseReadStatus[k]) confetti({ particleCount: 25 });
             };
             btn.className = ok 
-                ? 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300/60 shadow-sm cursor-pointer'
-                : 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold glass text-pink-950/50 hover:text-pink-950 cursor-pointer';
+                ? 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300/60 shadow-sm cursor-pointer'
+                : 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold glass opacity-60 hover:opacity-100 cursor-pointer';
             btn.innerHTML = ok ? `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> ${name}` : `<i data-lucide="circle" class="w-3.5 h-3.5"></i> ${name}`;
             container.appendChild(btn);
         });
         lucide.createIcons();
     }
 
-    // Direct jump from Daily Verse Card to the full chapter in Bible Reader
     function openVerseInBibleReader(verseData) {
         currentBibleBookId = verseData.bookId;
         currentBibleChapter = verseData.chapter;
@@ -1157,7 +1246,7 @@
         document.getElementById('chapterIndicator').innerText = `Capítulo ${chapter} de ${book.chapters}`;
 
         const container = document.getElementById('bibleVersesContent');
-        container.innerHTML = `<div class="text-center py-12"><div class="spinner mx-auto"></div><p class="text-xs font-sans font-semibold text-pink-900/50 mt-3">Cargando ${book.name} ${chapter}...</p></div>`;
+        container.innerHTML = `<div class="text-center py-12"><div class="spinner mx-auto"></div><p class="text-xs font-sans font-semibold opacity-60 mt-3">Cargando ${book.name} ${chapter}...</p></div>`;
 
         try {
             const res = await fetch(`https://bolls.life/get-chapter/RV1960/${bookId}/${chapter}/`);
@@ -1165,7 +1254,7 @@
             renderBibleVerses(verses, book, chapter);
         } catch(err) {
             console.error(err);
-            container.innerHTML = `<div class="text-center py-8 glass rounded-2xl"><p class="text-xs font-sans font-bold text-rose-500">Error al conectar con la API de la Biblia.</p><button onclick="loadBibleChapter(${bookId}, ${chapter})" class="btn-gradient mt-3 px-4 py-1.5 rounded-xl text-xs font-bold">Reintentar</button></div>`;
+            container.innerHTML = `<div class="text-center py-8 glass rounded-2xl"><p class="text-xs font-sans font-bold text-rose-500">Error al conectar con la API bíblica.</p><button onclick="loadBibleChapter(${bookId}, ${chapter})" class="btn-gradient mt-3 px-4 py-1.5 rounded-xl text-xs font-bold">Reintentar</button></div>`;
         }
     }
 
@@ -1182,7 +1271,7 @@
 
             const p = document.createElement('p');
             p.id = `verse_el_${v.verse}`;
-            p.className = `p-2 rounded-xl transition-all cursor-pointer hover:bg-pink-50/70 relative group ${highlightClass}`;
+            p.className = `p-2 rounded-xl transition-all cursor-pointer hover:bg-pink-50/70 dark:hover:bg-orange-950/40 relative group ${highlightClass}`;
             if (targetHighlightVerse && v.verse === targetHighlightVerse) {
                 p.classList.add('verse-focus-ring', 'highlight-pink');
             }
@@ -1190,11 +1279,11 @@
             p.onclick = () => openVerseToolbar(book, chapter, v.verse, v.text, studyData);
 
             p.innerHTML = `
-                <sup class="font-sans text-[11px] font-extrabold text-pink-600 mr-1 select-none">${v.verse}</sup>
+                <sup class="font-sans text-[11px] font-extrabold text-pink-600 dark:text-orange-400 mr-1 select-none">${v.verse}</sup>
                 <span class="verse-text-body">${v.text}</span>
                 ${noteText ? `
-                    <span class="block mt-1 p-2 rounded-xl bg-amber-100/80 border border-amber-300/80 text-[12px] font-sans font-medium text-amber-900 shadow-sm flex items-start gap-1.5">
-                        <i data-lucide="sticky-note" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                    <span class="block mt-1 p-2 rounded-xl bg-amber-100/90 dark:bg-amber-950/80 border border-amber-300/80 dark:border-amber-700/80 text-[12px] font-sans font-medium text-amber-900 dark:text-amber-200 shadow-sm flex items-start gap-1.5">
+                        <i data-lucide="sticky-note" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"></i>
                         <span>${noteText}</span>
                     </span>` : ''}
             `;
@@ -1203,7 +1292,6 @@
 
         lucide.createIcons();
 
-        // If a specific verse was requested, scroll to it smoothly
         if (targetHighlightVerse) {
             setTimeout(() => {
                 const targetEl = document.getElementById(`verse_el_${targetHighlightVerse}`);
@@ -1318,10 +1406,10 @@
 
     function filterBibleTestament(test) {
         ['tabTestamentAll', 'tabTestamentNT', 'tabTestamentOT'].forEach(id => {
-            document.getElementById(id).className = 'flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60';
+            document.getElementById(id).className = 'flex-1 py-1.5 rounded-xl text-xs font-semibold opacity-60';
         });
         const activeTab = test === 'all' ? 'tabTestamentAll' : (test === 'nt' ? 'tabTestamentNT' : 'tabTestamentOT');
-        document.getElementById(activeTab).className = 'flex-1 py-1.5 rounded-xl text-xs font-bold bg-white text-pink-600 shadow-sm';
+        document.getElementById(activeTab).className = 'flex-1 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-neutral-800 text-pink-600 dark:text-orange-400 shadow-sm';
 
         const container = document.getElementById('booksListContainer');
         container.innerHTML = '';
@@ -1329,11 +1417,11 @@
         const filtered = test === 'all' ? BIBLE_BOOKS : BIBLE_BOOKS.filter(b => b.test === test);
         filtered.forEach(book => {
             const btn = document.createElement('button');
-            btn.className = 'w-full glass p-3 rounded-2xl flex items-center justify-between text-xs font-bold text-pink-950 hover:bg-white transition-all cursor-pointer text-left';
+            btn.className = 'w-full glass p-3 rounded-2xl flex items-center justify-between text-xs font-bold hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-left';
             btn.onclick = () => selectBookForChapters(book);
             btn.innerHTML = `
                 <span>${book.name}</span>
-                <span class="text-[10px] text-pink-900/40 font-medium">${book.chapters} caps.</span>
+                <span class="text-[10px] opacity-50 font-medium">${book.chapters} caps.</span>
             `;
             container.appendChild(btn);
         });
@@ -1347,7 +1435,7 @@
 
         for (let i = 1; i <= book.chapters; i++) {
             const btn = document.createElement('button');
-            btn.className = 'glass p-2.5 rounded-xl text-xs font-bold text-pink-950 hover:bg-pink-500 hover:text-white transition-all cursor-pointer text-center';
+            btn.className = 'glass p-2.5 rounded-xl text-xs font-bold hover:bg-pink-500 hover:text-white dark:hover:bg-orange-500 transition-all cursor-pointer text-center';
             btn.innerText = i;
             btn.onclick = () => {
                 currentBibleBookId = book.id;
@@ -1366,7 +1454,7 @@
         document.getElementById('booksListContainer').classList.remove('hidden');
     }
 
-    /* ===== VOICE RECORDER (MediaRecorder) ===== */
+    /* ===== VOICE RECORDER ===== */
     async function startRecordingAudio() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1409,54 +1497,63 @@
         document.getElementById('audioPreviewElement').src = '';
     }
 
-    /* ===== POST PHOTO HANDLER ===== */
-    function handlePostPhoto(e) {
+    /* ===== POST PHOTO HANDLER (with canvas compression & fallback) ===== */
+    async function handlePostPhoto(e) {
         const file = e.target.files[0]; if (!file) return;
         postPhotoFile = file;
-        const reader = new FileReader();
-        reader.onload = ev => {
-            document.getElementById('postPhotoImg').src = ev.target.result;
-            document.getElementById('postPhotoPreview').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+        postPhotoBase64 = await compressImageFile(file, 1200, 0.85);
+        document.getElementById('postPhotoImg').src = postPhotoBase64;
+        document.getElementById('postPhotoPreview').classList.remove('hidden');
+        toast('Foto lista para publicar 📸', 'info');
     }
     function removePostPhoto() {
         postPhotoFile = null;
+        postPhotoBase64 = null;
         document.getElementById('postPhotoPreview').classList.add('hidden');
         document.getElementById('postPhotoInput').value = '';
     }
 
-    /* ===== SUBMIT POST ===== */
+    /* ===== SUBMIT POST (100% Reliable Photo & Audio Pipeline) ===== */
     async function submitPost() {
         const text = document.getElementById('postInput').value.trim();
-        if (!text && !postPhotoFile && !recordedAudioBlob) return toast('Escribe algo o adjunta foto/audio', 'info');
+        if (!text && !postPhotoBase64 && !recordedAudioBlob) return toast('Escribe algo o adjunta foto/audio', 'info');
 
         const btn = document.getElementById('publishBtn');
         btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Publicando...';
 
-        let photoUrl = null;
+        let photoUrl = postPhotoBase64; // Default to fast reliable compressed Base64
+        
+        // Also try uploading to Supabase Storage in parallel if configured
         if (postPhotoFile) {
-            const path = `posts/${currentUser.id}_${Date.now()}.${postPhotoFile.name.split('.').pop()}`;
-            const { error: upErr } = await sb.storage.from('photos').upload(path, postPhotoFile);
-            if (!upErr) {
-                const { data } = sb.storage.from('photos').getPublicUrl(path);
-                photoUrl = data.publicUrl;
+            try {
+                const path = `posts/${currentUser.id}_${Date.now()}.${postPhotoFile.name.split('.').pop()}`;
+                const { error: upErr } = await sb.storage.from('photos').upload(path, postPhotoFile);
+                if (!upErr) {
+                    const { data } = sb.storage.from('photos').getPublicUrl(path);
+                    if (data?.publicUrl) photoUrl = data.publicUrl;
+                }
+            } catch(e) {
+                console.warn("Storage upload fallback to base64:", e);
             }
         }
 
         let audioUrl = null;
         if (recordedAudioBlob) {
-            const path = `audios/${currentUser.id}_${Date.now()}.webm`;
-            const { error: upAudioErr } = await sb.storage.from('photos').upload(path, recordedAudioBlob);
-            if (!upAudioErr) {
-                const { data } = sb.storage.from('photos').getPublicUrl(path);
-                audioUrl = data.publicUrl;
+            try {
+                const path = `audios/${currentUser.id}_${Date.now()}.webm`;
+                const { error: upAudioErr } = await sb.storage.from('photos').upload(path, recordedAudioBlob);
+                if (!upAudioErr) {
+                    const { data } = sb.storage.from('photos').getPublicUrl(path);
+                    audioUrl = data.publicUrl;
+                }
+            } catch(e) {
+                console.warn("Audio storage upload error:", e);
             }
         }
 
         const { error } = await sb.from('posts').insert({
             user_id: currentUser.id,
-            text: text || '📸 Compartió un momento lindo',
+            text: text || (photoUrl ? '📸 Compartió una foto linda' : '🎙️ Compartió una nota de voz'),
             photo_url: photoUrl,
             audio_url: audioUrl,
             reactions: {}
@@ -1469,7 +1566,7 @@
         removePostPhoto();
         discardRecordedAudio();
         await loadPosts();
-        toast('¡Momento publicado en la nube! 💖', 'success');
+        toast('¡Momento publicado con éxito! 💖', 'success');
         confetti({ particleCount: 40, spread: 60 });
     }
 
@@ -1491,7 +1588,7 @@
     function renderFeed(posts, comments) {
         const list = document.getElementById('feedList'); list.innerHTML = '';
         if (posts.length === 0) {
-            list.innerHTML = '<div class="text-center py-14 glass-card rounded-[2.5rem]"><p class="text-xs font-semibold text-pink-950/50">Aún no hay publicaciones compartidas.<br>¡Sé el primero en compartir algo hoy! 🌸</p></div>';
+            list.innerHTML = '<div class="text-center py-14 glass-card rounded-[2.5rem]"><p class="text-xs font-semibold opacity-60">Aún no hay publicaciones compartidas.<br>¡Sé el primero en compartir algo hoy! 🌸</p></div>';
             return;
         }
 
@@ -1505,13 +1602,13 @@
             let commentsHtml = postComments.map(c => {
                 const cp = getProfile(c.user_id);
                 return `<div class="flex items-start gap-2.5 p-2.5 rounded-2xl glass-subtle">
-                    <img src="${cp.avatar_url}" class="w-6 h-6 rounded-full object-cover mt-0.5 border border-pink-300">
+                    <img src="${cp.avatar_url}" class="w-6 h-6 rounded-full object-cover mt-0.5 border border-pink-300 dark:border-orange-400">
                     <div class="flex-1">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold text-pink-950">${cp.name}</span>
-                            <span class="text-[9px] text-pink-900/40">${formatTime(c.created_at)}</span>
+                            <span class="text-[11px] font-bold">${cp.name}</span>
+                            <span class="text-[9px] opacity-40">${formatTime(c.created_at)}</span>
                         </div>
-                        <p class="text-xs text-pink-950/85 mt-0.5">${c.text}</p>
+                        <p class="text-xs opacity-90 mt-0.5">${c.text}</p>
                     </div>
                 </div>`;
             }).join('');
@@ -1523,43 +1620,43 @@
                     <div class="flex items-center gap-3">
                         <img src="${author.avatar_url}" class="w-9 h-9 rounded-2xl object-cover story-ring-active shadow-sm">
                         <div>
-                            <h4 class="text-xs sm:text-sm font-extrabold ${isOwner ? 'text-pink-600' : 'text-purple-600'}">${author.name}</h4>
-                            <p class="text-[10px] text-pink-900/40 font-medium">${timeAgo}</p>
+                            <h4 class="text-xs sm:text-sm font-extrabold ${isOwner ? 'text-pink-600 dark:text-orange-400' : 'text-purple-600 dark:text-amber-400'}">${author.name}</h4>
+                            <p class="text-[10px] opacity-50 font-medium">${timeAgo}</p>
                         </div>
                     </div>
-                    <span class="text-[10px] px-2.5 py-1 rounded-full glass font-bold text-pink-600">✨ Momento</span>
+                    <span class="text-[10px] px-2.5 py-1 rounded-full glass font-bold text-pink-600 dark:text-orange-400">✨ Momento</span>
                 </div>
 
-                <p class="text-xs sm:text-sm leading-relaxed text-pink-950/90 font-medium">${post.text}</p>
+                <p class="text-xs sm:text-sm leading-relaxed opacity-95 font-medium">${post.text}</p>
 
                 ${post.photo_url ? `
-                    <div class="rounded-2xl overflow-hidden max-h-72 shadow-md cursor-pointer group" onclick="openLightbox('${post.photo_url}')">
+                    <div class="rounded-2xl overflow-hidden max-h-72 shadow-md cursor-pointer group border border-pink-200/50 dark:border-orange-500/20" onclick="openLightbox('${post.photo_url}')">
                         <img src="${post.photo_url}" class="w-full h-auto object-cover rounded-2xl group-hover:scale-102 transition-all duration-300">
                     </div>` : ''}
 
                 ${post.audio_url ? `
-                    <div class="glass p-3 rounded-2xl flex items-center gap-3 border border-purple-200">
-                        <div class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-md">
+                    <div class="glass p-3 rounded-2xl flex items-center gap-3 border border-purple-200 dark:border-orange-500/30">
+                        <div class="w-8 h-8 rounded-full bg-purple-500 dark:bg-orange-500 text-white flex items-center justify-center shadow-md">
                             <i data-lucide="mic" class="w-4 h-4"></i>
                         </div>
                         <audio controls class="flex-1 h-8 rounded-xl" src="${post.audio_url}"></audio>
                     </div>` : ''}
 
-                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 text-xs">
+                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 dark:border-orange-500/20 text-xs">
                     <div class="flex items-center gap-1.5 flex-wrap">
-                        <button onclick="react('${post.id}','❤️')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">❤️ ${reactions['❤️']||0}</button>
-                        <button onclick="react('${post.id}','🔥')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">🔥 ${reactions['🔥']||0}</button>
-                        <button onclick="react('${post.id}','✨')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">✨ ${reactions['✨']||0}</button>
-                        <button onclick="react('${post.id}','💡')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">💡 ${reactions['💡']||0}</button>
-                        <button onclick="toggleComments('${post.id}')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold flex items-center gap-1 text-pink-700">
+                        <button onclick="react('${post.id}','❤️')" class="glass px-2.5 py-1 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-xs font-bold active:scale-90">❤️ ${reactions['❤️']||0}</button>
+                        <button onclick="react('${post.id}','🔥')" class="glass px-2.5 py-1 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-xs font-bold active:scale-90">🔥 ${reactions['🔥']||0}</button>
+                        <button onclick="react('${post.id}','✨')" class="glass px-2.5 py-1 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-xs font-bold active:scale-90">✨ ${reactions['✨']||0}</button>
+                        <button onclick="react('${post.id}','💡')" class="glass px-2.5 py-1 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-xs font-bold active:scale-90">💡 ${reactions['💡']||0}</button>
+                        <button onclick="toggleComments('${post.id}')" class="glass px-2.5 py-1 rounded-xl hover:bg-white dark:hover:bg-neutral-800 transition-all cursor-pointer text-xs font-bold flex items-center gap-1 text-pink-700 dark:text-orange-400">
                             <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> ${postComments.length}
                         </button>
                     </div>
                 </div>
 
-                <div id="comments_${post.id}" class="hidden pt-3 border-t border-pink-200/40 space-y-2.5">
+                <div id="comments_${post.id}" class="hidden pt-3 border-t border-pink-200/40 dark:border-orange-500/20 space-y-2.5">
                     <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        ${commentsHtml || '<p class="text-[11px] text-pink-900/40 text-center py-2">Sé el primero en dejar un comentario cariñoso 💬</p>'}
+                        ${commentsHtml || '<p class="text-[11px] opacity-50 text-center py-2">Sé el primero en dejar un comentario cariñoso 💬</p>'}
                     </div>
                     <div class="flex gap-2">
                         <input type="text" id="ci_${post.id}" placeholder="Escribe un comentario..." class="input-glass-luxe flex-1 px-4 py-2 rounded-xl text-xs font-medium" onkeypress="if(event.key==='Enter')postComment('${post.id}')">
@@ -1599,12 +1696,9 @@
     async function handleStoryUpload(e) {
         const file = e.target.files[0]; if (!file) return;
         toast('Subiendo momento...', 'info');
-        const path = `stories/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
-        const { error: upErr } = await sb.storage.from('photos').upload(path, file);
-        if (upErr) return toast('Error: ' + upErr.message, 'error');
-        const { data: urlData } = sb.storage.from('photos').getPublicUrl(path);
+        const compressedBase64 = await compressImageFile(file, 1080, 0.85);
 
-        await sb.from('stories').insert({ user_id: currentUser.id, photo_url: urlData.publicUrl, caption: 'Momento de hoy ✨' });
+        await sb.from('stories').insert({ user_id: currentUser.id, photo_url: compressedBase64, caption: 'Momento de hoy ✨' });
         toast('¡Momento compartido! 📸', 'success');
         confetti({ particleCount: 30 });
         loadStories();
@@ -1625,7 +1719,7 @@
                 <div class="w-14 h-14 rounded-2xl p-0.5 story-ring-active shadow-md hover:scale-105 transition-all">
                     <img src="${s.photo_url}" class="w-full h-full rounded-2xl object-cover">
                 </div>
-                <span class="text-[10px] font-bold text-pink-950/80 truncate max-w-[60px]">${author.name}</span>
+                <span class="text-[10px] font-bold opacity-80 truncate max-w-[60px]">${author.name}</span>
             `;
             container.appendChild(el);
         });
@@ -1642,7 +1736,26 @@
     }
     function closeStoryViewer() { document.getElementById('storyViewerModal').classList.add('hidden'); }
 
-    /* ===== HABITS ===== */
+    /* ===== HABITS / METAS (Custom Glass Modal) ===== */
+    function openNewHabitModal() {
+        document.getElementById('newHabitInput').value = '';
+        document.getElementById('newHabitModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('newHabitInput').focus(), 100);
+        lucide.createIcons();
+    }
+    function closeNewHabitModal() {
+        document.getElementById('newHabitModal').classList.add('hidden');
+    }
+    async function confirmAddHabit() {
+        const text = document.getElementById('newHabitInput').value.trim();
+        if (!text) return toast('Escribe el nombre de la meta', 'info');
+        closeNewHabitModal();
+        await sb.from('habits').insert({ user_id: currentUser.id, text, is_done: false });
+        await loadHabits();
+        toast('¡Meta agregada con éxito! ✨', 'success');
+        confetti({ particleCount: 25 });
+    }
+
     async function loadHabits() {
         const { data } = await sb.from('habits').select('*').order('created_at', { ascending: true });
         if (!data) return;
@@ -1661,19 +1774,19 @@
             const isMe = p.id === currentUser.id;
 
             const card = document.createElement('div');
-            card.className = 'glass rounded-3xl p-4 sm:p-5 space-y-3 border border-pink-200/50 shadow-sm';
+            card.className = 'glass rounded-3xl p-4 sm:p-5 space-y-3 border border-pink-200/50 dark:border-orange-500/20 shadow-sm';
             card.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
-                        <img src="${p.avatar_url}" class="w-7 h-7 rounded-xl object-cover border border-pink-300">
-                        <span class="text-xs sm:text-sm font-extrabold text-pink-950">${p.name}</span>
+                        <img src="${p.avatar_url}" class="w-7 h-7 rounded-xl object-cover border border-pink-300 dark:border-orange-400">
+                        <span class="text-xs sm:text-sm font-extrabold">${p.name}</span>
                     </div>
-                    <span class="text-xs font-mono font-extrabold ${pct >= 50 ? 'text-emerald-600' : 'text-pink-600'}">${done}/${list.length} (${pct}%)</span>
+                    <span class="text-xs font-mono font-extrabold ${pct >= 50 ? 'text-emerald-600 dark:text-emerald-400' : 'text-pink-600 dark:text-orange-400'}">${done}/${list.length} (${pct}%)</span>
                 </div>
                 ${list.map(h => `
                     <div class="flex items-center justify-between p-2.5 rounded-2xl glass-subtle">
-                        <label class="flex items-center gap-2.5 text-xs font-bold text-pink-950/80 cursor-pointer flex-1">
-                            <input type="checkbox" ${h.is_done ? 'checked' : ''} onchange="toggleHabit('${h.id}', this.checked)" class="w-4 h-4 rounded-md accent-pink-500 cursor-pointer" ${!isMe ? 'disabled' : ''}>
+                        <label class="flex items-center gap-2.5 text-xs font-bold opacity-90 cursor-pointer flex-1">
+                            <input type="checkbox" ${h.is_done ? 'checked' : ''} onchange="toggleHabit('${h.id}', this.checked)" class="w-4 h-4 rounded-md accent-pink-500 dark:accent-orange-500 cursor-pointer" ${!isMe ? 'disabled' : ''}>
                             <span class="${h.is_done ? 'line-through opacity-40' : ''}">${h.text}</span>
                         </label>
                         ${isMe ? `<button onclick="deleteHabit('${h.id}')" class="opacity-30 hover:opacity-100 p-1 text-rose-500 cursor-pointer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
@@ -1693,13 +1806,6 @@
         await sb.from('habits').delete().eq('id', id);
         await loadHabits();
     }
-    async function addHabit() {
-        const text = prompt('Escribe una nueva meta para compartir:');
-        if (!text) return;
-        await sb.from('habits').insert({ user_id: currentUser.id, text, is_done: false });
-        await loadHabits();
-        toast('Meta creada ✨', 'success');
-    }
 
     /* ===== GALLERY ===== */
     async function loadGallery() {
@@ -1708,19 +1814,19 @@
         const { data: posts } = await sb.from('posts').select('*').not('photo_url', 'is', null).order('created_at', { ascending: false });
         grid.innerHTML = '';
         if (!posts || posts.length === 0) {
-            grid.innerHTML = '<p class="col-span-full text-center py-10 text-xs font-semibold text-pink-900/40">No hay fotos compartidas aún.</p>';
+            grid.innerHTML = '<p class="col-span-full text-center py-10 text-xs font-semibold opacity-40">No hay fotos compartidas aún.</p>';
             return;
         }
         posts.forEach(p => {
             const author = getProfile(p.user_id);
             const el = document.createElement('div');
-            el.className = 'glass rounded-2xl overflow-hidden group cursor-pointer shadow-md hover:scale-102 transition-all';
+            el.className = 'glass rounded-2xl overflow-hidden group cursor-pointer shadow-md hover:scale-102 transition-all border border-pink-200/40 dark:border-orange-500/20';
             el.onclick = () => openLightbox(p.photo_url);
             el.innerHTML = `
                 <img src="${p.photo_url}" class="w-full h-36 sm:h-44 object-cover">
                 <div class="p-2.5 flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-pink-950">${author.name}</span>
-                    <span class="text-[9px] text-pink-900/40">${formatTime(p.created_at)}</span>
+                    <span class="text-[10px] font-bold">${author.name}</span>
+                    <span class="text-[9px] opacity-40">${formatTime(p.created_at)}</span>
                 </div>
             `;
             grid.appendChild(el);
