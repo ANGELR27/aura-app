@@ -802,7 +802,21 @@
                 </div>
 
                 <!-- Chat Message Input Dock & Voice Recorder -->
-                <div class="pt-0.5">
+                <div class="pt-0.5 relative">
+                    <!-- Quoted Message Reply Banner -->
+                    <div id="chatReplyBanner" class="hidden flex items-center justify-between p-2 px-3 mb-1.5 rounded-2xl glass-card border-l-4 border-pink-500 dark:border-orange-400 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-md shadow-lg transition-all animate-slide-up">
+                        <div class="flex flex-col flex-1 min-w-0 pr-2">
+                            <div class="flex items-center gap-1.5 text-[10.5px] font-bold text-pink-600 dark:text-orange-400">
+                                <i data-lucide="reply" class="w-3 h-3"></i>
+                                <span id="chatReplyAuthor">Respondiendo</span>
+                            </div>
+                            <p id="chatReplyPreview" class="text-xs truncate opacity-75 mt-0.5 text-neutral-800 dark:text-neutral-200"></p>
+                        </div>
+                        <button onclick="cancelReplyToMessage()" class="w-6 h-6 rounded-full hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center cursor-pointer text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors" title="Cancelar respuesta">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
                     <!-- Standard Input Bar (Minimalist Liquid Glass Pill) -->
                     <div id="chatNormalInputContainer" class="relative flex items-center rounded-full glass-liquid-rim p-1 pl-3 focus-within:border-pink-400/60 dark:focus-within:border-white/40 transition-all gap-1.5 shadow-xl">
                         <!-- Image Attachment Button -->
@@ -843,6 +857,27 @@
                 </div>
             </div>
         </section>
+
+        <!-- ========================== MODAL: ELIMINAR MENSAJE ========================== -->
+        <div id="deleteMsgModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+            <div class="glass-card rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-pink-200/50 dark:border-orange-500/20 text-center animate-scale-up">
+                <div class="w-12 h-12 rounded-full mx-auto bg-rose-100 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center text-xl shadow-inner">
+                    <i data-lucide="trash-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-base">¿Eliminar este mensaje?</h3>
+                    <p class="text-xs opacity-60 mt-1">Este mensaje desaparecerá de la conversación para ambos.</p>
+                </div>
+                <div class="space-y-2 pt-2">
+                    <button id="confirmDeleteMsgBtn" onclick="executeDeleteChatMessage()" class="w-full py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 active:scale-95 text-white text-xs font-bold transition-all shadow-md cursor-pointer">
+                        Eliminar para todos
+                    </button>
+                    <button onclick="closeDeleteMsgModal()" class="w-full py-2.5 rounded-xl tactile-pill text-xs font-bold transition-all cursor-pointer">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- ========================== VIEW: PERFIL ESTILO FACEBOOK ========================== -->
         <section id="viewProfile" class="hidden space-y-4 fade-in pb-20">
@@ -3203,6 +3238,121 @@
     }
 
     let lastChatHash = '__UNINITIALIZED__';
+    let activeReplyTarget = null; // { id, author, text }
+    let pendingDeleteMsgId = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    /* ===== SWIPE TO REPLY & GESTURES ===== */
+    function handleMsgTouchStart(e, msgId, author, text, isMe) {
+        if (!e.touches || e.touches.length === 0) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        const el = e.currentTarget;
+        el._msgData = { id: msgId, author: author, text: text, isMe: isMe };
+        el._swiped = false;
+    }
+
+    function handleMsgTouchMove(e, el) {
+        if (!touchStartX) return;
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - touchStartX;
+        const diffY = Math.abs(currentY - touchStartY);
+
+        // Only trigger horizontal swipe when user is dragging right
+        if (diffY < 25 && diffX > 8 && diffX < 85) {
+            el.style.transform = `translateX(${diffX * 0.7}px)`;
+            el.style.transition = 'none';
+            if (diffX > 40 && !el._swiped) {
+                el._swiped = true;
+                triggerHaptic();
+            }
+        }
+    }
+
+    function handleMsgTouchEnd(e, el, msgId, author, text) {
+        if (!el) return;
+        el.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+        el.style.transform = 'translateX(0px)';
+        if (el._swiped) {
+            startReplyToMessage(msgId, author, text);
+        }
+        touchStartX = 0;
+        touchStartY = 0;
+        el._swiped = false;
+    }
+
+    function startReplyToMessage(msgId, author, text) {
+        triggerHaptic();
+        activeReplyTarget = { id: msgId, author: author, text: text };
+        const banner = document.getElementById('chatReplyBanner');
+        const authorEl = document.getElementById('chatReplyAuthor');
+        const previewEl = document.getElementById('chatReplyPreview');
+        if (banner && authorEl && previewEl) {
+            authorEl.innerText = `Respondiendo a ${author}`;
+            previewEl.innerText = text;
+            banner.classList.remove('hidden');
+            lucide.createIcons();
+        }
+        const input = document.getElementById('chatInput');
+        if (input) input.focus();
+    }
+
+    function cancelReplyToMessage() {
+        activeReplyTarget = null;
+        const banner = document.getElementById('chatReplyBanner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function openDeleteMsgModal(msgId) {
+        triggerHaptic();
+        pendingDeleteMsgId = msgId;
+        const modal = document.getElementById('deleteMsgModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+    }
+
+    function closeDeleteMsgModal() {
+        pendingDeleteMsgId = null;
+        const modal = document.getElementById('deleteMsgModal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    async function executeDeleteChatMessage() {
+        if (!pendingDeleteMsgId) return;
+        const targetId = pendingDeleteMsgId;
+        closeDeleteMsgModal();
+        triggerHaptic();
+
+        // 1. Remove locally immediately
+        currentChatMessages = currentChatMessages.filter(m => m.id !== targetId);
+        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));
+        lastChatHash = '__FORCE_RERENDER__';
+        renderChatMessages();
+        toast('Mensaje eliminado 🗑️', 'info');
+
+        // 2. Delete from database
+        try {
+            await sb.from('messages').delete().eq('id', targetId);
+        } catch(e) {
+            console.warn('Delete error messages table:', e);
+        }
+        try {
+            await sb.from('posts').delete().eq('id', targetId);
+        } catch(e) {}
+
+        // 3. Broadcast delete to partner
+        try {
+            realtimeChannelGlobal?.send({
+                type: 'broadcast',
+                event: 'delete_message',
+                payload: { id: targetId }
+            });
+        } catch(e) {}
+    }
 
     function renderChatMessages() {
         const list = document.getElementById('chatMessagesList');
@@ -3237,21 +3387,40 @@
                 const msgDate = m.created_at ? new Date(m.created_at) : new Date();
                 const timeStr = isNaN(msgDate.getTime()) ? '' : msgDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-                const isAudio = m.text && m.text.startsWith('[AUDIO');
-                const isPhoto = m.text && m.text.startsWith('[PHOTO]');
+                // Check Quoted Reply
+                let rawText = m.text || '';
+                let replyQuoteHtml = '';
+                const replyMatch = rawText.match(/^\[REPLY:([^|]+)\|([^\]]+)\]([\s\S]*)$/);
+                if (replyMatch) {
+                    const qAuthor = replyMatch[1];
+                    const qPreview = replyMatch[2];
+                    rawText = replyMatch[3];
+                    replyQuoteHtml = `
+                        <div class="mb-1 p-1.5 px-2.5 rounded-xl text-[10.5px] bg-black/10 dark:bg-white/10 border-l-2 ${isMe ? 'border-white/80 text-white/90' : 'border-pink-500 dark:border-orange-400 text-neutral-800 dark:text-neutral-200'}">
+                            <p class="font-bold text-[9px] opacity-90">${escapeHtml(qAuthor)}</p>
+                            <p class="truncate opacity-75 text-[10px]">${escapeHtml(qPreview)}</p>
+                        </div>
+                    `;
+                }
+
+                const isAudio = rawText && rawText.startsWith('[AUDIO');
+                const isPhoto = rawText && rawText.startsWith('[PHOTO]');
                 let contentHtml = '';
+                let previewSnippet = rawText;
 
                 if (isAudio) {
-                    const match = m.text.match(/^\[AUDIO:?(\d+)?\](.*)$/);
+                    const match = rawText.match(/^\[AUDIO:?(\d+)?\](.*)$/);
                     const rawDuration = match && match[1] ? parseInt(match[1]) : 0;
                     const durationMins = Math.floor(rawDuration / 60);
                     const durationSecs = rawDuration % 60;
                     const durationStr = rawDuration > 0 ? `${durationMins}:${durationSecs < 10 ? '0' : ''}${durationSecs}` : '0:03';
-                    const audioData = match ? match[2] : m.text.replace('[AUDIO]', '');
+                    const audioData = match ? match[2] : rawText.replace('[AUDIO]', '');
                     const audioKey = 'aud_' + (m.id || (Date.now() + '_' + Math.random().toString(36).substr(2, 5)));
                     window._cachedAudios[audioKey] = audioData;
+                    previewSnippet = `🎙️ Nota de voz (${durationStr})`;
 
                     contentHtml = `
+                        ${replyQuoteHtml}
                         <div class="flex items-center gap-2 py-0.5">
                             <button onclick="togglePlayVoiceNote(this, '${audioKey}')" class="w-7 h-7 rounded-full ${isMe ? 'bg-white/25 text-white hover:bg-white/35' : 'bg-gradient-to-tr from-pink-500 to-rose-500 dark:from-orange-500 dark:to-amber-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all flex-shrink-0 shadow-sm" title="Reproducir">
                                 <i data-lucide="play" class="w-3.5 h-3.5 voice-play-icon ml-0.5"></i>
@@ -3273,19 +3442,41 @@
                         </div>
                     `;
                 } else if (isPhoto) {
-                    const photoUrl = m.text.replace('[PHOTO]', '').trim();
+                    const photoUrl = rawText.replace('[PHOTO]', '').trim();
+                    previewSnippet = '📸 Foto';
                     contentHtml = `
+                        ${replyQuoteHtml}
                         <div class="rounded-2xl overflow-hidden cursor-pointer my-1 max-w-[240px] shadow-md border border-white/20" onclick="openLightbox('${photoUrl}')">
                             <img src="${photoUrl}" class="w-full h-auto object-cover rounded-2xl hover:scale-105 transition-transform duration-300">
                         </div>
                     `;
                 } else {
-                    contentHtml = `<p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${formatMessageTextWithLinks(escapeHtml(m.text || ''))}</p>`;
+                    contentHtml = `
+                        ${replyQuoteHtml}
+                        <p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${formatMessageTextWithLinks(escapeHtml(rawText))}</p>
+                    `;
                 }
+
+                const senderDisplayName = isMe ? 'Tú' : partner.name;
+                const safePreview = escapeHtml(previewSnippet.substring(0, 60));
 
                 if (isMe) {
                     html += `
-                        <div class="flex justify-end items-end gap-1.5 slide-up">
+                        <div class="relative group flex justify-end items-end gap-1.5 slide-up"
+                             ontouchstart="handleMsgTouchStart(event, '${m.id}', '${senderDisplayName}', '${safePreview}', true)"
+                             ontouchmove="handleMsgTouchMove(event, this)"
+                             ontouchend="handleMsgTouchEnd(event, this, '${m.id}', '${senderDisplayName}', '${safePreview}')">
+                            
+                            <!-- Action Buttons (Reply & Delete) -->
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 pb-1">
+                                <button onclick="startReplyToMessage('${m.id}', '${senderDisplayName}', '${safePreview}')" class="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-neutral-400 hover:text-pink-500 transition-colors cursor-pointer" title="Responder">
+                                    <i data-lucide="reply" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="openDeleteMsgModal('${m.id}')" class="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-neutral-400 hover:text-rose-500 transition-colors cursor-pointer" title="Eliminar mensaje">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+
                             <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-br-sm bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
                                 ${contentHtml}
                                 <div class="flex items-center justify-end gap-1 text-[8.5px] text-white/80 font-mono">
@@ -3297,13 +3488,26 @@
                     `;
                 } else {
                     html += `
-                        <div class="flex justify-start items-end gap-2 slide-up">
+                        <div class="relative group flex justify-start items-end gap-2 slide-up"
+                             ontouchstart="handleMsgTouchStart(event, '${m.id}', '${senderDisplayName}', '${safePreview}', false)"
+                             ontouchmove="handleMsgTouchMove(event, this)"
+                             ontouchend="handleMsgTouchEnd(event, this, '${m.id}', '${senderDisplayName}', '${safePreview}')">
                             <img src="${partner.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-pink-300 dark:border-orange-400 mb-1 flex-shrink-0 shadow-sm">
                             <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-bl-sm glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
                                 ${contentHtml}
                                 <div class="flex items-center justify-end text-[8.5px] opacity-50 font-mono">
                                     <span>${timeStr}</span>
                                 </div>
+                            </div>
+
+                            <!-- Action Buttons (Reply & Delete) -->
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 pb-1">
+                                <button onclick="startReplyToMessage('${m.id}', '${senderDisplayName}', '${safePreview}')" class="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-neutral-400 hover:text-pink-500 transition-colors cursor-pointer" title="Responder">
+                                    <i data-lucide="reply" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="openDeleteMsgModal('${m.id}')" class="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-neutral-400 hover:text-rose-500 transition-colors cursor-pointer" title="Eliminar mensaje">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -3343,10 +3547,20 @@
         playNotificationSound();
 
         const partner = getPartnerProfile();
+        let payloadText = text;
+
+        // Attach Quoted Reply Prefix if active
+        if (activeReplyTarget) {
+            const cleanAuthor = activeReplyTarget.author || partner.name;
+            const cleanPreview = (activeReplyTarget.text || '').replace(/[|\]]/g, ' ').substring(0, 70);
+            payloadText = `[REPLY:${cleanAuthor}|${cleanPreview}]${text}`;
+            cancelReplyToMessage();
+        }
+
         const tempMsg = {
             id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             sender_id: currentUser.id,
-            text: text,
+            text: payloadText,
             created_at: new Date().toISOString()
         };
 
@@ -3361,7 +3575,7 @@
             const { error: msgErr } = await sb.from('messages').insert({
                 sender_id: currentUser.id,
                 receiver_id: partner.id,
-                text: text
+                text: payloadText
             });
             if (!msgErr) insertedOk = true;
         } catch(e) {
@@ -3373,7 +3587,7 @@
             try {
                 await sb.from('posts').insert({
                     user_id: currentUser.id,
-                    text: `[CHAT] ${text}`,
+                    text: `[CHAT] ${payloadText}`,
                     photo_url: null,
                     reactions: {}
                 });
@@ -3389,7 +3603,7 @@
                 event: 'new_message',
                 payload: {
                     sender_id: currentUser.id,
-                    text: text
+                    text: payloadText
                 }
             });
         } catch(e) {}
@@ -3493,6 +3707,24 @@
                 } else {
                     loadPosts();
                     loadStories();
+                }
+            })
+            .on('broadcast', { event: 'delete_message' }, payload => {
+                const targetId = payload.payload?.id;
+                if (targetId) {
+                    currentChatMessages = currentChatMessages.filter(m => m.id !== targetId);
+                    localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));
+                    lastChatHash = '__FORCE_RERENDER__';
+                    renderChatMessages();
+                }
+            })
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
+                const targetId = payload.old?.id;
+                if (targetId) {
+                    currentChatMessages = currentChatMessages.filter(m => m.id !== targetId);
+                    localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));
+                    lastChatHash = '__FORCE_RERENDER__';
+                    renderChatMessages();
                 }
             })
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
