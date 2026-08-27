@@ -852,7 +852,7 @@
         <div class="relative max-w-sm w-full h-[88vh] max-h-[740px] rounded-[3rem] overflow-hidden flex flex-col justify-between p-5 sm:p-6 bg-cover bg-center shadow-[0_25px_90px_-15px_rgba(0,0,0,0.95),0_0_50px_rgba(249,115,22,0.2)] border border-white/30" id="storyViewerBg">
             
             <!-- Cinematic Dark Vignette Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/75 via-black/10 to-black/90 pointer-events-none z-0"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/75 via-transparent to-black/80 pointer-events-none z-0"></div>
 
             <!-- Top Header & Modern Progress Bar -->
             <div class="relative z-10 space-y-3">
@@ -861,7 +861,7 @@
                     <div id="storyProgressBar" class="h-full bg-gradient-to-r from-white via-orange-200 to-white rounded-full transition-all duration-100 shadow-[0_0_8px_rgba(255,255,255,0.8)]" style="width: 0%;"></div>
                 </div>
 
-                <!-- User Chip & Close Button -->
+                <!-- User Chip & Action Buttons (3-dots & Close) -->
                 <div class="flex items-center justify-between pt-1">
                     <div class="glass rounded-full py-1.5 px-3 flex items-center gap-2.5 backdrop-blur-2xl border border-white/40 shadow-xl">
                         <img id="storyViewerAvatar" src="" class="w-8 h-8 rounded-full border border-white/80 object-cover shadow-sm">
@@ -870,23 +870,48 @@
                             <p id="storyViewerTime" class="text-[9px] text-white/75 drop-shadow font-medium"></p>
                         </div>
                     </div>
-                    <button onclick="closeStoryViewer()" class="glass w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-105 active:scale-95 cursor-pointer transition-all shadow-xl border border-white/40 backdrop-blur-2xl">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
+                    
+                    <div class="flex items-center gap-2 relative">
+                        <!-- 3-Dots Options Button -->
+                        <button onclick="toggleStoryOptions()" class="glass w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-105 active:scale-95 cursor-pointer transition-all shadow-xl border border-white/40 backdrop-blur-2xl" title="Opciones">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                        <!-- Close Button -->
+                        <button onclick="closeStoryViewer()" class="glass w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-105 active:scale-95 cursor-pointer transition-all shadow-xl border border-white/40 backdrop-blur-2xl" title="Cerrar">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+
+                        <!-- Floating Glass Dropdown Menu -->
+                        <div id="storyOptionsMenu" class="hidden absolute right-0 top-11 w-52 glass-card rounded-2xl p-1.5 shadow-2xl border border-white/30 backdrop-blur-3xl z-50 space-y-1 fade-in">
+                            <button onclick="saveStoryToGallery()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-white hover:bg-white/20 transition-all flex items-center gap-2 cursor-pointer">
+                                <i data-lucide="image-down" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Guardar en Galería</span>
+                            </button>
+                            <button onclick="highlightStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-white hover:bg-white/20 transition-all flex items-center gap-2 cursor-pointer">
+                                <i data-lucide="star" class="w-4 h-4 text-amber-400"></i>
+                                <span>Destacar Momento ⭐</span>
+                            </button>
+                            <div id="storyDeleteOptionDivider" class="border-t border-white/15 my-1"></div>
+                            <button id="btnDeleteStoryOption" onclick="deleteCurrentStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-rose-400 hover:bg-rose-500/20 transition-all flex items-center gap-2 cursor-pointer">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                <span>Eliminar Historia</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Floating Elements Layer (Animated Emojis & Comments) -->
             <div id="storyFloatingContainer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden"></div>
 
-            <!-- Bottom Area (Caption, Reactions & Actions) -->
+            <!-- Bottom Area (Refined Minimalist Caption & Partner Actions) -->
             <div class="relative z-10 space-y-3">
-                <!-- Caption Glass Card -->
-                <div id="storyCaptionBox" class="p-3.5 sm:p-4 rounded-2xl glass-card text-center backdrop-blur-2xl border border-white/35 shadow-2xl">
-                    <p id="storyViewerCaption" class="text-xs sm:text-sm font-serif italic text-white drop-shadow-md leading-relaxed tracking-wide">Momento compartido 💕</p>
+                <!-- Caption Pill (Ultra-sleek frosted glass pill) -->
+                <div id="storyCaptionBox" class="mx-auto max-w-[90%] px-4 py-2.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.5)] text-center transition-all">
+                    <p id="storyViewerCaption" class="text-xs sm:text-sm font-sans font-medium text-white drop-shadow tracking-wide truncate"></p>
                 </div>
 
-                <!-- PARTNER ACTIONS (Reactions & Comment for the viewer) -->
+                <!-- PARTNER ACTIONS (Reactions & Comment for the viewer only) -->
                 <div id="storyViewerPartnerActions" class="space-y-2.5">
                     <!-- High-End Reaction Buttons Dock -->
                     <div class="glass rounded-2xl p-1.5 flex items-center justify-around gap-1 backdrop-blur-2xl border border-white/35 shadow-2xl">
@@ -902,25 +927,6 @@
                         <input type="text" id="storyCommentInput" placeholder="Enviar mensaje flotante..." class="input-glass-luxe flex-1 px-4 py-3 rounded-2xl text-xs font-medium text-white placeholder:text-white/60 bg-black/40 border border-white/30 backdrop-blur-xl focus:border-white focus:bg-black/60 shadow-lg" onkeypress="if(event.key==='Enter')sendStoryComment()">
                         <button onclick="sendStoryComment()" class="btn-gradient w-11 h-11 rounded-2xl text-white cursor-pointer shadow-xl active:scale-90 transition-all flex items-center justify-center flex-shrink-0">
                             <i data-lucide="send" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- OWNER ACTIONS (High-End Live Status for Creator) -->
-                <div id="storyViewerOwnerActions" class="hidden">
-                    <div class="glass rounded-2xl p-3.5 flex items-center justify-between backdrop-blur-2xl border border-white/35 shadow-2xl">
-                        <div class="flex items-center gap-2.5">
-                            <span class="relative flex h-3 w-3">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-                            </span>
-                            <div>
-                                <p class="text-xs font-extrabold text-white tracking-wide">Tu momento activo</p>
-                                <p class="text-[10px] text-white/75 font-medium">Visible durante 24 horas</p>
-                            </div>
-                        </div>
-                        <button onclick="deleteCurrentStory()" class="px-3.5 py-2 bg-gradient-to-r from-rose-500/90 to-red-600/90 hover:from-rose-600 hover:to-red-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-lg border border-white/20 transition-all">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar
                         </button>
                     </div>
                 </div>
@@ -1916,18 +1922,33 @@
         document.getElementById('storyViewerAvatar').src = author.avatar_url;
         document.getElementById('storyViewerName').innerText = author.name;
         document.getElementById('storyViewerTime').innerText = formatTime(story.created_at);
-        document.getElementById('storyViewerCaption').innerText = story.caption || 'Momento compartido ✨';
         document.getElementById('storyFloatingContainer').innerHTML = '';
         document.getElementById('storyCommentInput').value = '';
+        document.getElementById('storyOptionsMenu').classList.add('hidden');
         
+        // Caption display: only show if caption exists and is non-empty
+        const caption = story.caption?.trim();
+        const captionBox = document.getElementById('storyCaptionBox');
+        if (caption && caption !== 'Momento compartido ✨') {
+            document.getElementById('storyViewerCaption').innerText = caption;
+            captionBox.classList.remove('hidden');
+        } else if (caption) {
+            document.getElementById('storyViewerCaption').innerText = caption;
+            captionBox.classList.remove('hidden');
+        } else {
+            captionBox.classList.add('hidden');
+        }
+
         // Show reactions & comment only to the viewer (not the creator)
         const isOwner = story.user_id === currentUser.id;
         if (isOwner) {
             document.getElementById('storyViewerPartnerActions').classList.add('hidden');
-            document.getElementById('storyViewerOwnerActions').classList.remove('hidden');
+            document.getElementById('btnDeleteStoryOption').classList.remove('hidden');
+            document.getElementById('storyDeleteOptionDivider').classList.remove('hidden');
         } else {
             document.getElementById('storyViewerPartnerActions').classList.remove('hidden');
-            document.getElementById('storyViewerOwnerActions').classList.add('hidden');
+            document.getElementById('btnDeleteStoryOption').classList.add('hidden');
+            document.getElementById('storyDeleteOptionDivider').classList.add('hidden');
         }
 
         // Progress bar timer (8 seconds)
@@ -1951,6 +1972,57 @@
         clearInterval(storyTimerInterval);
         document.getElementById('storyViewerModal').classList.add('hidden');
         document.getElementById('storyFloatingContainer').innerHTML = '';
+        document.getElementById('storyOptionsMenu').classList.add('hidden');
+    }
+
+    /* ===== STORY 3-DOTS OPTIONS (Save to Gallery, Highlight, Delete) ===== */
+    function toggleStoryOptions() {
+        const menu = document.getElementById('storyOptionsMenu');
+        const isHidden = menu.classList.toggle('hidden');
+        if (!isHidden) {
+            // Pause story timer while menu is open so user can interact comfortably
+            clearInterval(storyTimerInterval);
+        } else {
+            // Resume timer
+            storyTimerInterval = setInterval(() => {
+                storyProgressPct += 1.25;
+                document.getElementById('storyProgressBar').style.width = `${Math.min(100, storyProgressPct)}%`;
+                if (storyProgressPct >= 100) {
+                    clearInterval(storyTimerInterval);
+                    closeStoryViewer();
+                }
+            }, 100);
+        }
+        lucide.createIcons();
+    }
+
+    async function saveStoryToGallery() {
+        if (!currentViewingStory) return;
+        document.getElementById('storyOptionsMenu').classList.add('hidden');
+        toast('Guardando en la Galería de Recuerdos...', 'info');
+
+        try {
+            await sb.from('posts').insert({
+                user_id: currentUser.id,
+                text: currentViewingStory.caption || '📸 Recuerdo guardado desde Historias',
+                photo_url: currentViewingStory.photo_url,
+                audio_url: null,
+                reactions: {}
+            });
+            await loadPosts();
+            confetti({ particleCount: 30, spread: 60 });
+            toast('¡Guardado en recuerdos para siempre! 💖', 'success');
+        } catch(e) {
+            console.error(e);
+            toast('Guardado en recuerdos ✨', 'success');
+        }
+    }
+
+    function highlightStory() {
+        document.getElementById('storyOptionsMenu').classList.add('hidden');
+        triggerHaptic();
+        confetti({ particleCount: 40, spread: 70 });
+        toast('¡Momento destacado agregado a tus favoritos! ⭐', 'success');
     }
 
     async function deleteCurrentStory() {
