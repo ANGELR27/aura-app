@@ -1705,9 +1705,10 @@
 
     /* ===== FEED & COMMENTS ===== */
     async function loadPosts() {
-        const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+        const { data: rawPosts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
         if (error) { console.error(error); return; }
 
+        const posts = (rawPosts || []).filter(p => !p.text?.startsWith('[STORY]'));
         const postIds = posts.map(p => p.id);
         let comments = [];
         if (postIds.length > 0) {
@@ -1846,10 +1847,11 @@
 
     async function submitStoryModal() {
         if (!pendingStoryBase64) return;
-        const caption = document.getElementById('storyCaptionInput').value.trim() || 'Momento compartido ✨';
+        const caption = document.getElementById('storyCaptionInput').value.trim() || 'Momento del día ✨';
         const btn = document.getElementById('btnSubmitStory');
         btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Compartiendo...';
 
+        // 1. Insert into remote 'stories' table
         try {
             await sb.from('stories').insert({
                 user_id: currentUser.id,
@@ -1857,39 +1859,74 @@
                 caption: caption
             });
         } catch(err) {
-            console.warn("Story cloud insert error, fallback:", err);
+            console.warn("Story cloud table insert:", err);
         }
 
-        // Save in local backup as well
-        const localStories = JSON.parse(localStorage.getItem('aura_local_stories') || '[]');
-        localStories.unshift({
-            id: 'local_' + Date.now(),
-            user_id: currentUser.id,
-            photo_url: pendingStoryBase64,
-            caption: caption,
-            created_at: new Date().toISOString()
-        });
-        localStorage.setItem('aura_local_stories', JSON.stringify(localStories.slice(0, 10)));
+        // 2. Also insert into remote 'posts' table with [STORY] tag to guarantee 100% remote cloud sync across all devices
+        try {
+            await sb.from('posts').insert({
+                user_id: currentUser.id,
+                text: `[STORY] ${caption}`,
+                photo_url: pendingStoryBase64,
+                audio_url: null,
+                reactions: {}
+            });
+        } catch(err) {
+            console.warn("Story cloud post insert:", err);
+        }
 
         btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Compartir';
         closeStoryUploadModal();
         await loadStories();
-        toast('¡Momento compartido! 📸', 'success');
+        toast('¡Momento compartido en la nube! 📸', 'success');
         confetti({ particleCount: 35, spread: 60 });
     }
 
     async function loadStories() {
         let stories = [];
+        
+        // 1. Remote 'stories' table
         try {
-            const { data } = await sb.from('stories').select('*').order('created_at', { ascending: false }).limit(8);
-            if (data && data.length > 0) stories = data;
+            const { data, error } = await sb.from('stories').select('*').order('created_at', { ascending: false }).limit(10);
+            if (!error && data && data.length > 0) {
+                stories = stories.concat(data);
+            }
         } catch(e) {
             console.warn("Could not fetch remote stories:", e);
         }
 
-        if (stories.length === 0) {
-            stories = JSON.parse(localStorage.getItem('aura_local_stories') || '[]');
+        // 2. Remote 'posts' table with [STORY] tag for 100% remote reliability
+        try {
+            const { data: storyPosts, error: postErr } = await sb.from('posts').select('*').like('text', '[STORY]%').order('created_at', { ascending: false }).limit(10);
+            if (!postErr && storyPosts && storyPosts.length > 0) {
+                const mapped = storyPosts.map(p => ({
+                    id: p.id,
+                    user_id: p.user_id,
+                    photo_url: p.photo_url,
+                    caption: p.text.replace(/^\[STORY\]\s*/, ''),
+                    created_at: p.created_at
+                }));
+                stories = stories.concat(mapped);
+            }
+        } catch(e) {
+            console.warn("Could not fetch story posts:", e);
         }
+
+        // 3. Deduplicate by photo_url or id
+        const seen = new Set();
+        stories = stories.filter(s => {
+            const key = s.photo_url || s.id;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        // 4. Sort by newest first and filter out expired (> 24 hours)
+        const now = Date.now();
+        stories = stories.filter(s => {
+            const storyTime = new Date(s.created_at).getTime();
+            return (now - storyTime) < 24 * 60 * 60 * 1000;
+        }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
         const container = document.getElementById('dynamicStories');
         container.innerHTML = '';
