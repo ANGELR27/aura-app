@@ -1,0 +1,23 @@
+{
+  "name": "Aura — Red Social Privada",
+  "short_name": "Aura",
+  "description": "Red social privada, momentos compartidos y estudio bíblico",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fdf0f4",
+  "theme_color": "#f43f7d",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
