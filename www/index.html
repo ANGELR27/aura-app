@@ -2478,7 +2478,7 @@
 
         // 1. Try querying messages table
         try {
-            const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: true }).limit(60);
+            const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: true }).limit(80);
             if (!error && data && data.length > 0) {
                 messages = messages.concat(data);
             }
@@ -2488,9 +2488,9 @@
 
         // 2. Dual fallback query on posts table with [CHAT] tag
         try {
-            const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').like('text', '[CHAT]%').order('created_at', { ascending: true }).limit(60);
+            const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(80);
             if (!postErr && chatPosts && chatPosts.length > 0) {
-                const mapped = chatPosts.map(p => ({
+                const mapped = chatPosts.filter(p => p.text?.includes('[CHAT]')).map(p => ({
                     id: p.id,
                     sender_id: p.user_id,
                     text: p.text.replace(/^\[CHAT\]\s*/, ''),
@@ -2502,7 +2502,11 @@
             console.warn("Chat posts query:", e);
         }
 
-        // 3. Deduplicate and sort
+        // 3. Fallback to local storage cache if offline
+        const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
+        messages = messages.concat(localChat);
+
+        // 4. Deduplicate and sort
         const seen = new Set();
         currentChatMessages = messages.filter(m => {
             const key = m.id || (m.sender_id + '_' + m.created_at + '_' + m.text);
@@ -2510,6 +2514,9 @@
             seen.add(key);
             return true;
         }).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        // Save local backup
+        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-60)));
 
         renderChatMessages();
     }
@@ -2599,6 +2606,7 @@
             created_at: new Date().toISOString()
         };
         currentChatMessages.push(tempMsg);
+        localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-60)));
         renderChatMessages();
 
         // 1. Insert into 'messages' table
@@ -2623,6 +2631,8 @@
         } catch(e) {
             console.warn("Chat post insert error:", e);
         }
+
+        setTimeout(() => loadChatMessages(), 600);
     }
 
     function escapeHtml(text) {
@@ -2631,18 +2641,17 @@
         return div.innerHTML;
     }
 
-    /* ===== REALTIME SUBSCRIPTIONS ===== */
+    /* ===== REALTIME SUBSCRIPTIONS & BACKGROUND SYNC ===== */
     function setupRealtime() {
         sb.channel('aura-realtime-cloud')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
-                if (payload.new && payload.new.user_id !== currentUser.id) {
-                    const author = getProfile(payload.new.user_id);
-                    const isStory = payload.new.text?.startsWith('[STORY]');
-                    const isChat = payload.new.text?.startsWith('[CHAT]');
+                const isChat = payload.new?.text?.includes('[CHAT]');
 
-                    if (isChat) {
+                if (isChat) {
+                    loadChatMessages();
+                    if (payload.new && payload.new.user_id !== currentUser.id) {
+                        const author = getProfile(payload.new.user_id);
                         const cleanMsg = payload.new.text.replace(/^\[CHAT\]\s*/, '');
-                        loadChatMessages();
                         if (currentActiveTab !== 'chat') {
                             document.getElementById('dockChatBadge')?.classList.remove('hidden');
                             toast(`${author.name}: ${cleanMsg}`, 'info');
@@ -2650,7 +2659,11 @@
                         } else {
                             playNotificationSound();
                         }
-                    } else if (isStory) {
+                    }
+                } else if (payload.new && payload.new.user_id !== currentUser.id) {
+                    const author = getProfile(payload.new.user_id);
+                    const isStory = payload.new.text?.startsWith('[STORY]');
+                    if (isStory) {
                         toast(`${author.name} subió una historia`, 'info');
                         sendNativeNotification('Nueva Historia 📸', `${author.name} compartió un momento`, author.avatar_url);
                         loadStories();
@@ -2675,9 +2688,9 @@
                 }
             })
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                loadChatMessages();
                 if (payload.new && payload.new.sender_id !== currentUser.id) {
                     const author = getProfile(payload.new.sender_id);
-                    loadChatMessages();
                     if (currentActiveTab !== 'chat') {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
                         toast(`${author.name}: ${payload.new.text}`, 'info');
@@ -2718,6 +2731,22 @@
                 loadStories();
             })
             .subscribe();
+
+        // Sync when returning to the app
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                loadChatMessages();
+                loadPosts();
+                loadStories();
+            }
+        });
+
+        // Periodic background poll every 8 seconds when chat is active
+        setInterval(() => {
+            if (currentActiveTab === 'chat') {
+                loadChatMessages();
+            }
+        }, 8000);
     }
 
     /* ===== UTILS ===== */
