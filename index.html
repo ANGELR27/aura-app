@@ -1126,6 +1126,43 @@
         if (navigator.vibrate) navigator.vibrate(20);
     }
 
+    /* ===== NATIVE DEVICE NOTIFICATIONS ===== */
+    async function requestNotificationPermission() {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'granted') return;
+        if (Notification.permission !== 'denied') {
+            try {
+                await Notification.requestPermission();
+            } catch(e) {
+                console.warn('Notification permission request failed:', e);
+            }
+        }
+    }
+
+    function sendNativeNotification(title, body, icon) {
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+        if (document.hasFocus()) return; // Don't notify if user is already looking at the app
+        try {
+            const notif = new Notification(title, {
+                body: body,
+                icon: icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>',
+                badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>',
+                tag: 'aura-' + Date.now(),
+                renotify: true,
+                silent: false
+            });
+            notif.onclick = () => {
+                window.focus();
+                notif.close();
+            };
+            // Auto-close after 6 seconds
+            setTimeout(() => notif.close(), 6000);
+        } catch(e) {
+            console.warn('Native notification error:', e);
+        }
+    }
+
     /* ===== INIT ===== */
     window.onload = async function() {
         initTheme();
@@ -1138,6 +1175,7 @@
                 showApp();
                 await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
                 setupRealtime();
+                requestNotificationPermission();
             } catch(err) {
                 console.error(err);
                 showAuth();
@@ -1207,7 +1245,8 @@
         showApp();
         await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
-        toast(`¡Bienvenida/o, ${data.name}! 🌸`, 'success');
+        requestNotificationPermission();
+        toast(`¡Bienvenida/o, ${data.name}!`, 'success');
         confetti({ particleCount: 60, spread: 70 });
     }
 
@@ -1235,7 +1274,8 @@
         showApp();
         await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
-        toast(`¡Cuenta creada con éxito! 💖`, 'success');
+        requestNotificationPermission();
+        toast(`¡Cuenta creada con éxito!`, 'success');
     }
 
     async function quickLogin(email, pw) {
@@ -1249,7 +1289,8 @@
         showApp();
         await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
-        toast(`¡Hola, ${data.name}! 🌸`, 'success');
+        requestNotificationPermission();
+        toast(`¡Hola, ${data.name}!`, 'success');
         confetti({ particleCount: 50, spread: 60 });
     }
 
@@ -2257,22 +2298,56 @@
             .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
                 if (payload.new && payload.new.user_id !== currentUser.id) {
                     const author = getProfile(payload.new.user_id);
-                    toast(`${author.name} compartió algo nuevo 🌸`, 'info');
-                    confetti({ particleCount: 25, spread: 50 });
+                    const isStory = payload.new.text?.startsWith('[STORY]');
+                    if (isStory) {
+                        toast(`${author.name} subió una historia`, 'info');
+                        sendNativeNotification('Nueva Historia', `${author.name} compartió un momento`, author.avatar_url);
+                    } else if (payload.eventType === 'INSERT') {
+                        const hasPhoto = !!payload.new.photo_url;
+                        toast(`${author.name} publicó algo nuevo`, 'info');
+                        sendNativeNotification(
+                            'Nueva Publicación',
+                            hasPhoto ? `${author.name} compartió una foto` : `${author.name}: ${(payload.new.text || '').substring(0, 60)}`,
+                            author.avatar_url
+                        );
+                        confetti({ particleCount: 25, spread: 50 });
+                    } else if (payload.eventType === 'UPDATE' && payload.new.reactions) {
+                        // Reaction update
+                        toast(`${author.name} reaccionó a una publicación`, 'info');
+                        sendNativeNotification('Nueva Reacción', `${author.name} reaccionó a tu publicación`, author.avatar_url);
+                    }
                 }
                 loadPosts();
+                loadStories();
             })
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
                 if (payload.new && payload.new.user_id !== currentUser.id) {
                     const author = getProfile(payload.new.user_id);
-                    toast(`${author.name} comentó 💬`, 'info');
+                    toast(`${author.name} comentó en una publicación`, 'info');
+                    sendNativeNotification('Nuevo Comentario', `${author.name}: ${(payload.new.text || '').substring(0, 80)}`, author.avatar_url);
                 }
                 loadPosts();
             })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'habits' }, () => {
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'habits' }, payload => {
+                if (payload.new && payload.new.user_id !== currentUser.id) {
+                    const author = getProfile(payload.new.user_id);
+                    if (payload.eventType === 'INSERT') {
+                        toast(`${author.name} agregó una nueva meta`, 'info');
+                        sendNativeNotification('Nueva Meta', `${author.name} agregó: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
+                    } else if (payload.eventType === 'UPDATE' && payload.new.is_done) {
+                        toast(`${author.name} completó una meta ✓`, 'success');
+                        sendNativeNotification('Meta Completada', `${author.name} completó: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
+                        confetti({ particleCount: 20, spread: 40 });
+                    }
+                }
                 loadHabits();
             })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, () => {
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'stories' }, payload => {
+                if (payload.new && payload.new.user_id !== currentUser.id) {
+                    const author = getProfile(payload.new.user_id);
+                    toast(`${author.name} subió una historia`, 'info');
+                    sendNativeNotification('Nueva Historia 📸', `${author.name} compartió un momento`, author.avatar_url);
+                }
                 loadStories();
             })
             .subscribe();
