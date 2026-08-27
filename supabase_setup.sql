@@ -1,5 +1,5 @@
 -- ============================================
--- AURA - Schema de Base de Datos Supabase (v3.5)
+-- AURA - Schema de Base de Datos Supabase (v4.0 Biblia & Social)
 -- Ejecutar en: Supabase Dashboard > SQL Editor
 -- ============================================
 
@@ -24,8 +24,6 @@ CREATE TABLE IF NOT EXISTS posts (
   reactions JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Si la tabla posts ya existía, agregamos las columnas nuevas
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS audio_url TEXT;
 
 -- 3. Tabla de Comentarios
@@ -55,14 +53,25 @@ CREATE TABLE IF NOT EXISTS stories (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- ============================================
--- Row Level Security (Permisos públicos para la app privada)
--- ============================================
+-- 6. Tabla de Notas Bíblicas & Subrayados Compartidos
+CREATE TABLE IF NOT EXISTS bible_notes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  book_id INT NOT NULL,
+  chapter INT NOT NULL,
+  verse INT NOT NULL,
+  highlight_color TEXT,
+  note_text TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bible_notes ENABLE ROW LEVEL SECURITY;
 
 DO $$ 
 BEGIN
@@ -81,11 +90,12 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'public_stories') THEN
     CREATE POLICY "public_stories" ON stories FOR ALL USING (true) WITH CHECK (true);
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'public_bible_notes') THEN
+    CREATE POLICY "public_bible_notes" ON bible_notes FOR ALL USING (true) WITH CHECK (true);
+  END IF;
 END $$;
 
--- ============================================
 -- Storage Bucket para Fotos y Audios
--- ============================================
 INSERT INTO storage.buckets (id, name, public) VALUES ('photos', 'photos', true)
 ON CONFLICT (id) DO NOTHING;
 
@@ -105,30 +115,15 @@ BEGIN
   END IF;
 END $$;
 
--- ============================================
 -- Perfiles iniciales de Roxana y Ángel
--- ============================================
 INSERT INTO profiles (id, email, name, avatar_url, password) VALUES
   ('a1000000-0000-0000-0000-000000000001', 'roxana@aura.app', 'Roxana', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80', 'roxana123'),
   ('a1000000-0000-0000-0000-000000000002', 'angel@aura.app', 'Ángel', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', 'angel123')
 ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url;
-
--- Publicaciones iniciales de ejemplo
-INSERT INTO posts (user_id, text, photo_url, reactions) VALUES
-  ('a1000000-0000-0000-0000-000000000001', '¿Sabías que el orégano contiene carvacrol, un compuesto con potentes propiedades antimicrobianas? ¡Lo leí en un artículo científico!', 'https://images.unsplash.com/photo-1509358217858-a4f22782e4e8?auto=format&fit=crop&w=600&q=80', '{"❤️":2,"💡":3}'),
-  ('a1000000-0000-0000-0000-000000000002', 'Dato curioso bíblico: La palabra "Amén" aparece en casi todos los idiomas sin traducirse, conservando su raíz hebrea que significa "así sea".', NULL, '{"🙌":4,"❤️":1}');
-
--- Hábitos iniciales de ejemplo
-INSERT INTO habits (user_id, text, is_done) VALUES
-  ('a1000000-0000-0000-0000-000000000001', 'Lectura bíblica (15 min)', true),
-  ('a1000000-0000-0000-0000-000000000001', 'Anotar un dato curioso', true),
-  ('a1000000-0000-0000-0000-000000000001', 'Tomar 2L de agua', false),
-  ('a1000000-0000-0000-0000-000000000002', 'Lectura bíblica (15 min)', true),
-  ('a1000000-0000-0000-0000-000000000002', 'Resolver 1 reto de código', false),
-  ('a1000000-0000-0000-0000-000000000002', 'Ejercicio 30 min', false);
 
 -- Habilitar sincronización en tiempo real
 ALTER PUBLICATION supabase_realtime ADD TABLE posts;
 ALTER PUBLICATION supabase_realtime ADD TABLE comments;
 ALTER PUBLICATION supabase_realtime ADD TABLE habits;
 ALTER PUBLICATION supabase_realtime ADD TABLE stories;
+ALTER PUBLICATION supabase_realtime ADD TABLE bible_notes;

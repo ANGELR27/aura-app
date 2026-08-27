@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aura — Red Social Privada</title>
+    <title>Aura — Red Social Privada & Biblia</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,600&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Canvas Confetti for interactions -->
+    <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <script>
@@ -24,20 +24,7 @@
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        aura: {
-                            50: '#fff1f5',
-                            100: '#ffe4ec',
-                            200: '#fecddc',
-                            300: '#fda4c1',
-                            400: '#fb719f',
-                            500: '#f43f7d',
-                            600: '#e11d62',
-                            700: '#be124e',
-                            800: '#9d1243',
-                            900: '#83143b',
-                        }
+                        serif: ['Newsreader', 'serif'],
                     }
                 }
             }
@@ -67,44 +54,41 @@
 
         /* ===== Pinterest Luxe Glassmorphism ===== */
         .glass {
-            background: rgba(255, 255, 255, 0.62);
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(28px) saturate(190%);
             -webkit-backdrop-filter: blur(28px) saturate(190%);
             border: 1px solid rgba(255, 255, 255, 0.75);
             box-shadow: 0 10px 35px -5px rgba(220, 140, 180, 0.12), 
-                        0 1px 3px 0 rgba(0, 0, 0, 0.02),
                         inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(32px) saturate(200%);
             -webkit-backdrop-filter: blur(32px) saturate(200%);
             border: 1px solid rgba(255, 255, 255, 0.85);
             box-shadow: 0 14px 45px -8px rgba(210, 130, 170, 0.14),
-                        0 2px 6px 0 rgba(0, 0, 0, 0.02),
                         inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
         }
 
         .glass-subtle {
-            background: rgba(255, 255, 255, 0.42);
+            background: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .glass-hover {
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .glass-hover:hover {
-            background: rgba(255, 255, 255, 0.85);
-            transform: translateY(-3px);
-            box-shadow: 0 20px 50px -10px rgba(220, 120, 170, 0.22),
-                        inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.88);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 50px -10px rgba(220, 120, 170, 0.22);
         }
 
         .glass-dock {
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(36px) saturate(210%);
             -webkit-backdrop-filter: blur(36px) saturate(210%);
             border: 1px solid rgba(255, 255, 255, 0.9);
@@ -112,11 +96,8 @@
                         inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
         }
 
-        /* ===== Buttons & Accents ===== */
         .btn-gradient {
             background: linear-gradient(135deg, #f43f7d 0%, #d946ef 50%, #8b5cf6 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 6s ease infinite;
             color: #ffffff;
             font-weight: 600;
             border: none;
@@ -132,28 +113,24 @@
         }
 
         .btn-ghost-pill {
-            background: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.58);
             backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.7);
             transition: all 0.25s ease;
         }
         .btn-ghost-pill:hover {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             transform: translateY(-1.5px);
-            border-color: rgba(244, 63, 125, 0.3);
-        }
-        .btn-ghost-pill:active {
-            transform: scale(0.96);
         }
 
         .input-glass-luxe {
-            background: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
             border: 1.5px solid rgba(230, 210, 225, 0.6);
             transition: all 0.3s ease;
         }
         .input-glass-luxe:focus {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             border-color: #f43f7d;
             box-shadow: 0 0 0 4px rgba(244, 63, 125, 0.15);
             outline: none;
@@ -166,6 +143,40 @@
             box-shadow: 0 4px 15px rgba(244, 63, 125, 0.3);
         }
 
+        /* ===== Highlights & Annotations in Bible Reader ===== */
+        .highlight-yellow {
+            background: linear-gradient(120deg, rgba(254, 240, 138, 0.7) 0%, rgba(253, 224, 71, 0.6) 100%);
+            border-bottom: 2px solid #eab308;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+        .highlight-pink {
+            background: linear-gradient(120deg, rgba(254, 205, 220, 0.75) 0%, rgba(244, 114, 182, 0.5) 100%);
+            border-bottom: 2px solid #ec4899;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+        .highlight-green {
+            background: linear-gradient(120deg, rgba(187, 247, 208, 0.75) 0%, rgba(134, 239, 172, 0.5) 100%);
+            border-bottom: 2px solid #22c55e;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+        .highlight-blue {
+            background: linear-gradient(120deg, rgba(186, 230, 253, 0.75) 0%, rgba(125, 211, 252, 0.5) 100%);
+            border-bottom: 2px solid #0284c7;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        .verse-focus-ring {
+            animation: pulseFocus 2.5s ease-out;
+        }
+        @keyframes pulseFocus {
+            0% { background-color: rgba(244, 63, 125, 0.25); transform: scale(1.02); }
+            100% { background-color: transparent; transform: scale(1); }
+        }
+
         /* Ambient floating orbs */
         .ambient-orb {
             position: fixed;
@@ -173,27 +184,13 @@
             filter: blur(75px);
             pointer-events: none;
             z-index: 0;
-            opacity: 0.55;
-            animation: orbFloat 14s ease-in-out infinite alternate;
+            opacity: 0.5;
         }
         .orb-1 { width: 380px; height: 380px; top: -80px; left: -80px; background: radial-gradient(circle, #fecddc, #f472b6); }
-        .orb-2 { width: 420px; height: 420px; bottom: 10%; right: -100px; background: radial-gradient(circle, #e9d5ff, #c084fc); animation-delay: -5s; }
-        .orb-3 { width: 320px; height: 320px; top: 45%; left: 30%; background: radial-gradient(circle, #fed7aa, #f43f7d); opacity: 0.3; animation-delay: -9s; }
+        .orb-2 { width: 420px; height: 420px; bottom: 10%; right: -100px; background: radial-gradient(circle, #e9d5ff, #c084fc); }
 
-        @keyframes orbFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -40px) scale(1.08); }
-            100% { transform: translate(-25px, 30px) scale(0.95); }
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(35px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -220,42 +217,34 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        .record-pulse {
-            animation: pulseRec 1.2s ease-in-out infinite;
-        }
+        .record-pulse { animation: pulseRec 1.2s ease-in-out infinite; }
         @keyframes pulseRec {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.15); opacity: 0.8; }
         }
 
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(220, 160, 190, 0.35); border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(244, 63, 125, 0.5); }
     </style>
 </head>
 <body class="min-h-screen antialiased relative">
 
-    <!-- Ambient background spheres -->
     <div class="ambient-orb orb-1"></div>
     <div class="ambient-orb orb-2"></div>
-    <div class="ambient-orb orb-3"></div>
 
-    <!-- Toast Notifications container -->
     <div id="toastContainer" class="fixed top-4 right-4 left-4 sm:left-auto sm:w-80 z-[120] space-y-2 pointer-events-none"></div>
 
-    <!-- ========================== INITIAL LOADING SPINNER ========================== -->
+    <!-- ========================== LOADING SPINNER ========================== -->
     <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-100/90 via-purple-50/90 to-blue-50/90 backdrop-blur-md">
         <div class="text-center space-y-4 slide-up">
-            <div class="w-18 h-18 mx-auto p-1 story-ring-active shadow-2xl">
-                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-inner">
-                    <span class="text-2xl font-display font-extrabold bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+            <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center shadow-xl">
+                <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+                    <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
                 </div>
             </div>
             <div class="flex items-center justify-center gap-2">
                 <div class="spinner"></div>
-                <p class="text-xs font-semibold tracking-wide text-pink-900/70">Conectando con Aura...</p>
+                <p class="text-xs font-bold text-pink-900/70">Conectando con Aura...</p>
             </div>
         </div>
     </div>
@@ -263,21 +252,18 @@
     <!-- ========================== AUTH / LOGIN SCREEN ========================== -->
     <div id="authScreen" class="fixed inset-0 z-40 flex items-center justify-center p-4 overflow-y-auto" style="display:none;">
         <div class="glass-card rounded-[2.5rem] p-7 sm:p-9 max-w-md w-full slide-up space-y-6 my-auto">
-            
-            <!-- Logo Header -->
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center">
                     <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
-                        <span class="text-2xl font-display font-extrabold bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                        <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
                     </div>
                 </div>
                 <h1 class="text-2xl font-display font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 bg-clip-text text-transparent">Aura</h1>
                 <p class="text-xs font-medium text-pink-950/60 flex items-center justify-center gap-1.5">
-                    <span class="pulse-live"></span> Red Social Privada en Tiempo Real
+                    <span class="pulse-live"></span> Red Social Privada & Estudio Bíblico
                 </p>
             </div>
 
-            <!-- Login / Register Tabs -->
             <div class="flex items-center bg-black/5 p-1 rounded-2xl glass-subtle">
                 <button onclick="setAuthMode('login')" id="authTabLogin" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600">Iniciar Sesión</button>
                 <button onclick="setAuthMode('register')" id="authTabRegister" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950">Crear Cuenta</button>
@@ -332,7 +318,7 @@
                 </button>
             </div>
 
-            <!-- Quick Access Profiles -->
+            <!-- Quick Access -->
             <div class="pt-4 border-t border-pink-200/50">
                 <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-900/40 mb-3 text-center">Acceso Rápido en 1 Clic</p>
                 <div class="grid grid-cols-2 gap-2.5">
@@ -356,14 +342,13 @@
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- ========================== MAIN APPLICATION ========================== -->
     <div id="mainApp" class="relative z-10 max-w-2xl mx-auto px-3 sm:px-5 pt-4 sm:pt-6 pb-36" style="display:none;">
 
-        <!-- Top Header Navigation -->
+        <!-- Header -->
         <header class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
             <div class="flex items-center gap-2.5 sm:gap-3">
                 <div class="w-10 h-10 rounded-2xl story-ring-active flex items-center justify-center flex-shrink-0 shadow-md">
@@ -374,21 +359,18 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <h1 class="text-base sm:text-lg font-display font-extrabold tracking-tight text-pink-950">Aura</h1>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100/80 text-pink-600 font-bold border border-pink-200/60">v3.5 Cloud</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100/80 text-pink-600 font-bold border border-pink-200/60">v4.0</span>
                     </div>
                     <p class="text-[10px] text-pink-950/50 font-medium flex items-center gap-1.5">
-                        <span class="pulse-live"></span> En vivo en la nube
+                        <span class="pulse-live"></span> Conectado en la nube
                     </p>
                 </div>
             </div>
 
-            <!-- Header Actions -->
             <div class="flex items-center gap-2">
                 <button onclick="loadPosts(); triggerHaptic();" class="glass p-2.5 rounded-xl hover:bg-white transition-all cursor-pointer text-pink-700" title="Actualizar">
                     <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                 </button>
-                
-                <!-- Profile Pill -->
                 <button onclick="openProfileMenu()" class="flex items-center gap-2 glass p-1.5 pr-3 rounded-2xl hover:bg-white transition-all cursor-pointer border border-white/80 shadow-sm">
                     <img id="headerAvatar" src="" class="w-7 h-7 rounded-xl object-cover border border-pink-300">
                     <span id="headerName" class="text-xs font-bold text-pink-900 max-w-[80px] truncate"></span>
@@ -397,61 +379,60 @@
             </div>
         </header>
 
-        <!-- ===== MOMENTS & STORIES BAR ===== -->
-        <section class="glass-card rounded-[2rem] p-3.5 mb-5 fade-in">
-            <div class="flex items-center justify-between mb-2.5 px-1">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-pink-950/50 flex items-center gap-1.5">
-                    <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día
-                </span>
-                <span id="storyDateHeader" class="text-[10px] font-bold text-pink-600/70">Hoy</span>
-            </div>
-            
-            <div class="flex items-center gap-3 overflow-x-auto pb-1 pt-1 px-1 scrollbar-none" id="storiesList">
-                <!-- Add Story Button -->
-                <label class="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
-                    <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 flex items-center justify-center text-pink-500 group-hover:scale-105 transition-all shadow-sm">
-                        <i data-lucide="plus" class="w-6 h-6"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-pink-950/70">Subir foto</span>
-                    <input type="file" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
-                </label>
-
-                <!-- Stories items rendered dynamically -->
-                <div id="dynamicStories" class="flex items-center gap-3"></div>
-            </div>
-        </section>
-
         <!-- ========================== VIEW: FEED / DIARIO ========================== -->
         <main id="viewFeed" class="space-y-5">
 
-            <!-- Verse of the Day Card -->
-            <section class="glass-card rounded-[2.2rem] p-5 sm:p-6 fade-in relative overflow-hidden">
+            <!-- Stories Moments Bar -->
+            <section class="glass-card rounded-[2rem] p-3.5 fade-in">
+                <div class="flex items-center justify-between mb-2.5 px-1">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-pink-950/50 flex items-center gap-1.5">
+                        <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día
+                    </span>
+                    <span class="text-[10px] font-bold text-pink-600/70">Hoy</span>
+                </div>
+                <div class="flex items-center gap-3 overflow-x-auto pb-1 pt-1 px-1 scrollbar-none" id="storiesList">
+                    <label class="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
+                        <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 flex items-center justify-center text-pink-500 group-hover:scale-105 transition-all shadow-sm">
+                            <i data-lucide="plus" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-[10px] font-bold text-pink-950/70">Subir foto</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
+                    </label>
+                    <div id="dynamicStories" class="flex items-center gap-3"></div>
+                </div>
+            </section>
+
+            <!-- Versículo del Día Interactivo (Clic abre el pasaje completo) -->
+            <section class="glass-card rounded-[2.2rem] p-5 sm:p-6 fade-in relative overflow-hidden group cursor-pointer" onclick="openVerseInBibleReader(currentVerseData)" title="Toca para leer el capítulo completo">
                 <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-gradient-to-tr from-pink-300/30 to-purple-300/30 rounded-full blur-2xl pointer-events-none"></div>
                 
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-pink-100/90 text-pink-600 flex items-center justify-center shadow-sm">
+                        <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shadow-sm">
                             <i data-lucide="book-open" class="w-4 h-4"></i>
                         </div>
                         <div>
-                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-pink-900/40">Pasaje Bíblico Compartido</p>
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-pink-900/40">Pasaje Bíblico del Día</p>
                             <p class="text-xs font-bold text-pink-950" id="verseDate"></p>
                         </div>
                     </div>
-                    <button onclick="shuffleVerse()" class="btn-ghost-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-pink-700 flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Cambiar
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="event.stopPropagation(); shuffleVerse();" class="btn-ghost-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-pink-700 flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Cambiar
+                        </button>
+                    </div>
                 </div>
 
                 <div class="pl-4 border-l-2.5 border-pink-400/60 my-3.5 py-1">
-                    <blockquote id="verseText" class="text-xs sm:text-sm font-display font-medium italic leading-relaxed text-pink-950/90"></blockquote>
-                    <p id="verseRef" class="text-[11px] font-extrabold text-pink-600 mt-2"></p>
+                    <blockquote id="verseText" class="text-xs sm:text-sm font-serif italic leading-relaxed text-pink-950/90"></blockquote>
+                    <p id="verseRef" class="text-[11px] font-extrabold text-pink-600 mt-2 flex items-center gap-1"></p>
                 </div>
 
-                <!-- Verse Read Status for both -->
                 <div class="flex items-center justify-between pt-3 border-t border-pink-200/40">
-                    <span class="text-[10px] font-bold text-pink-900/50">Lectura completada hoy:</span>
-                    <div class="flex gap-2" id="verseStatusButtons"></div>
+                    <span class="text-[11px] font-bold text-pink-600 flex items-center gap-1 group-hover:underline">
+                        <i data-lucide="book" class="w-3.5 h-3.5"></i> Toca para leer capítulo completo
+                    </span>
+                    <div class="flex gap-2" id="verseStatusButtons" onclick="event.stopPropagation()"></div>
                 </div>
             </section>
 
@@ -467,7 +448,7 @@
 
                 <textarea id="postInput" rows="3" placeholder="Comparte un dato curioso, reflexión, pasaje o momento lindo para leer juntos..." class="input-glass-luxe w-full p-4 rounded-2xl text-xs sm:text-sm resize-none mb-3 font-medium placeholder:text-pink-900/35"></textarea>
 
-                <!-- Voice Recording Live Bar (Hidden by default) -->
+                <!-- Voice Recording Bar -->
                 <div id="voiceRecorderBar" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-rose-300/60 animate-pulse">
                     <div class="flex items-center gap-2.5">
                         <span class="w-3 h-3 rounded-full bg-rose-500 record-pulse"></span>
@@ -479,7 +460,6 @@
                     </button>
                 </div>
 
-                <!-- Audio Preview Player (If recorded) -->
                 <div id="audioPreviewContainer" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-pink-300">
                     <div class="flex items-center gap-2 text-pink-700">
                         <i data-lucide="mic" class="w-4 h-4"></i>
@@ -489,45 +469,96 @@
                     <button onclick="discardRecordedAudio()" class="p-1 text-pink-400 hover:text-rose-600 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
 
-                <!-- Action Bar -->
+                <!-- Actions -->
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center gap-2">
-                        <!-- Photo Button -->
                         <label class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-pink-700 cursor-pointer flex items-center gap-1.5">
                             <i data-lucide="image" class="w-4 h-4 text-pink-500"></i>
                             <span>Foto</span>
                             <input type="file" id="postPhotoInput" accept="image/*" class="hidden" onchange="handlePostPhoto(event)">
                         </label>
-
-                        <!-- Voice Note Button -->
                         <button type="button" onclick="startRecordingAudio()" id="btnVoiceRecord" class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-purple-700 cursor-pointer flex items-center gap-1.5">
                             <i data-lucide="mic" class="w-4 h-4 text-purple-500"></i>
                             <span>Voz</span>
                         </button>
                     </div>
-
-                    <!-- Publish Button -->
                     <button onclick="submitPost()" id="publishBtn" class="btn-gradient px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md">
                         <i data-lucide="send" class="w-4 h-4"></i>
                         <span>Publicar</span>
                     </button>
                 </div>
 
-                <!-- Photo Preview Thumbnail -->
                 <div id="postPhotoPreview" class="hidden mt-3 relative inline-block rounded-2xl overflow-hidden max-w-[220px] shadow-md">
                     <img id="postPhotoImg" src="" class="w-full h-auto rounded-2xl object-cover">
                     <button onclick="removePostPhoto()" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-full text-xs cursor-pointer"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                 </div>
             </section>
 
-            <!-- Live Feed Stream -->
-            <div class="space-y-4" id="feedList">
-                <div class="text-center py-12 glass rounded-3xl">
-                    <div class="spinner mx-auto"></div>
-                    <p class="text-xs font-semibold text-pink-900/50 mt-3">Cargando momentos en la nube...</p>
+            <!-- Feed list -->
+            <div class="space-y-4" id="feedList"></div>
+        </main>
+
+        <!-- ========================== VIEW: BIBLE READER & STUDY (BIBLIA) ========================== -->
+        <section id="viewBible" class="hidden space-y-5 fade-in">
+            <!-- Reader Header Controls -->
+            <div class="glass-card rounded-[2.2rem] p-4 sm:p-5 shadow-xl shadow-pink-500/5">
+                <div class="flex items-center justify-between mb-3">
+                    <!-- Book and Chapter Selector Button -->
+                    <button onclick="openBookSelectorModal()" class="glass px-4 py-2 rounded-2xl flex items-center gap-2 text-xs sm:text-sm font-extrabold text-pink-950 hover:bg-white transition-all cursor-pointer border border-pink-200/60 shadow-sm">
+                        <i data-lucide="book-marked" class="w-4 h-4 text-pink-500"></i>
+                        <span id="bibleCurrentBookLabel">Filipenses 4</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-pink-400"></i>
+                    </button>
+
+                    <!-- Text Size & Version controls -->
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="changeFontSize(-1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold text-pink-900 cursor-pointer" title="Reducir letra">A-</button>
+                        <button onclick="changeFontSize(1)" class="glass px-2.5 py-1.5 rounded-xl text-xs font-bold text-pink-900 cursor-pointer" title="Aumentar letra">A+</button>
+                        <span class="text-[10px] px-2 py-1 rounded-xl bg-pink-100 text-pink-700 font-extrabold">RVR1960</span>
+                    </div>
+                </div>
+
+                <!-- Chapter Fast Stepper -->
+                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 text-xs font-bold">
+                    <button onclick="prevChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 cursor-pointer">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i> Cap. Anterior
+                    </button>
+                    <span id="chapterIndicator" class="text-pink-950/60 font-semibold text-[11px]">Capítulo 4</span>
+                    <button onclick="nextChapter()" class="btn-ghost-pill px-3 py-1.5 rounded-xl flex items-center gap-1 text-pink-700 cursor-pointer">
+                        Cap. Siguiente <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
-        </main>
+
+            <!-- Chapter Verses Text Reader Card -->
+            <div class="glass-card rounded-[2.5rem] p-6 sm:p-8 space-y-4 shadow-xl">
+                <div class="text-center pb-3 border-b border-pink-200/50">
+                    <h2 id="bibleTitleHeading" class="text-xl sm:text-2xl font-serif font-bold text-pink-950">Filipenses 4</h2>
+                    <p class="text-[11px] font-medium text-pink-900/50 mt-0.5">Toca cualquier versículo para resaltar, estudiar o compartir ✨</p>
+                </div>
+
+                <!-- Text Content Area -->
+                <div id="bibleVersesContent" class="space-y-3 font-serif text-sm sm:text-base leading-relaxed text-pink-950/90" style="font-size: 16px;">
+                    <div class="text-center py-12">
+                        <div class="spinner mx-auto"></div>
+                        <p class="text-xs font-sans font-semibold text-pink-900/50 mt-3">Cargando pasaje bíblico...</p>
+                    </div>
+                </div>
+
+                <!-- Bottom Navigation Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-pink-200/40">
+                    <button onclick="prevChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i> Anterior
+                    </button>
+                    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="glass px-3 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> Arriba
+                    </button>
+                    <button onclick="nextChapter()" class="btn-ghost-pill px-4 py-2 rounded-2xl text-xs font-bold text-pink-700 flex items-center gap-1 cursor-pointer">
+                        Siguiente <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
 
         <!-- ========================== VIEW: HABITS / METAS ========================== -->
         <section id="viewHabits" class="hidden space-y-5 fade-in">
@@ -559,24 +590,102 @@
         </section>
 
         <!-- ========================== FLOATING iOS GLASS DOCK ========================== -->
-        <nav class="fixed bottom-4 left-4 right-4 max-w-md mx-auto glass-dock rounded-[2rem] p-2 flex items-center justify-around z-40 shadow-2xl">
-            <button onclick="switchTab('feed')" id="dockFeed" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold">
+        <nav class="fixed bottom-4 left-4 right-4 max-w-lg mx-auto glass-dock rounded-[2rem] p-2 flex items-center justify-around z-40 shadow-2xl">
+            <button onclick="switchTab('feed')" id="dockFeed" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold">
                 <i data-lucide="sparkles" class="w-5 h-5"></i>
                 <span class="text-[10px]">Diario</span>
             </button>
-            <button onclick="switchTab('gallery')" id="dockGallery" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="switchTab('bible')" id="dockBible" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="text-[10px]">Biblia</span>
+            </button>
+            <button onclick="switchTab('gallery')" id="dockGallery" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
                 <i data-lucide="image" class="w-5 h-5"></i>
                 <span class="text-[10px]">Galería</span>
             </button>
-            <button onclick="switchTab('habits')" id="dockHabits" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="switchTab('habits')" id="dockHabits" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
                 <i data-lucide="target" class="w-5 h-5"></i>
                 <span class="text-[10px]">Metas</span>
             </button>
-            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="text-[10px]">Perfil</span>
             </button>
         </nav>
+    </div>
+
+    <!-- ========================== BIBLE VERSE TOOLBAR MODAL / DRAWER ========================== -->
+    <div id="verseToolbarModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-pink-500"></span>
+                    <h4 id="verseToolbarHeading" class="font-display font-extrabold text-sm text-pink-950">Versículo</h4>
+                </div>
+                <button onclick="closeVerseToolbar()" class="p-1.5 rounded-xl glass hover:bg-white cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-900"></i></button>
+            </div>
+
+            <p id="verseToolbarSnippet" class="text-xs font-serif italic text-pink-950/80 bg-pink-50/60 p-3 rounded-xl line-clamp-2"></p>
+
+            <!-- Color Highlighters -->
+            <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-pink-900/50 mb-2">Subrayar / Resaltar con color</p>
+                <div class="flex items-center justify-around gap-2">
+                    <button onclick="applyVerseHighlight('yellow')" class="w-8 h-8 rounded-full bg-yellow-300 border-2 border-yellow-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Amarillo"></button>
+                    <button onclick="applyVerseHighlight('pink')" class="w-8 h-8 rounded-full bg-pink-300 border-2 border-pink-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Rosa"></button>
+                    <button onclick="applyVerseHighlight('green')" class="w-8 h-8 rounded-full bg-emerald-300 border-2 border-emerald-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Verde"></button>
+                    <button onclick="applyVerseHighlight('blue')" class="w-8 h-8 rounded-full bg-sky-300 border-2 border-sky-500 shadow-sm active:scale-90 transition-all cursor-pointer" title="Azul"></button>
+                    <button onclick="applyVerseHighlight('none')" class="w-8 h-8 rounded-full bg-white border border-pink-300 flex items-center justify-center text-pink-400 active:scale-90 transition-all cursor-pointer" title="Quitar subrayado"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+
+            <!-- Add Note -->
+            <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-pink-900/50 mb-1.5">Nota de estudio personal</p>
+                <textarea id="verseNoteInput" rows="2" placeholder="Escribe tu reflexión o apunte sobre este versículo..." class="input-glass-luxe w-full p-3 rounded-xl text-xs resize-none"></textarea>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="saveVerseStudyNote()" class="btn-gradient py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                    <i data-lucide="check" class="w-4 h-4"></i> Guardar Nota
+                </button>
+                <button onclick="shareVerseToFeed()" class="btn-ghost-pill py-2.5 rounded-xl text-xs font-bold text-pink-700 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i data-lucide="share-2" class="w-4 h-4 text-pink-500"></i> Publicar en Diario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== BIBLE BOOK & CHAPTER SELECTOR MODAL ========================== -->
+    <div id="bibleBookSelectorModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-md w-full max-h-[85vh] flex flex-col slide-up shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-pink-200/50">
+                <h3 class="font-display font-extrabold text-base text-pink-950 flex items-center gap-2">
+                    <i data-lucide="book" class="w-4 h-4 text-pink-500"></i> Elegir Libro y Capítulo
+                </h3>
+                <button onclick="closeBookSelectorModal()" class="p-1.5 rounded-xl glass hover:bg-white cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-900"></i></button>
+            </div>
+
+            <!-- Testament Toggle -->
+            <div class="flex items-center bg-black/5 p-1 rounded-2xl glass-subtle my-3">
+                <button onclick="filterBibleTestament('all')" id="tabTestamentAll" class="flex-1 py-1.5 rounded-xl text-xs font-bold bg-white text-pink-600 shadow-sm">Todos</button>
+                <button onclick="filterBibleTestament('nt')" id="tabTestamentNT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60">Nuevo Testamento</button>
+                <button onclick="filterBibleTestament('ot')" id="tabTestamentOT" class="flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60">Antiguo Testamento</button>
+            </div>
+
+            <!-- Books Grid -->
+            <div class="overflow-y-auto flex-1 pr-1 space-y-2" id="booksListContainer"></div>
+
+            <!-- Chapter Picker Section (Shown when book is selected) -->
+            <div id="chaptersPickerContainer" class="hidden pt-3 border-t border-pink-200/50 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span id="selectedBookHeading" class="text-xs font-extrabold text-pink-950">Capítulos:</span>
+                    <button onclick="backToBooksList()" class="text-[11px] font-bold text-pink-600 hover:underline">← Cambiar libro</button>
+                </div>
+                <div id="chaptersGrid" class="grid grid-cols-6 gap-2 max-h-40 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
     </div>
 
     <!-- ========================== PROFILE EDIT MODAL ========================== -->
@@ -589,7 +698,6 @@
                 <button onclick="closeProfileMenu()" class="p-2 rounded-xl glass hover:bg-white transition-all cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-800"></i></button>
             </div>
 
-            <!-- Profile Info Card -->
             <div class="glass rounded-2xl p-4 flex items-center gap-3.5 border border-pink-200/50">
                 <img id="profileAvatar" src="" class="w-14 h-14 rounded-2xl object-cover story-ring-active shadow-md">
                 <div class="truncate">
@@ -601,7 +709,6 @@
                 </div>
             </div>
 
-            <!-- Edit Name and Avatar -->
             <div class="space-y-3">
                 <div>
                     <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider">Cambiar Nombre</label>
@@ -632,7 +739,6 @@
     <!-- ========================== STORY VIEWER MODAL ========================== -->
     <div id="storyViewerModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[150] hidden flex items-center justify-center p-4">
         <div class="relative max-w-sm w-full h-[80vh] rounded-[2.5rem] overflow-hidden flex flex-col justify-between p-5 bg-cover bg-center shadow-2xl" id="storyViewerBg">
-            <!-- Top Story Bar -->
             <div class="flex items-center justify-between z-10">
                 <div class="flex items-center gap-2.5">
                     <img id="storyViewerAvatar" src="" class="w-8 h-8 rounded-full border border-white">
@@ -643,8 +749,6 @@
                 </div>
                 <button onclick="closeStoryViewer()" class="p-2 rounded-full bg-black/40 text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
-            <!-- Bottom Caption -->
             <div class="z-10 p-4 rounded-2xl glass-subtle text-white text-xs font-medium text-center">
                 <p id="storyViewerCaption">Momento compartido 💕</p>
             </div>
@@ -659,7 +763,79 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyaGljZmp1Z2NsY2NodmNremt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODIxMjEsImV4cCI6MjEwMzM1ODEyMX0.CTjIV7Gpr20u60byAFkH1v9D5onuNVA5pBOyqrfbYMg';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* ===== APPLICATION STATE ===== */
+    /* ===== BIBLE BOOKS DATA (Reina Valera 1960) ===== */
+    const BIBLE_BOOKS = [
+        // Antiguo Testamento (1-39)
+        { id: 1, name: "Génesis", chapters: 50, test: "ot" },
+        { id: 2, name: "Éxodo", chapters: 40, test: "ot" },
+        { id: 3, name: "Levítico", chapters: 27, test: "ot" },
+        { id: 4, name: "Números", chapters: 36, test: "ot" },
+        { id: 5, name: "Deuteronomio", chapters: 34, test: "ot" },
+        { id: 6, name: "Josué", chapters: 24, test: "ot" },
+        { id: 7, name: "Jueces", chapters: 21, test: "ot" },
+        { id: 8, name: "Rut", chapters: 4, test: "ot" },
+        { id: 9, name: "1 Samuel", chapters: 31, test: "ot" },
+        { id: 10, name: "2 Samuel", chapters: 24, test: "ot" },
+        { id: 11, name: "1 Reyes", chapters: 22, test: "ot" },
+        { id: 12, name: "2 Reyes", chapters: 25, test: "ot" },
+        { id: 13, name: "1 Crónicas", chapters: 29, test: "ot" },
+        { id: 14, name: "2 Crónicas", chapters: 36, test: "ot" },
+        { id: 15, name: "Esdras", chapters: 10, test: "ot" },
+        { id: 16, name: "Nehemías", chapters: 13, test: "ot" },
+        { id: 17, name: "Ester", chapters: 10, test: "ot" },
+        { id: 18, name: "Job", chapters: 42, test: "ot" },
+        { id: 19, name: "Salmos", chapters: 150, test: "ot" },
+        { id: 20, name: "Proverbios", chapters: 31, test: "ot" },
+        { id: 21, name: "Eclesiastés", chapters: 12, test: "ot" },
+        { id: 22, name: "Cantares", chapters: 8, test: "ot" },
+        { id: 23, name: "Isaías", chapters: 66, test: "ot" },
+        { id: 24, name: "Jeremías", chapters: 52, test: "ot" },
+        { id: 25, name: "Lamentaciones", chapters: 5, test: "ot" },
+        { id: 26, name: "Ezequiel", chapters: 48, test: "ot" },
+        { id: 27, name: "Daniel", chapters: 12, test: "ot" },
+        { id: 28, name: "Oseas", chapters: 14, test: "ot" },
+        { id: 29, name: "Joel", chapters: 3, test: "ot" },
+        { id: 30, name: "Amós", chapters: 9, test: "ot" },
+        { id: 31, name: "Abdías", chapters: 1, test: "ot" },
+        { id: 32, name: "Jonás", chapters: 4, test: "ot" },
+        { id: 33, name: "Miqueas", chapters: 7, test: "ot" },
+        { id: 34, name: "Nahúm", chapters: 3, test: "ot" },
+        { id: 35, name: "Habacuc", chapters: 3, test: "ot" },
+        { id: 36, name: "Sofonías", chapters: 3, test: "ot" },
+        { id: 37, name: "Hageo", chapters: 2, test: "ot" },
+        { id: 38, name: "Zacarías", chapters: 14, test: "ot" },
+        { id: 39, name: "Malaquías", chapters: 4, test: "ot" },
+        // Nuevo Testamento (40-66)
+        { id: 40, name: "Mateo", chapters: 28, test: "nt" },
+        { id: 41, name: "Marcos", chapters: 16, test: "nt" },
+        { id: 42, name: "Lucas", chapters: 24, test: "nt" },
+        { id: 43, name: "Juan", chapters: 21, test: "nt" },
+        { id: 44, name: "Hechos", chapters: 28, test: "nt" },
+        { id: 45, name: "Romanos", chapters: 16, test: "nt" },
+        { id: 46, name: "1 Corintios", chapters: 16, test: "nt" },
+        { id: 47, name: "2 Corintios", chapters: 13, test: "nt" },
+        { id: 48, name: "Gálatas", chapters: 6, test: "nt" },
+        { id: 49, name: "Efesios", chapters: 6, test: "nt" },
+        { id: 50, name: "Filipenses", chapters: 4, test: "nt" },
+        { id: 51, name: "Colosenses", chapters: 4, test: "nt" },
+        { id: 52, name: "1 Tesalonicenses", chapters: 5, test: "nt" },
+        { id: 53, name: "2 Tesalonicenses", chapters: 3, test: "nt" },
+        { id: 54, name: "1 Timoteo", chapters: 6, test: "nt" },
+        { id: 55, name: "2 Timoteo", chapters: 4, test: "nt" },
+        { id: 56, name: "Tito", chapters: 3, test: "nt" },
+        { id: 57, name: "Filemón", chapters: 1, test: "nt" },
+        { id: 58, name: "Hebreos", chapters: 13, test: "nt" },
+        { id: 59, name: "Santiago", chapters: 5, test: "nt" },
+        { id: 60, name: "1 Pedro", chapters: 5, test: "nt" },
+        { id: 61, name: "2 Pedro", chapters: 3, test: "nt" },
+        { id: 62, name: "1 Juan", chapters: 5, test: "nt" },
+        { id: 63, name: "2 Juan", chapters: 1, test: "nt" },
+        { id: 64, name: "3 Juan", chapters: 1, test: "nt" },
+        { id: 65, name: "Judas", chapters: 1, test: "nt" },
+        { id: 66, name: "Apocalipsis", chapters: 22, test: "nt" }
+    ];
+
+    /* ===== STATE ===== */
     let currentUser = null;
     let allProfiles = {};
     let postPhotoFile = null;
@@ -669,17 +845,27 @@
     let recordInterval = null;
     let recordSeconds = 0;
 
-    const VERSES = [
-        { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6-7" },
-        { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105" },
-        { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
-        { text: "El amor es sufrido, es benigno; el amor no tiene envidia.", ref: "1 Corintios 13:4" },
-        { text: "Confía en el Señor con todo tu corazón, y no te apoyes en tu propia prudencia.", ref: "Proverbios 3:5" },
-        { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz.", ref: "Jeremías 29:11" },
-        { text: "Y sobre todas estas cosas vestíos de amor, que es el vínculo perfecto.", ref: "Colosenses 3:14" }
+    // Daily Verses Catalog with direct chapter mapping
+    const DAILY_VERSES = [
+        { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6-7", bookId: 50, chapter: 4, verseNum: 6 },
+        { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105", bookId: 19, chapter: 119, verseNum: 105 },
+        { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13", bookId: 50, chapter: 4, verseNum: 13 },
+        { text: "El amor es sufrido, es benigno; el amor no tiene envidia.", ref: "1 Corintios 13:4", bookId: 46, chapter: 13, verseNum: 4 },
+        { text: "Confía en el Señor con todo tu corazón, y no te apoyes en tu propia prudencia.", ref: "Proverbios 3:5", bookId: 20, chapter: 3, verseNum: 5 },
+        { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz.", ref: "Jeremías 29:11", bookId: 24, chapter: 29, verseNum: 11 },
+        { text: "Y sobre todas estas cosas vestíos de amor, que es el vínculo perfecto.", ref: "Colosenses 3:14", bookId: 51, chapter: 3, verseNum: 14 }
     ];
     let verseIdx = 0;
+    let currentVerseData = DAILY_VERSES[0];
     let verseReadStatus = { roxana: true, angel: false };
+
+    // Bible Reader State
+    let currentBibleBookId = 50; // Filipenses
+    let currentBibleChapter = 4;
+    let targetHighlightVerse = null;
+    let bibleFontSize = 16;
+    let bibleNotesAndHighlights = JSON.parse(localStorage.getItem('aura_bible_notes') || '{}');
+    let activeVerseSelection = null; // { bookId, chapter, verse, text }
 
     /* ===== TOAST NOTIFICATIONS ===== */
     function toast(msg, type = 'info') {
@@ -700,21 +886,19 @@
         if (navigator.vibrate) navigator.vibrate(20);
     }
 
-    /* ===== LIFECYCLE & PERSISTENT SESSION ===== */
+    /* ===== INIT ===== */
     window.onload = async function() {
         lucide.createIcons();
-        
-        // Permanent persistent session from localStorage
         const savedUser = localStorage.getItem('aura_cloud_user');
         if (savedUser) {
             try {
                 currentUser = JSON.parse(savedUser);
                 await loadAllProfiles();
                 showApp();
-                await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+                await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
                 setupRealtime();
             } catch(err) {
-                console.error("Error al restaurar sesión:", err);
+                console.error(err);
                 showAuth();
             }
         } else {
@@ -780,10 +964,10 @@
         localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
         await loadAllProfiles();
         showApp();
-        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
         toast(`¡Bienvenida/o, ${data.name}! 🌸`, 'success');
-        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+        confetti({ particleCount: 60, spread: 70 });
     }
 
     async function handleRegister() {
@@ -808,24 +992,24 @@
         localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
         await loadAllProfiles();
         showApp();
-        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
         toast(`¡Cuenta creada con éxito! 💖`, 'success');
     }
 
     async function quickLogin(email, pw) {
         const { data, error } = await sb.from('profiles').select('*').eq('email', email).single();
-        if (error || !data) return toast('Perfil no encontrado. Asegúrate de ejecutar el SQL en Supabase.', 'error');
+        if (error || !data) return toast('Perfil no encontrado en Supabase. Asegúrate de ejecutar el SQL en Supabase.', 'error');
         if (data.password !== pw) return toast('Contraseña incorrecta', 'error');
 
         currentUser = data;
         localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
         await loadAllProfiles();
         showApp();
-        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        await Promise.all([loadPosts(), loadHabits(), loadStories(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
         setupRealtime();
         toast(`¡Hola, ${data.name}! 🌸`, 'success');
-        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+        confetti({ particleCount: 50, spread: 60 });
     }
 
     function handleLogout() {
@@ -833,26 +1017,23 @@
         currentUser = null;
         closeProfileMenu();
         showAuth();
-        toast('Sesión cerrada correctamente', 'info');
+        toast('Sesión cerrada', 'info');
     }
 
-    /* ===== PROFILES & HEADER ===== */
+    /* ===== PROFILES ===== */
     async function loadAllProfiles() {
         const { data } = await sb.from('profiles').select('*');
         if (data) data.forEach(p => allProfiles[p.id] = p);
     }
-
     function getProfile(id) {
         return allProfiles[id] || { name: 'Aura', avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=aura' };
     }
-
     function updateHeader() {
         document.getElementById('headerAvatar').src = currentUser.avatar_url;
         document.getElementById('headerName').innerText = currentUser.name;
         document.getElementById('postAvatar').src = currentUser.avatar_url;
         document.getElementById('postAsLabel').innerText = `Publicando como: ${currentUser.name}`;
     }
-
     function openProfileMenu() {
         document.getElementById('profileAvatar').src = currentUser.avatar_url;
         document.getElementById('profileName').innerText = currentUser.name;
@@ -867,10 +1048,10 @@
         const file = e.target.files[0]; if (!file) return;
         toast('Subiendo nueva foto...', 'info');
         const path = `avatars/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
-        const { error } = await sb.storage.from('photos').upload(path, file);
-        if (error) return toast('Error al subir foto: ' + error.message, 'error');
-        const { data: urlData } = sb.storage.from('photos').getPublicUrl(path);
-        currentUser.avatar_url = urlData.publicUrl;
+        const { error: upErr } = await sb.storage.from('photos').upload(path, file);
+        if (upErr) return toast('Error: ' + upErr.message, 'error');
+        const { data } = sb.storage.from('photos').getPublicUrl(path);
+        currentUser.avatar_url = data.publicUrl;
         document.getElementById('profileAvatar').src = currentUser.avatar_url;
         toast('Foto actualizada ✨', 'success');
     }
@@ -878,42 +1059,39 @@
     async function saveProfile() {
         const name = document.getElementById('editName').value.trim();
         if (name) currentUser.name = name;
-        const { error } = await sb.from('profiles').update({ name: currentUser.name, avatar_url: currentUser.avatar_url }).eq('id', currentUser.id);
-        if (error) return toast('Error al guardar', 'error');
+        await sb.from('profiles').update({ name: currentUser.name, avatar_url: currentUser.avatar_url }).eq('id', currentUser.id);
         localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
         allProfiles[currentUser.id] = currentUser;
         updateHeader();
         closeProfileMenu();
         loadPosts();
-        toast('Perfil guardado con éxito 💖', 'success');
+        toast('Perfil guardado 💖', 'success');
     }
 
-    /* ===== TABS & DOCK SWITCHING ===== */
+    /* ===== TABS NAVIGATION ===== */
     function switchTab(tab) {
         document.getElementById('viewFeed').classList.toggle('hidden', tab !== 'feed');
+        document.getElementById('viewBible').classList.toggle('hidden', tab !== 'bible');
         document.getElementById('viewGallery').classList.toggle('hidden', tab !== 'gallery');
         document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
 
-        ['dockFeed', 'dockGallery', 'dockHabits'].forEach(id => {
-            document.getElementById(id).className = 'flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium';
+        ['dockFeed', 'dockBible', 'dockGallery', 'dockHabits'].forEach(id => {
+            document.getElementById(id).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium';
         });
 
-        const map = {
-            feed: 'dockFeed',
-            gallery: 'dockGallery',
-            habits: 'dockHabits'
-        };
+        const map = { feed: 'dockFeed', bible: 'dockBible', gallery: 'dockGallery', habits: 'dockHabits' };
         if (map[tab]) {
-            document.getElementById(map[tab]).className = 'flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold shadow-sm';
+            document.getElementById(map[tab]).className = 'flex flex-col items-center gap-0.5 px-3 sm:px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold shadow-sm';
         }
 
         if (tab === 'gallery') loadGallery();
         if (tab === 'habits') loadHabits();
+        if (tab === 'bible') loadBibleChapter(currentBibleBookId, currentBibleChapter);
         lucide.createIcons();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ===== BIBLE VERSE SECTION ===== */
+    /* ===== BIBLE DAILY VERSE & READER LINK ===== */
     function setVerseDate() {
         const d = new Date();
         const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -921,12 +1099,13 @@
         document.getElementById('verseDate').innerText = `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`;
     }
     function renderVerse() {
-        const v = VERSES[verseIdx];
-        document.getElementById('verseText').innerText = `"${v.text}"`;
-        document.getElementById('verseRef').innerText = `— ${v.ref}`;
+        currentVerseData = DAILY_VERSES[verseIdx];
+        document.getElementById('verseText').innerText = `"${currentVerseData.text}"`;
+        document.getElementById('verseRef').innerHTML = `— ${currentVerseData.ref} <i data-lucide="external-link" class="w-3 h-3 inline"></i>`;
+        lucide.createIcons();
     }
     function shuffleVerse() {
-        verseIdx = (verseIdx + 1) % VERSES.length;
+        verseIdx = (verseIdx + 1) % DAILY_VERSES.length;
         renderVerse();
         triggerHaptic();
     }
@@ -937,10 +1116,11 @@
             const name = k === 'roxana' ? 'Roxana' : 'Ángel';
             const ok = verseReadStatus[k];
             const btn = document.createElement('button');
-            btn.onclick = () => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
                 verseReadStatus[k] = !verseReadStatus[k];
                 renderVerseStatus();
-                if (verseReadStatus[k]) confetti({ particleCount: 30, spread: 50 });
+                if (verseReadStatus[k]) confetti({ particleCount: 25 });
             };
             btn.className = ok 
                 ? 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300/60 shadow-sm cursor-pointer'
@@ -951,7 +1131,233 @@
         lucide.createIcons();
     }
 
-    /* ===== VOICE RECORDER (MediaRecorder API) ===== */
+    // Direct jump from Daily Verse Card to the full chapter in Bible Reader
+    function openVerseInBibleReader(verseData) {
+        currentBibleBookId = verseData.bookId;
+        currentBibleChapter = verseData.chapter;
+        targetHighlightVerse = verseData.verseNum;
+        switchTab('bible');
+        toast(`Abriendo ${verseData.ref}... 📖`, 'info');
+    }
+
+    /* ===== BIBLE READER ENGINE & STUDY HIGHLIGHTS ===== */
+    async function loadBibleChapter(bookId, chapter) {
+        const book = BIBLE_BOOKS.find(b => b.id === bookId) || BIBLE_BOOKS[0];
+        document.getElementById('bibleCurrentBookLabel').innerText = `${book.name} ${chapter}`;
+        document.getElementById('bibleTitleHeading').innerText = `${book.name} ${chapter}`;
+        document.getElementById('chapterIndicator').innerText = `Capítulo ${chapter} de ${book.chapters}`;
+
+        const container = document.getElementById('bibleVersesContent');
+        container.innerHTML = `<div class="text-center py-12"><div class="spinner mx-auto"></div><p class="text-xs font-sans font-semibold text-pink-900/50 mt-3">Cargando ${book.name} ${chapter}...</p></div>`;
+
+        try {
+            const res = await fetch(`https://bolls.life/get-chapter/RV1960/${bookId}/${chapter}/`);
+            const verses = await res.json();
+            renderBibleVerses(verses, book, chapter);
+        } catch(err) {
+            console.error(err);
+            container.innerHTML = `<div class="text-center py-8 glass rounded-2xl"><p class="text-xs font-sans font-bold text-rose-500">Error al conectar con la API de la Biblia.</p><button onclick="loadBibleChapter(${bookId}, ${chapter})" class="btn-gradient mt-3 px-4 py-1.5 rounded-xl text-xs font-bold">Reintentar</button></div>`;
+        }
+    }
+
+    function renderBibleVerses(verses, book, chapter) {
+        const container = document.getElementById('bibleVersesContent');
+        container.innerHTML = '';
+        container.style.fontSize = `${bibleFontSize}px`;
+
+        verses.forEach(v => {
+            const key = `${book.id}_${chapter}_${v.verse}`;
+            const studyData = bibleNotesAndHighlights[key] || {};
+            const highlightClass = studyData.color ? `highlight-${studyData.color}` : '';
+            const noteText = studyData.note || '';
+
+            const p = document.createElement('p');
+            p.id = `verse_el_${v.verse}`;
+            p.className = `p-2 rounded-xl transition-all cursor-pointer hover:bg-pink-50/70 relative group ${highlightClass}`;
+            if (targetHighlightVerse && v.verse === targetHighlightVerse) {
+                p.classList.add('verse-focus-ring', 'highlight-pink');
+            }
+
+            p.onclick = () => openVerseToolbar(book, chapter, v.verse, v.text, studyData);
+
+            p.innerHTML = `
+                <sup class="font-sans text-[11px] font-extrabold text-pink-600 mr-1 select-none">${v.verse}</sup>
+                <span class="verse-text-body">${v.text}</span>
+                ${noteText ? `
+                    <span class="block mt-1 p-2 rounded-xl bg-amber-100/80 border border-amber-300/80 text-[12px] font-sans font-medium text-amber-900 shadow-sm flex items-start gap-1.5">
+                        <i data-lucide="sticky-note" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                        <span>${noteText}</span>
+                    </span>` : ''}
+            `;
+            container.appendChild(p);
+        });
+
+        lucide.createIcons();
+
+        // If a specific verse was requested, scroll to it smoothly
+        if (targetHighlightVerse) {
+            setTimeout(() => {
+                const targetEl = document.getElementById(`verse_el_${targetHighlightVerse}`);
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetHighlightVerse = null;
+            }, 350);
+        }
+    }
+
+    function prevChapter() {
+        const book = BIBLE_BOOKS.find(b => b.id === currentBibleBookId);
+        if (currentBibleChapter > 1) {
+            currentBibleChapter--;
+        } else {
+            const prevBookIdx = BIBLE_BOOKS.findIndex(b => b.id === currentBibleBookId) - 1;
+            if (prevBookIdx >= 0) {
+                currentBibleBookId = BIBLE_BOOKS[prevBookIdx].id;
+                currentBibleChapter = BIBLE_BOOKS[prevBookIdx].chapters;
+            }
+        }
+        loadBibleChapter(currentBibleBookId, currentBibleChapter);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextChapter() {
+        const book = BIBLE_BOOKS.find(b => b.id === currentBibleBookId);
+        if (currentBibleChapter < book.chapters) {
+            currentBibleChapter++;
+        } else {
+            const nextBookIdx = BIBLE_BOOKS.findIndex(b => b.id === currentBibleBookId) + 1;
+            if (nextBookIdx < BIBLE_BOOKS.length) {
+                currentBibleBookId = BIBLE_BOOKS[nextBookIdx].id;
+                currentBibleChapter = 1;
+            }
+        }
+        loadBibleChapter(currentBibleBookId, currentBibleChapter);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changeFontSize(delta) {
+        bibleFontSize = Math.max(13, Math.min(24, bibleFontSize + delta));
+        document.getElementById('bibleVersesContent').style.fontSize = `${bibleFontSize}px`;
+    }
+
+    /* ===== VERSE TOOLBAR (Highlighter & Study Notes) ===== */
+    function openVerseToolbar(book, chapter, verse, text, studyData) {
+        activeVerseSelection = { bookId: book.id, bookName: book.name, chapter, verse, text };
+        document.getElementById('verseToolbarHeading').innerText = `${book.name} ${chapter}:${verse}`;
+        document.getElementById('verseToolbarSnippet').innerText = text;
+        document.getElementById('verseNoteInput').value = studyData.note || '';
+        document.getElementById('verseToolbarModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeVerseToolbar() {
+        document.getElementById('verseToolbarModal').classList.add('hidden');
+    }
+
+    function applyVerseHighlight(color) {
+        if (!activeVerseSelection) return;
+        const key = `${activeVerseSelection.bookId}_${activeVerseSelection.chapter}_${activeVerseSelection.verse}`;
+        if (!bibleNotesAndHighlights[key]) bibleNotesAndHighlights[key] = {};
+
+        if (color === 'none') {
+            delete bibleNotesAndHighlights[key].color;
+        } else {
+            bibleNotesAndHighlights[key].color = color;
+        }
+
+        localStorage.setItem('aura_bible_notes', JSON.stringify(bibleNotesAndHighlights));
+        triggerHaptic();
+        loadBibleChapter(currentBibleBookId, currentBibleChapter);
+        closeVerseToolbar();
+        toast('Subrayado guardado ✨', 'success');
+    }
+
+    function saveVerseStudyNote() {
+        if (!activeVerseSelection) return;
+        const note = document.getElementById('verseNoteInput').value.trim();
+        const key = `${activeVerseSelection.bookId}_${activeVerseSelection.chapter}_${activeVerseSelection.verse}`;
+        if (!bibleNotesAndHighlights[key]) bibleNotesAndHighlights[key] = {};
+
+        bibleNotesAndHighlights[key].note = note;
+        localStorage.setItem('aura_bible_notes', JSON.stringify(bibleNotesAndHighlights));
+        loadBibleChapter(currentBibleBookId, currentBibleChapter);
+        closeVerseToolbar();
+        toast('Nota de estudio guardada 📝', 'success');
+    }
+
+    function shareVerseToFeed() {
+        if (!activeVerseSelection) return;
+        const text = `📖 "${activeVerseSelection.text}" — ${activeVerseSelection.bookName} ${activeVerseSelection.chapter}:${activeVerseSelection.verse}`;
+        closeVerseToolbar();
+        switchTab('feed');
+        document.getElementById('postInput').value = text;
+        document.getElementById('postInput').focus();
+        toast('Versículo copiado al Diario listo para publicar 💖', 'info');
+    }
+
+    /* ===== BOOK SELECTOR MODAL ===== */
+    function openBookSelectorModal() {
+        filterBibleTestament('all');
+        document.getElementById('chaptersPickerContainer').classList.add('hidden');
+        document.getElementById('booksListContainer').classList.remove('hidden');
+        document.getElementById('bibleBookSelectorModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeBookSelectorModal() {
+        document.getElementById('bibleBookSelectorModal').classList.add('hidden');
+    }
+
+    function filterBibleTestament(test) {
+        ['tabTestamentAll', 'tabTestamentNT', 'tabTestamentOT'].forEach(id => {
+            document.getElementById(id).className = 'flex-1 py-1.5 rounded-xl text-xs font-semibold text-pink-950/60';
+        });
+        const activeTab = test === 'all' ? 'tabTestamentAll' : (test === 'nt' ? 'tabTestamentNT' : 'tabTestamentOT');
+        document.getElementById(activeTab).className = 'flex-1 py-1.5 rounded-xl text-xs font-bold bg-white text-pink-600 shadow-sm';
+
+        const container = document.getElementById('booksListContainer');
+        container.innerHTML = '';
+
+        const filtered = test === 'all' ? BIBLE_BOOKS : BIBLE_BOOKS.filter(b => b.test === test);
+        filtered.forEach(book => {
+            const btn = document.createElement('button');
+            btn.className = 'w-full glass p-3 rounded-2xl flex items-center justify-between text-xs font-bold text-pink-950 hover:bg-white transition-all cursor-pointer text-left';
+            btn.onclick = () => selectBookForChapters(book);
+            btn.innerHTML = `
+                <span>${book.name}</span>
+                <span class="text-[10px] text-pink-900/40 font-medium">${book.chapters} caps.</span>
+            `;
+            container.appendChild(btn);
+        });
+    }
+
+    function selectBookForChapters(book) {
+        document.getElementById('booksListContainer').classList.add('hidden');
+        document.getElementById('selectedBookHeading').innerText = `${book.name} — Selecciona Capítulo:`;
+        const grid = document.getElementById('chaptersGrid');
+        grid.innerHTML = '';
+
+        for (let i = 1; i <= book.chapters; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'glass p-2.5 rounded-xl text-xs font-bold text-pink-950 hover:bg-pink-500 hover:text-white transition-all cursor-pointer text-center';
+            btn.innerText = i;
+            btn.onclick = () => {
+                currentBibleBookId = book.id;
+                currentBibleChapter = i;
+                closeBookSelectorModal();
+                loadBibleChapter(currentBibleBookId, currentBibleChapter);
+            };
+            grid.appendChild(btn);
+        }
+
+        document.getElementById('chaptersPickerContainer').classList.remove('hidden');
+    }
+
+    function backToBooksList() {
+        document.getElementById('chaptersPickerContainer').classList.add('hidden');
+        document.getElementById('booksListContainer').classList.remove('hidden');
+    }
+
+    /* ===== VOICE RECORDER (MediaRecorder) ===== */
     async function startRecordingAudio() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -982,14 +1388,12 @@
             toast('Permiso de micrófono no disponible: ' + err.message, 'error');
         }
     }
-
     function stopRecordingAudio() {
         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
             mediaRecorder.stop();
             mediaRecorder.stream.getTracks().forEach(t => t.stop());
         }
     }
-
     function discardRecordedAudio() {
         recordedAudioBlob = null;
         document.getElementById('audioPreviewContainer').classList.add('hidden');
@@ -1057,10 +1461,10 @@
         discardRecordedAudio();
         await loadPosts();
         toast('¡Momento publicado en la nube! 💖', 'success');
-        confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
+        confetti({ particleCount: 40, spread: 60 });
     }
 
-    /* ===== LOAD & RENDER POSTS ===== */
+    /* ===== FEED & COMMENTS ===== */
     async function loadPosts() {
         const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
         if (error) { console.error(error); return; }
@@ -1132,7 +1536,6 @@
                         <audio controls class="flex-1 h-8 rounded-xl" src="${post.audio_url}"></audio>
                     </div>` : ''}
 
-                <!-- Reactions Bar -->
                 <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 text-xs">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <button onclick="react('${post.id}','❤️')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">❤️ ${reactions['❤️']||0}</button>
@@ -1145,7 +1548,6 @@
                     </div>
                 </div>
 
-                <!-- Comments Drawer -->
                 <div id="comments_${post.id}" class="hidden pt-3 border-t border-pink-200/40 space-y-2.5">
                     <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
                         ${commentsHtml || '<p class="text-[11px] text-pink-900/40 text-center py-2">Sé el primero en dejar un comentario cariñoso 💬</p>'}
@@ -1172,9 +1574,7 @@
         await loadPosts();
     }
 
-    function toggleComments(id) {
-        document.getElementById('comments_' + id)?.classList.toggle('hidden');
-    }
+    function toggleComments(id) { document.getElementById('comments_' + id)?.classList.toggle('hidden'); }
 
     async function postComment(postId) {
         const input = document.getElementById('ci_' + postId);
@@ -1195,14 +1595,9 @@
         if (upErr) return toast('Error: ' + upErr.message, 'error');
         const { data: urlData } = sb.storage.from('photos').getPublicUrl(path);
 
-        await sb.from('stories').insert({
-            user_id: currentUser.id,
-            photo_url: urlData.publicUrl,
-            caption: 'Momento de hoy ✨'
-        });
-
+        await sb.from('stories').insert({ user_id: currentUser.id, photo_url: urlData.publicUrl, caption: 'Momento de hoy ✨' });
         toast('¡Momento compartido! 📸', 'success');
-        confetti({ particleCount: 30, spread: 50 });
+        confetti({ particleCount: 30 });
         loadStories();
     }
 
@@ -1236,17 +1631,14 @@
         document.getElementById('storyViewerModal').classList.remove('hidden');
         lucide.createIcons();
     }
-    function closeStoryViewer() {
-        document.getElementById('storyViewerModal').classList.add('hidden');
-    }
+    function closeStoryViewer() { document.getElementById('storyViewerModal').classList.add('hidden'); }
 
-    /* ===== HABITS / METAS ===== */
+    /* ===== HABITS ===== */
     async function loadHabits() {
         const { data } = await sb.from('habits').select('*').order('created_at', { ascending: true });
         if (!data) return;
         renderHabits(data);
     }
-
     function renderHabits(habits) {
         const container = document.getElementById('habitsContainer');
         container.innerHTML = '';
@@ -1283,28 +1675,24 @@
         });
         lucide.createIcons();
     }
-
     async function toggleHabit(id, done) {
         triggerHaptic();
         await sb.from('habits').update({ is_done: done }).eq('id', id);
         await loadHabits();
     }
-
     async function deleteHabit(id) {
         await sb.from('habits').delete().eq('id', id);
         await loadHabits();
     }
-
     async function addHabit() {
         const text = prompt('Escribe una nueva meta para compartir:');
         if (!text) return;
         await sb.from('habits').insert({ user_id: currentUser.id, text, is_done: false });
         await loadHabits();
-        toast('Meta creada con éxito ✨', 'success');
-        confetti({ particleCount: 20 });
+        toast('Meta creada ✨', 'success');
     }
 
-    /* ===== GALLERY SECTION ===== */
+    /* ===== GALLERY ===== */
     async function loadGallery() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '<div class="col-span-full text-center py-8"><div class="spinner mx-auto"></div></div>';
@@ -1366,7 +1754,7 @@
             .subscribe();
     }
 
-    /* ===== TIME HELPER ===== */
+    /* ===== UTILS ===== */
     function formatTime(iso) {
         const d = new Date(iso);
         const now = new Date();
