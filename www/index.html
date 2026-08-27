@@ -1,37 +1,42 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura - Productividad & Aprendizaje Compartido</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura — Red Social Privada</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Canvas Confetti for interactions -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace']
                     },
                     colors: {
-                        rose: {
-                            50: '#fff1f2',
-                            100: '#ffe4e6',
-                            200: '#fecdd3',
-                            300: '#fda4af',
-                            400: '#fb7185',
-                            500: '#f43f5e'
+                        aura: {
+                            50: '#fff1f5',
+                            100: '#ffe4ec',
+                            200: '#fecddc',
+                            300: '#fda4c1',
+                            400: '#fb719f',
+                            500: '#f43f7d',
+                            600: '#e11d62',
+                            700: '#be124e',
+                            800: '#9d1243',
+                            900: '#83143b',
                         }
                     }
                 }
@@ -39,1348 +44,1339 @@
         }
     </script>
     <style>
-        body { transition: background 0.4s ease, color 0.3s ease; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        .theme-palo-rosa {
-            background: linear-gradient(135deg, #fce8ec 0%, #f7d6e0 35%, #f2c6de 70%, #fce3ec 100%);
+        html {
+            scroll-behavior: smooth;
+            height: auto;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #fdf0f4 0%, #fbe4ee 20%, #f3e8f9 50%, #eaf0fb 80%, #f6effa 100%);
             background-attachment: fixed;
-            color: #3d242b;
+            min-height: 100vh;
+            color: #2e1d32;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .theme-palo-rosa .cloud-bg {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 0;
-            background: 
-                radial-gradient(circle at 15% 15%, rgba(255, 215, 225, 0.85) 0%, transparent 45%),
-                radial-gradient(circle at 85% 25%, rgba(255, 195, 215, 0.65) 0%, transparent 55%),
-                radial-gradient(circle at 50% 85%, rgba(255, 225, 205, 0.75) 0%, transparent 50%);
-            filter: blur(40px); opacity: 0.9;
+        /* ===== Pinterest Luxe Glassmorphism ===== */
+        .glass {
+            background: rgba(255, 255, 255, 0.62);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 10px 35px -5px rgba(220, 140, 180, 0.12), 
+                        0 1px 3px 0 rgba(0, 0, 0, 0.02),
+                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
         }
 
-        .theme-palo-rosa .borderless-card {
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px -8px rgba(210, 130, 155, 0.18);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 14px 45px -8px rgba(210, 130, 170, 0.14),
+                        0 2px 6px 0 rgba(0, 0, 0, 0.02),
+                        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        .glass-subtle {
+            background: rgba(255, 255, 255, 0.42);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-hover {
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px -10px rgba(220, 120, 170, 0.22),
+                        inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+        }
+
+        .glass-dock {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(36px) saturate(210%);
+            -webkit-backdrop-filter: blur(36px) saturate(210%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 50px -10px rgba(180, 100, 150, 0.25),
+                        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        /* ===== Buttons & Accents ===== */
+        .btn-gradient {
+            background: linear-gradient(135deg, #f43f7d 0%, #d946ef 50%, #8b5cf6 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+            color: #ffffff;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 8px 25px -4px rgba(244, 63, 125, 0.45);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 12px 30px -4px rgba(244, 63, 125, 0.6);
+        }
+        .btn-gradient:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-ghost-pill {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: all 0.25s ease;
+        }
+        .btn-ghost-pill:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-1.5px);
+            border-color: rgba(244, 63, 125, 0.3);
+        }
+        .btn-ghost-pill:active {
+            transform: scale(0.96);
         }
 
-        .theme-palo-rosa .borderless-card-interactive:hover {
-            background: rgba(255, 255, 255, 0.88);
-            transform: translateY(-2px);
-            box-shadow: 0 14px 35px -8px rgba(210, 120, 150, 0.25);
+        .input-glass-luxe {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(230, 210, 225, 0.6);
+            transition: all 0.3s ease;
+        }
+        .input-glass-luxe:focus {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #f43f7d;
+            box-shadow: 0 0 0 4px rgba(244, 63, 125, 0.15);
+            outline: none;
         }
 
-        .theme-gamer {
-            background: #0f1013;
-            background-attachment: fixed;
-            color: #e2e8f0;
+        .story-ring-active {
+            padding: 2.5px;
+            background: linear-gradient(135deg, #f43f7d, #ec4899, #a855f7);
+            border-radius: 9999px;
+            box-shadow: 0 4px 15px rgba(244, 63, 125, 0.3);
         }
 
-        .theme-gamer .cloud-bg {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 0;
-            background: 
-                radial-gradient(circle at 85% 60%, rgba(217, 119, 6, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 15% 20%, rgba(30, 40, 60, 0.35) 0%, transparent 60%),
-                radial-gradient(circle at 50% 100%, rgba(15, 16, 20, 0.95) 0%, transparent 70%);
-            filter: blur(35px);
+        /* Ambient floating orbs */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(75px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.55;
+            animation: orbFloat 14s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 380px; height: 380px; top: -80px; left: -80px; background: radial-gradient(circle, #fecddc, #f472b6); }
+        .orb-2 { width: 420px; height: 420px; bottom: 10%; right: -100px; background: radial-gradient(circle, #e9d5ff, #c084fc); animation-delay: -5s; }
+        .orb-3 { width: 320px; height: 320px; top: 45%; left: 30%; background: radial-gradient(circle, #fed7aa, #f43f7d); opacity: 0.3; animation-delay: -9s; }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -40px) scale(1.08); }
+            100% { transform: translate(-25px, 30px) scale(0.95); }
         }
 
-        .theme-gamer .borderless-card {
-            background: rgba(22, 24, 31, 0.78);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .theme-gamer .borderless-card-interactive:hover {
-            background: rgba(28, 31, 41, 0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75), 0 0 15px rgba(217, 119, 6, 0.07);
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(35px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .spinner {
+            border: 2.5px solid rgba(244, 63, 125, 0.2);
+            border-top: 2.5px solid #f43f7d;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .pulse-live {
+            width: 8px; height: 8px; border-radius: 50%; background: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulseEmerald 2s infinite;
+        }
+        @keyframes pulseEmerald {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        ::-webkit-scrollbar { width: 5px; }
+        .record-pulse {
+            animation: pulseRec 1.2s ease-in-out infinite;
+        }
+        @keyframes pulseRec {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.25); border-radius: 10px; }
-
-        @keyframes wave { 0%, 100% { height: 5px; } 50% { height: 20px; } }
-        .animate-wave { animation: wave 1.2s infinite ease-in-out; }
-        .animate-wave-2 { animation: wave 1.2s infinite ease-in-out 0.2s; }
-        .animate-wave-3 { animation: wave 1.2s infinite ease-in-out 0.4s; }
+        ::-webkit-scrollbar-thumb { background: rgba(220, 160, 190, 0.35); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(244, 63, 125, 0.5); }
     </style>
 </head>
-<body class="theme-palo-rosa min-h-full font-sans antialiased selection:bg-pink-300/40 relative pb-16">
-    <div class="cloud-bg"></div>
+<body class="min-h-screen antialiased relative">
 
-    <div id="app" class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <!-- Ambient background spheres -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
 
-        <!-- TOP NAVIGATION BAR -->
-        <header class="borderless-card rounded-2xl p-3.5 sm:p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-400 via-rose-300 to-amber-300 flex items-center justify-center text-white shadow-sm font-display font-bold text-lg">
-                    A
+    <!-- Toast Notifications container -->
+    <div id="toastContainer" class="fixed top-4 right-4 left-4 sm:left-auto sm:w-80 z-[120] space-y-2 pointer-events-none"></div>
+
+    <!-- ========================== INITIAL LOADING SPINNER ========================== -->
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-100/90 via-purple-50/90 to-blue-50/90 backdrop-blur-md">
+        <div class="text-center space-y-4 slide-up">
+            <div class="w-18 h-18 mx-auto p-1 story-ring-active shadow-2xl">
+                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-inner">
+                    <span class="text-2xl font-display font-extrabold bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-center gap-2">
+                <div class="spinner"></div>
+                <p class="text-xs font-semibold tracking-wide text-pink-900/70">Conectando con Aura...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== AUTH / LOGIN SCREEN ========================== -->
+    <div id="authScreen" class="fixed inset-0 z-40 flex items-center justify-center p-4 overflow-y-auto" style="display:none;">
+        <div class="glass-card rounded-[2.5rem] p-7 sm:p-9 max-w-md w-full slide-up space-y-6 my-auto">
+            
+            <!-- Logo Header -->
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center">
+                    <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+                        <span class="text-2xl font-display font-extrabold bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-display font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 bg-clip-text text-transparent">Aura</h1>
+                <p class="text-xs font-medium text-pink-950/60 flex items-center justify-center gap-1.5">
+                    <span class="pulse-live"></span> Red Social Privada en Tiempo Real
+                </p>
+            </div>
+
+            <!-- Login / Register Tabs -->
+            <div class="flex items-center bg-black/5 p-1 rounded-2xl glass-subtle">
+                <button onclick="setAuthMode('login')" id="authTabLogin" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600">Iniciar Sesión</button>
+                <button onclick="setAuthMode('register')" id="authTabRegister" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950">Crear Cuenta</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="space-y-3.5">
+                <div>
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="email" id="loginEmail" placeholder="tu@correo.com" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
+                    </div>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-display font-bold tracking-tight flex items-center gap-2">
-                        Aura 
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-200/50 dark:bg-amber-500/20 text-rose-700 dark:text-amber-300 font-mono">v2.7</span>
-                    </h1>
-                    <p class="text-[11px] opacity-70">Red Social Privada & Aprendizaje Compartido</p>
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="password" id="loginPassword" placeholder="••••••••" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
+                    </div>
+                </div>
+                <button onclick="handleLogin()" id="loginBtn" class="btn-gradient w-full py-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> Iniciar Sesión
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="space-y-3.5" style="display:none;">
+                <div>
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Tu Nombre</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="text" id="registerName" placeholder="Ej: Roxana" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Correo Electrónico</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="email" id="registerEmail" placeholder="tu@correo.com" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider mb-1 block">Contraseña</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" class="input-glass-luxe w-full pl-10 pr-4 py-3 rounded-2xl text-xs sm:text-sm font-medium">
+                    </div>
+                </div>
+                <button onclick="handleRegister()" id="registerBtn" class="btn-gradient w-full py-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Crear mi Cuenta
+                </button>
+            </div>
+
+            <!-- Quick Access Profiles -->
+            <div class="pt-4 border-t border-pink-200/50">
+                <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-900/40 mb-3 text-center">Acceso Rápido en 1 Clic</p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button onclick="quickLogin('roxana@aura.app','roxana123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 transition-all cursor-pointer text-left group">
+                        <div class="w-9 h-9 rounded-xl overflow-hidden story-ring-active flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-full h-full object-cover">
+                        </div>
+                        <div class="truncate">
+                            <p class="text-xs font-bold text-pink-600 group-hover:text-pink-700">Roxana</p>
+                            <p class="text-[9px] text-pink-950/50 truncate">Ella</p>
+                        </div>
+                    </button>
+                    <button onclick="quickLogin('angel@aura.app','angel123')" class="glass p-3 rounded-2xl flex items-center gap-2.5 hover:bg-white/80 transition-all cursor-pointer text-left group">
+                        <div class="w-9 h-9 rounded-xl overflow-hidden story-ring-active flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" class="w-full h-full object-cover">
+                        </div>
+                        <div class="truncate">
+                            <p class="text-xs font-bold text-purple-600 group-hover:text-purple-700">Ángel</p>
+                            <p class="text-[9px] text-pink-950/50 truncate">Él</p>
+                        </div>
+                    </button>
                 </div>
             </div>
 
-            <!-- Profile & Controls -->
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
-                <!-- Notifications Bell Icon -->
-                <button onclick="openNotificationsModal()" class="relative p-2 rounded-xl bg-white/40 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 transition-all text-xs font-medium cursor-pointer" title="Notificaciones">
-                    <i data-lucide="bell" class="w-4 h-4 text-pink-600 dark:text-amber-400"></i>
-                    <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono font-bold text-[9px] flex items-center justify-center animate-pulse">0</span>
-                </button>
+        </div>
+    </div>
 
-                <!-- Theme Toggle -->
-                <button id="themeToggleBtn" onclick="toggleTheme()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/40 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 transition-all text-xs font-medium cursor-pointer">
-                    <span id="themeIcon" class="w-3.5 h-3.5"><i data-lucide="palette"></i></span>
-                    <span id="themeLabel">Tema: Palo Rosa</span>
-                </button>
+    <!-- ========================== MAIN APPLICATION ========================== -->
+    <div id="mainApp" class="relative z-10 max-w-2xl mx-auto px-3 sm:px-5 pt-4 sm:pt-6 pb-36" style="display:none;">
 
-                <!-- Active User Profile Pill -->
-                <div id="userProfileBox" class="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
-                    <img id="headerUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="w-7 h-7 rounded-lg object-cover border border-white/60">
-                    <div class="text-left pr-1">
-                        <p id="headerUserName" class="text-xs font-bold leading-none text-pink-600 dark:text-amber-300">Sofía</p>
+        <!-- Top Header Navigation -->
+        <header class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-10 h-10 rounded-2xl story-ring-active flex items-center justify-center flex-shrink-0 shadow-md">
+                    <div class="w-full h-full rounded-xl bg-white flex items-center justify-center">
+                        <span class="font-display font-black text-lg bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">A</span>
                     </div>
-                    <button onclick="openProfileModal()" class="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 text-xs opacity-70 hover:opacity-100 transition-all" title="Editar Perfil">
-                        <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="openAuthModal()" class="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 text-xs text-rose-500 opacity-80 hover:opacity-100 transition-all" title="Cambiar Cuenta">
-                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                    </button>
                 </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-base sm:text-lg font-display font-extrabold tracking-tight text-pink-950">Aura</h1>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100/80 text-pink-600 font-bold border border-pink-200/60">v3.5 Cloud</span>
+                    </div>
+                    <p class="text-[10px] text-pink-950/50 font-medium flex items-center gap-1.5">
+                        <span class="pulse-live"></span> En vivo en la nube
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2">
+                <button onclick="loadPosts(); triggerHaptic();" class="glass p-2.5 rounded-xl hover:bg-white transition-all cursor-pointer text-pink-700" title="Actualizar">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                </button>
+                
+                <!-- Profile Pill -->
+                <button onclick="openProfileMenu()" class="flex items-center gap-2 glass p-1.5 pr-3 rounded-2xl hover:bg-white transition-all cursor-pointer border border-white/80 shadow-sm">
+                    <img id="headerAvatar" src="" class="w-7 h-7 rounded-xl object-cover border border-pink-300">
+                    <span id="headerName" class="text-xs font-bold text-pink-900 max-w-[80px] truncate"></span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-pink-400"></i>
+                </button>
             </div>
         </header>
 
-        <!-- NAVIGATION TABS & STREAK BADGE -->
-        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-            <nav class="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
-                <button onclick="switchTab('feed')" id="tabFeed" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-stone-800 text-stone-800 dark:text-white shadow-sm">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-500 dark:text-amber-400"></i>
-                    Diario Hoy
-                </button>
-                <button onclick="switchTab('habits')" id="tabHabits" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-70 hover:opacity-100">
-                    <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
-                    Metas & Hábitos
-                </button>
-                <button onclick="switchTab('bitacora')" id="tabBitacora" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-70 hover:opacity-100">
-                    <i data-lucide="grid" class="w-3.5 h-3.5"></i>
-                    Bitácora
-                </button>
-            </nav>
-
-            <div class="borderless-card px-3.5 py-1.5 rounded-xl flex items-center gap-2 text-xs font-medium">
-                <span class="text-amber-500 animate-bounce"><i data-lucide="flame" class="w-3.5 h-3.5 fill-amber-500"></i></span>
-                <span>Racha: <strong id="streakCount" class="font-bold text-amber-600 dark:text-amber-400">12 días</strong></span>
+        <!-- ===== MOMENTS & STORIES BAR ===== -->
+        <section class="glass-card rounded-[2rem] p-3.5 mb-5 fade-in">
+            <div class="flex items-center justify-between mb-2.5 px-1">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-pink-950/50 flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día
+                </span>
+                <span id="storyDateHeader" class="text-[10px] font-bold text-pink-600/70">Hoy</span>
             </div>
-        </div>
-
-        <!-- TAB CONTENT 1: DIARIO HOY (FEED) -->
-        <main id="viewFeed" class="space-y-6">
-
-            <!-- BIBLE VERSE SECTION -->
-            <section class="borderless-card rounded-2xl p-5 relative overflow-hidden transition-all">
-                <div class="flex items-center justify-between gap-4 mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="p-1.5 rounded-lg bg-pink-500/10 dark:bg-amber-500/10 text-pink-600 dark:text-amber-400">
-                            <i data-lucide="book-open" class="w-4 h-4"></i>
-                        </span>
-                        <div>
-                            <h2 class="text-[10px] uppercase tracking-wider font-semibold opacity-60">Pasaje Bíblico de Hoy</h2>
-                            <p class="text-xs font-semibold opacity-90" id="verseDate">Lunes, 27 de Julio</p>
-                        </div>
+            
+            <div class="flex items-center gap-3 overflow-x-auto pb-1 pt-1 px-1 scrollbar-none" id="storiesList">
+                <!-- Add Story Button -->
+                <label class="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
+                    <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 flex items-center justify-center text-pink-500 group-hover:scale-105 transition-all shadow-sm">
+                        <i data-lucide="plus" class="w-6 h-6"></i>
                     </div>
-                    <button onclick="openVerseModal()" class="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-white/50 dark:bg-white/10 hover:bg-white/80 transition-all cursor-pointer">
-                        <i data-lucide="shuffle" class="w-3 h-3"></i>
-                        <span>Cambiar</span>
-                    </button>
-                </div>
+                    <span class="text-[10px] font-bold text-pink-950/70">Subir foto</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
+                </label>
 
-                <div class="my-4 pl-3.5 border-l-2 border-pink-400 dark:border-amber-500">
-                    <blockquote id="verseText" class="text-sm sm:text-base font-display font-medium italic leading-relaxed mb-1">
-                        "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones."
-                    </blockquote>
-                    <p id="verseRef" class="text-xs font-semibold opacity-80 text-pink-700 dark:text-amber-300">— Filipenses 4:6-7</p>
-                </div>
+                <!-- Stories items rendered dynamically -->
+                <div id="dynamicStories" class="flex items-center gap-3"></div>
+            </div>
+        </section>
 
-                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-black/5 dark:border-white/5">
-                    <div class="text-[11px] font-medium opacity-70">Estado de Lectura:</div>
-                    <div class="flex items-center gap-2" id="verseReadingStatusContainer">
-                        <!-- Injected via JS -->
-                    </div>
-                </div>
-            </section>
+        <!-- ========================== VIEW: FEED / DIARIO ========================== -->
+        <main id="viewFeed" class="space-y-5">
 
-
-            <!-- CREATE POST FORM -->
-            <section class="borderless-card rounded-2xl p-5 transition-all">
+            <!-- Verse of the Day Card -->
+            <section class="glass-card rounded-[2.2rem] p-5 sm:p-6 fade-in relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-gradient-to-tr from-pink-300/30 to-purple-300/30 rounded-full blur-2xl pointer-events-none"></div>
+                
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2.5">
-                        <img id="formUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-xl object-cover border border-white/60">
+                        <div class="w-8 h-8 rounded-xl bg-pink-100/90 text-pink-600 flex items-center justify-center shadow-sm">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                        </div>
                         <div>
-                            <h2 class="font-display font-bold text-sm">¿Qué aprendiste hoy?</h2>
-                            <p class="text-[10px] opacity-60 font-mono" id="currentUserBadge">Publicando como: Sofía</p>
+                            <p class="text-[9px] uppercase tracking-widest font-extrabold text-pink-900/40">Pasaje Bíblico Compartido</p>
+                            <p class="text-xs font-bold text-pink-950" id="verseDate"></p>
                         </div>
                     </div>
+                    <button onclick="shuffleVerse()" class="btn-ghost-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-pink-700 flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Cambiar
+                    </button>
                 </div>
 
-                <div class="space-y-3">
-                    <textarea id="entryInput" rows="2.5" placeholder="Escribe un dato curioso, concepto clave o reflexión que no sabías hasta hoy..." class="w-full p-3.5 rounded-xl bg-white/60 dark:bg-black/20 border-0 focus:ring-2 focus:ring-pink-400 dark:focus:ring-amber-500 outline-none resize-none text-xs sm:text-sm placeholder:opacity-50 transition-all"></textarea>
+                <div class="pl-4 border-l-2.5 border-pink-400/60 my-3.5 py-1">
+                    <blockquote id="verseText" class="text-xs sm:text-sm font-display font-medium italic leading-relaxed text-pink-950/90"></blockquote>
+                    <p id="verseRef" class="text-[11px] font-extrabold text-pink-600 mt-2"></p>
+                </div>
 
-                    <!-- File & Action Toolbar -->
-                    <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
-                        <div class="flex items-center gap-1.5">
-                            <!-- Attach Photo Button -->
-                            <label class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/50 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 transition-all text-xs font-medium cursor-pointer">
-                                <i data-lucide="image" class="w-3.5 h-3.5 text-blue-500"></i>
-                                <span>Foto</span>
-                                <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
-                            </label>
-
-                            <!-- Audio Recorder Button -->
-                            <button id="recordAudioBtn" onclick="toggleAudioRecording()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/50 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 transition-all text-xs font-medium cursor-pointer">
-                                <i data-lucide="mic" class="w-3.5 h-3.5 text-rose-500" id="micIcon"></i>
-                                <span id="recordAudioLabel">Voz</span>
-                            </button>
-                        </div>
-
-                        <!-- Compact Professional Submit Button -->
-                        <button onclick="submitNewEntry()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 dark:from-amber-600 dark:to-amber-500 text-white font-semibold text-xs shadow hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                            <span>Publicar</span>
-                        </button>
-                    </div>
-
-                    <!-- Photo Preview Box -->
-                    <div id="photoPreviewContainer" class="hidden relative inline-block rounded-xl overflow-hidden mt-2 max-w-xs border border-pink-300 dark:border-amber-500/30">
-                        <img id="photoPreviewImg" src="" alt="Vista previa" class="h-28 w-auto object-cover">
-                        <button onclick="removePhotoPreview()" class="absolute top-1.5 right-1.5 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-all">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </div>
-
-                    <!-- Voice Recorder Status Box -->
-                    <div id="audioRecorderBox" class="hidden p-2.5 rounded-xl bg-rose-500/10 dark:bg-amber-500/10 flex items-center justify-between border border-rose-500/20">
-                        <div class="flex items-center gap-2">
-                            <div class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></div>
-                            <span class="text-xs font-semibold text-rose-700 dark:text-amber-300">Grabando...</span>
-                            <span id="recordingTimer" class="font-mono text-xs font-bold">00:00</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <div class="w-1 bg-rose-500 rounded-full h-2.5 animate-wave"></div>
-                            <div class="w-1 bg-rose-500 rounded-full h-4 animate-wave-2"></div>
-                            <div class="w-1 bg-rose-500 rounded-full h-2 animate-wave-3"></div>
-                        </div>
-                    </div>
-
-                    <!-- Audio Playback Preview Box -->
-                    <div id="audioPreviewContainer" class="hidden p-2.5 rounded-xl bg-emerald-500/10 flex items-center justify-between border border-emerald-500/20">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
-                            <span class="text-xs font-medium text-emerald-800 dark:text-emerald-300">Nota de voz</span>
-                        </div>
-                        <audio id="audioPreviewPlayer" controls class="h-7 max-w-xs"></audio>
-                        <button onclick="removeAudioPreview()" class="text-xs text-rose-500 hover:underline">Eliminar</button>
-                    </div>
+                <!-- Verse Read Status for both -->
+                <div class="flex items-center justify-between pt-3 border-t border-pink-200/40">
+                    <span class="text-[10px] font-bold text-pink-900/50">Lectura completada hoy:</span>
+                    <div class="flex gap-2" id="verseStatusButtons"></div>
                 </div>
             </section>
 
-
-            <!-- FEED ENTRIES LIST -->
-            <section class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-display font-bold text-base flex items-center gap-1.5">
-                        <i data-lucide="activity" class="w-4 h-4 text-pink-500 dark:text-amber-400"></i>
-                        Publicaciones Recientes
-                    </h3>
-                    <span class="text-[11px] opacity-60">Sincronizado en vivo</span>
+            <!-- Create Post Card -->
+            <section class="glass-card rounded-[2.2rem] p-5 sm:p-6 fade-in shadow-xl shadow-pink-500/5">
+                <div class="flex items-center gap-3 mb-3.5">
+                    <img id="postAvatar" src="" class="w-9 h-9 rounded-2xl object-cover story-ring-active shadow-sm">
+                    <div>
+                        <p class="text-xs sm:text-sm font-extrabold text-pink-950">¿Qué descubriste o aprendiste hoy?</p>
+                        <p class="text-[10px] font-medium text-pink-600" id="postAsLabel"></p>
+                    </div>
                 </div>
 
-                <div id="feedList" class="space-y-4">
-                    <!-- Dynamic feed entries -->
+                <textarea id="postInput" rows="3" placeholder="Comparte un dato curioso, reflexión, pasaje o momento lindo para leer juntos..." class="input-glass-luxe w-full p-4 rounded-2xl text-xs sm:text-sm resize-none mb-3 font-medium placeholder:text-pink-900/35"></textarea>
+
+                <!-- Voice Recording Live Bar (Hidden by default) -->
+                <div id="voiceRecorderBar" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-rose-300/60 animate-pulse">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 record-pulse"></span>
+                        <span class="text-xs font-bold text-rose-600">Grabando Nota de Voz...</span>
+                        <span id="recordTimer" class="text-xs font-mono font-bold text-rose-700">00:00</span>
+                    </div>
+                    <button onclick="stopRecordingAudio()" class="px-3 py-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer">
+                        Listo
+                    </button>
+                </div>
+
+                <!-- Audio Preview Player (If recorded) -->
+                <div id="audioPreviewContainer" class="hidden glass p-3 rounded-2xl mb-3 flex items-center justify-between border border-pink-300">
+                    <div class="flex items-center gap-2 text-pink-700">
+                        <i data-lucide="mic" class="w-4 h-4"></i>
+                        <span class="text-xs font-bold">Nota de voz lista</span>
+                        <audio id="audioPreviewElement" controls class="h-8 max-w-[180px] sm:max-w-xs"></audio>
+                    </div>
+                    <button onclick="discardRecordedAudio()" class="p-1 text-pink-400 hover:text-rose-600 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center gap-2">
+                        <!-- Photo Button -->
+                        <label class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-pink-700 cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="image" class="w-4 h-4 text-pink-500"></i>
+                            <span>Foto</span>
+                            <input type="file" id="postPhotoInput" accept="image/*" class="hidden" onchange="handlePostPhoto(event)">
+                        </label>
+
+                        <!-- Voice Note Button -->
+                        <button type="button" onclick="startRecordingAudio()" id="btnVoiceRecord" class="btn-ghost-pill px-3 py-2 rounded-xl text-xs font-bold text-purple-700 cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="mic" class="w-4 h-4 text-purple-500"></i>
+                            <span>Voz</span>
+                        </button>
+                    </div>
+
+                    <!-- Publish Button -->
+                    <button onclick="submitPost()" id="publishBtn" class="btn-gradient px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Publicar</span>
+                    </button>
+                </div>
+
+                <!-- Photo Preview Thumbnail -->
+                <div id="postPhotoPreview" class="hidden mt-3 relative inline-block rounded-2xl overflow-hidden max-w-[220px] shadow-md">
+                    <img id="postPhotoImg" src="" class="w-full h-auto rounded-2xl object-cover">
+                    <button onclick="removePostPhoto()" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-full text-xs cursor-pointer"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                 </div>
             </section>
+
+            <!-- Live Feed Stream -->
+            <div class="space-y-4" id="feedList">
+                <div class="text-center py-12 glass rounded-3xl">
+                    <div class="spinner mx-auto"></div>
+                    <p class="text-xs font-semibold text-pink-900/50 mt-3">Cargando momentos en la nube...</p>
+                </div>
+            </div>
         </main>
 
-
-        <!-- TAB CONTENT 2: METAS Y HÁBITOS -->
-        <section id="viewHabits" class="hidden space-y-6">
-            <div class="borderless-card rounded-2xl p-5 sm:p-6">
-                <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <!-- ========================== VIEW: HABITS / METAS ========================== -->
+        <section id="viewHabits" class="hidden space-y-5 fade-in">
+            <div class="glass-card rounded-[2.2rem] p-5 sm:p-6 shadow-xl shadow-pink-500/5">
+                <div class="flex items-center justify-between mb-5">
                     <div>
-                        <h2 class="text-lg font-display font-bold">Hábitos & Metas Diarias</h2>
-                        <p class="text-xs opacity-70">Constancia compartida por perfil</p>
+                        <h2 class="text-base sm:text-lg font-display font-extrabold text-pink-950">Metas & Hábitos Compartidos</h2>
+                        <p class="text-[11px] font-medium text-pink-900/50">Progreso diario sincronizado en vivo</p>
                     </div>
-                    <button onclick="promptAddHabit()" class="px-3 py-1.5 rounded-xl bg-white/50 dark:bg-white/10 hover:bg-white/80 transition-all text-xs font-semibold flex items-center gap-1 cursor-pointer">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Añadir Meta</span>
+                    <button onclick="addHabit()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Nueva Meta
                     </button>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="habitsColumnsContainer">
-                    <!-- Dynamic habit columns -->
-                </div>
+                <div id="habitsContainer" class="space-y-4"></div>
             </div>
         </section>
 
-
-        <!-- TAB CONTENT 3: BITÁCORA -->
-        <section id="viewBitacora" class="hidden space-y-5">
-            <div class="borderless-card rounded-2xl p-5 sm:p-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+        <!-- ========================== VIEW: GALLERY / BITÁCORA ========================== -->
+        <section id="viewGallery" class="hidden space-y-5 fade-in">
+            <div class="glass-card rounded-[2.2rem] p-5 sm:p-6 shadow-xl shadow-pink-500/5">
+                <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-lg font-display font-bold">Bitácora & Galería</h2>
-                        <p class="text-xs opacity-70">Archivo histórico multimedia</p>
-                    </div>
-
-                    <div class="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1 rounded-xl text-xs">
-                        <button onclick="filterBitacora('all')" id="btnFilterAll" class="px-2.5 py-1 rounded-lg font-semibold bg-white dark:bg-stone-800 shadow-sm">Todos</button>
-                        <button onclick="filterBitacora('photos')" id="btnFilterPhotos" class="px-2.5 py-1 rounded-lg opacity-70 hover:opacity-100">Fotos</button>
-                        <button onclick="filterBitacora('audio')" id="btnFilterAudio" class="px-2.5 py-1 rounded-lg opacity-70 hover:opacity-100">Audios</button>
+                        <h2 class="text-base sm:text-lg font-display font-extrabold text-pink-950">Galería de Recuerdos</h2>
+                        <p class="text-[11px] font-medium text-pink-900/50">Álbum multimedia de todas las fotos compartidas</p>
                     </div>
                 </div>
-
-                <div id="bitacoraGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                    <!-- Injected dynamically -->
-                </div>
+                <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
             </div>
         </section>
 
+        <!-- ========================== FLOATING iOS GLASS DOCK ========================== -->
+        <nav class="fixed bottom-4 left-4 right-4 max-w-md mx-auto glass-dock rounded-[2rem] p-2 flex items-center justify-around z-40 shadow-2xl">
+            <button onclick="switchTab('feed')" id="dockFeed" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <span class="text-[10px]">Diario</span>
+            </button>
+            <button onclick="switchTab('gallery')" id="dockGallery" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+                <i data-lucide="image" class="w-5 h-5"></i>
+                <span class="text-[10px]">Galería</span>
+            </button>
+            <button onclick="switchTab('habits')" id="dockHabits" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+                <i data-lucide="target" class="w-5 h-5"></i>
+                <span class="text-[10px]">Metas</span>
+            </button>
+            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px]">Perfil</span>
+            </button>
+        </nav>
     </div>
 
-
-    <!-- MODAL 1: AUTH / PERFILES -->
-    <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="borderless-card rounded-2xl p-6 max-w-sm w-full shadow-2xl relative space-y-5">
+    <!-- ========================== PROFILE EDIT MODAL ========================== -->
+    <div id="profileMenuModal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-[2.2rem] p-6 sm:p-7 max-w-sm w-full slide-up space-y-5">
             <div class="flex items-center justify-between">
-                <h3 class="font-display font-bold text-lg flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-5 h-5 text-pink-500"></i>
-                    Seleccionar Perfil
+                <h3 class="font-display font-extrabold text-base sm:text-lg text-pink-950 flex items-center gap-2">
+                    <i data-lucide="user-circle" class="w-5 h-5 text-pink-500"></i> Mi Perfil
                 </h3>
-                <button onclick="closeAuthModal()" class="p-1 rounded-full opacity-60 hover:opacity-100">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <button onclick="closeProfileMenu()" class="p-2 rounded-xl glass hover:bg-white transition-all cursor-pointer"><i data-lucide="x" class="w-4 h-4 text-pink-800"></i></button>
             </div>
 
-            <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wider opacity-60 mb-2.5">Acceso Rápido:</p>
-                <div class="grid grid-cols-2 gap-2.5">
-                    <button onclick="switchQuickProfile('sofia')" class="p-2.5 rounded-xl borderless-card flex items-center gap-2.5 hover:scale-[1.02] transition-all cursor-pointer text-left">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover">
-                        <div>
-                            <p class="text-xs font-bold text-pink-600 dark:text-pink-300">Sofía</p>
-                            <p class="text-[10px] opacity-60">sofia@aura.app</p>
-                        </div>
-                    </button>
-                    <button onclick="switchQuickProfile('mateo')" class="p-2.5 rounded-xl borderless-card flex items-center gap-2.5 hover:scale-[1.02] transition-all cursor-pointer text-left">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover">
-                        <div>
-                            <p class="text-xs font-bold text-amber-600 dark:text-amber-300">Mateo</p>
-                            <p class="text-[10px] opacity-60">mateo@aura.app</p>
-                        </div>
-                    </button>
+            <!-- Profile Info Card -->
+            <div class="glass rounded-2xl p-4 flex items-center gap-3.5 border border-pink-200/50">
+                <img id="profileAvatar" src="" class="w-14 h-14 rounded-2xl object-cover story-ring-active shadow-md">
+                <div class="truncate">
+                    <p id="profileName" class="font-display font-extrabold text-sm text-pink-950"></p>
+                    <p id="profileEmail" class="text-[11px] text-pink-950/50 font-medium truncate"></p>
+                    <p class="text-[10px] text-emerald-600 font-bold mt-0.5 flex items-center gap-1.5">
+                        <span class="pulse-live"></span> Sesión activa en la nube
+                    </p>
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-black/10 dark:border-white/10 space-y-2.5">
-                <p class="text-[11px] font-semibold uppercase tracking-wider opacity-60">Acceso por Correo:</p>
-                <input type="email" id="authEmail" placeholder="Tu correo electrónico" class="w-full px-3.5 py-2 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400">
-                <input type="password" id="authPassword" placeholder="Tu contraseña" class="w-full px-3.5 py-2 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400">
-
-                <div class="flex gap-2 pt-1">
-                    <button onclick="handleSupabaseLogin()" class="w-full py-2 rounded-xl bg-pink-500 dark:bg-amber-600 text-white font-semibold text-xs shadow hover:opacity-90 transition-all">Iniciar Sesión</button>
-                    <button onclick="handleSupabaseSignUp()" class="w-full py-2 rounded-xl bg-white/50 dark:bg-white/10 font-semibold text-xs hover:bg-white/80 transition-all">Crear Cuenta</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- MODAL 2: EDITAR PERFIL DE USUARIO -->
-    <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="borderless-card rounded-2xl p-6 max-w-sm w-full shadow-2xl relative space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-bold text-base flex items-center gap-2">
-                    <i data-lucide="user-edit" class="w-4 h-4 text-pink-500"></i>
-                    Editar mi Perfil
-                </h3>
-                <button onclick="closeProfileModal()" class="p-1 rounded-full opacity-60 hover:opacity-100">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
+            <!-- Edit Name and Avatar -->
             <div class="space-y-3">
                 <div>
-                    <label class="text-xs font-semibold opacity-70">Nombre a Mostrar:</label>
-                    <input type="text" id="profileNameInput" class="w-full mt-1 px-3.5 py-1.5 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400">
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider">Cambiar Nombre</label>
+                    <input type="text" id="editName" class="input-glass-luxe w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold mt-1">
                 </div>
-
-                <!-- Avatar Selection via Gallery or URL -->
                 <div>
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold opacity-70">Foto de Perfil (Avatar):</label>
-                        <!-- Upload from device gallery button -->
-                        <label class="cursor-pointer text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-pink-500/10 text-pink-600 dark:text-pink-300 hover:bg-pink-500/20 transition-all flex items-center gap-1">
-                            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                            <span>Subir de Galería</span>
-                            <input type="file" id="profileAvatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarFileSelect(event)">
+                    <label class="text-[11px] font-bold text-pink-950/60 uppercase tracking-wider">Foto de Perfil</label>
+                    <div class="mt-1">
+                        <label class="btn-ghost-pill px-4 py-2.5 rounded-xl text-xs font-bold text-pink-700 cursor-pointer flex items-center justify-center gap-2">
+                            <i data-lucide="camera" class="w-4 h-4"></i> Subir Nueva Foto
+                            <input type="file" id="editAvatarFile" accept="image/*" class="hidden" onchange="handleEditAvatar(event)">
                         </label>
                     </div>
-                    <input type="url" id="profileAvatarInput" class="w-full mt-1.5 px-3.5 py-1.5 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400" placeholder="https://...">
                 </div>
+            </div>
 
-                <div>
-                    <label class="text-[11px] opacity-70">O elige uno predeterminado:</label>
-                    <div class="flex items-center gap-2 mt-1.5">
-                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80')" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover cursor-pointer hover:scale-110 transition-all border border-pink-400">
-                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80')" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover cursor-pointer hover:scale-110 transition-all border border-amber-400">
-                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80')" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover cursor-pointer hover:scale-110 transition-all">
-                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80')" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" class="w-8 h-8 rounded-lg object-cover cursor-pointer hover:scale-110 transition-all">
+            <div class="flex gap-2 pt-2">
+                <button onclick="saveProfile()" class="btn-gradient flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                    <i data-lucide="check" class="w-4 h-4"></i> Guardar
+                </button>
+                <button onclick="handleLogout()" class="btn-ghost-pill flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-rose-600 hover:bg-rose-50">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Salir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== STORY VIEWER MODAL ========================== -->
+    <div id="storyViewerModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[150] hidden flex items-center justify-center p-4">
+        <div class="relative max-w-sm w-full h-[80vh] rounded-[2.5rem] overflow-hidden flex flex-col justify-between p-5 bg-cover bg-center shadow-2xl" id="storyViewerBg">
+            <!-- Top Story Bar -->
+            <div class="flex items-center justify-between z-10">
+                <div class="flex items-center gap-2.5">
+                    <img id="storyViewerAvatar" src="" class="w-8 h-8 rounded-full border border-white">
+                    <div>
+                        <p id="storyViewerName" class="text-xs font-bold text-white"></p>
+                        <p id="storyViewerTime" class="text-[9px] text-white/70"></p>
                     </div>
                 </div>
-
-                <!-- Password Change Section -->
-                <div class="pt-3 border-t border-black/10 dark:border-white/10 space-y-2">
-                    <label class="text-xs font-semibold opacity-70">Cambiar Contraseña:</label>
-                    <input type="password" id="newPasswordInput" placeholder="Nueva contraseña" class="w-full px-3.5 py-1.5 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400">
-                </div>
+                <button onclick="closeStoryViewer()" class="p-2 rounded-full bg-black/40 text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <div class="pt-2 flex justify-end gap-2">
-                <button onclick="closeProfileModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-black/5 dark:bg-white/10 hover:bg-black/10">Cancelar</button>
-                <button onclick="saveUserProfile()" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pink-500 dark:bg-amber-600 text-white shadow">Guardar Cambios</button>
+            <!-- Bottom Caption -->
+            <div class="z-10 p-4 rounded-2xl glass-subtle text-white text-xs font-medium text-center">
+                <p id="storyViewerCaption">Momento compartido 💕</p>
             </div>
         </div>
     </div>
 
 
-    <!-- MODAL 3: NOTIFICACIONES 🔔 -->
-    <div id="notificationsModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="borderless-card rounded-2xl p-6 max-w-sm w-full shadow-2xl relative space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-bold text-base flex items-center gap-2">
-                    <i data-lucide="bell" class="w-4 h-4 text-pink-500"></i>
-                    Notificaciones
-                </h3>
-                <button onclick="closeNotificationsModal()" class="p-1 rounded-full opacity-60 hover:opacity-100">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <div id="notificationsList" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                <!-- Notifications injected via JS -->
-            </div>
-
-            <div class="pt-2 flex justify-end">
-                <button onclick="closeNotificationsModal()" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-black/5 dark:bg-white/10">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- MODAL 4: VERSÍCULOS -->
-    <div id="verseModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="borderless-card rounded-2xl p-5 max-w-md w-full shadow-2xl relative space-y-3">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-bold text-base flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4 text-pink-500"></i>
-                    Sugerir Versículo Bíblico
-                </h3>
-                <button onclick="closeVerseModal()" class="p-1 rounded-full opacity-60 hover:opacity-100">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <p class="text-xs opacity-70">Pasajes recomendados para hoy:</p>
-
-            <div class="space-y-2 max-h-56 overflow-y-auto pr-1" id="verseSuggestionsList">
-                <!-- Verse suggestions injected -->
-            </div>
-
-            <div class="pt-1 flex justify-end">
-                <button onclick="closeVerseModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-black/5 dark:bg-white/10">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <!-- ========================== JAVASCRIPT LOGIC ========================== -->
     <script>
-        /* Supabase Client Initialization */
-        let supabaseClient = null;
-        const SUPABASE_INTERNAL_CONFIG = {
-            url: localStorage.getItem('aura_supabase_url') || 'https://gU614XvJl7O3BkPONcgh1Q.supabase.co',
-            publicKey: 'sb_publishable_gU614XvJl7O3BkPONcgh1Q_2GkKcrjc'
-        };
+    /* ===== SUPABASE REMOTE CLIENT ===== */
+    const SUPABASE_URL = 'https://vrhicfjugclcchvckzkw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyaGljZmp1Z2NsY2NodmNremt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODIxMjEsImV4cCI6MjEwMzM1ODEyMX0.CTjIV7Gpr20u60byAFkH1v9D5onuNVA5pBOyqrfbYMg';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        function initSupabase() {
-            if (window.supabase && SUPABASE_INTERNAL_CONFIG.url.includes('.supabase.co')) {
-                try {
-                    supabaseClient = window.supabase.createClient(SUPABASE_INTERNAL_CONFIG.url, SUPABASE_INTERNAL_CONFIG.publicKey);
-                    loadSupabaseData();
-                } catch(e) {
-                    console.log('Supabase:', e);
-                }
-            }
-        }
+    /* ===== APPLICATION STATE ===== */
+    let currentUser = null;
+    let allProfiles = {};
+    let postPhotoFile = null;
+    let recordedAudioBlob = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordInterval = null;
+    let recordSeconds = 0;
 
-        const PROFILES = {
-            sofia: {
-                id: 'user_sofia',
-                name: 'Sofía',
-                email: 'sofia@aura.app',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-            },
-            mateo: {
-                id: 'user_mateo',
-                name: 'Mateo',
-                email: 'mateo@aura.app',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
-            }
-        };
+    const VERSES = [
+        { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6-7" },
+        { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105" },
+        { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
+        { text: "El amor es sufrido, es benigno; el amor no tiene envidia.", ref: "1 Corintios 13:4" },
+        { text: "Confía en el Señor con todo tu corazón, y no te apoyes en tu propia prudencia.", ref: "Proverbios 3:5" },
+        { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz.", ref: "Jeremías 29:11" },
+        { text: "Y sobre todas estas cosas vestíos de amor, que es el vínculo perfecto.", ref: "Colosenses 3:14" }
+    ];
+    let verseIdx = 0;
+    let verseReadStatus = { roxana: true, angel: false };
 
-        /* State Management */
-        let state = {
-            theme: 'palo-rosa',
-            currentUserKey: localStorage.getItem('aura_active_user') || 'sofia',
-            currentUser: null,
-            activeTab: 'feed',
-            streak: 12,
-            verseCheckedMap: { sofia: true, mateo: false },
-            notifications: JSON.parse(localStorage.getItem('aura_notifications')) || [
-                { id: 1, userKey: 'sofia', text: 'Mateo reaccionó ❤️ a tu dato curioso', time: 'Hace 10 min', read: false, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80' },
-                { id: 2, userKey: 'sofia', text: 'Mateo comentó: "¡Buenísimo ese dato!"', time: 'Hace 25 min', read: false, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80' }
-            ],
-            currentVerse: {
-                text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones.",
-                ref: "Filipenses 4:6-7"
-            },
-            habits: JSON.parse(localStorage.getItem('aura_habits')) || [
-                { id: 1, userKey: 'sofia', text: 'Lectura bíblica diaria (15 min)', done: true },
-                { id: 2, userKey: 'sofia', text: 'Anotar un dato curioso nuevo', done: true },
-                { id: 3, userKey: 'sofia', text: 'Tomar 2L de agua', done: false },
-                { id: 4, userKey: 'mateo', text: 'Lectura bíblica diaria (15 min)', done: true },
-                { id: 5, userKey: 'mateo', text: 'Resolver 1 reto de código / estudio', done: false },
-                { id: 6, userKey: 'mateo', text: 'Ejercicio 30 minutos', done: false }
-            ],
-            entries: JSON.parse(localStorage.getItem('aura_entries')) || [
-                {
-                    id: 101,
-                    userKey: 'sofia',
-                    userName: 'Sofía',
-                    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-                    time: 'Hoy, 09:30 AM',
-                    text: '¿Sabías que el orégano no solo es para cocinar? Contiene carvacrol, un compuesto natural con potentes propiedades antimicrobianas que fortalece el sistema inmune. ¡Lo leí en un artículo científico hoy!',
-                    photo: 'https://images.unsplash.com/photo-1509358217858-a4f22782e4e8?auto=format&fit=crop&w=600&q=80',
-                    audio: null,
-                    likes: { '❤️': 2, '💡': 3 },
-                    comments: [
-                        { id: 1, userName: 'Mateo', userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', text: '¡Excelente dato! No tenía idea sobre el carvacrol.', time: 'Hace 15 min' }
-                    ]
-                },
-                {
-                    id: 102,
-                    userKey: 'mateo',
-                    userName: 'Mateo',
-                    userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-                    time: 'Ayer, 08:15 PM',
-                    text: 'Dato curioso bíblico: La palabra "Amen" aparece en casi todos los idiomas del mundo sin traducirse, conservando su raíz hebrea original que significa "así sea" o "verdadero".',
-                    photo: null,
-                    audio: null,
-                    likes: { '🙌': 4, '❤️': 1 },
-                    comments: []
-                }
-            ]
-        };
+    /* ===== TOAST NOTIFICATIONS ===== */
+    function toast(msg, type = 'info') {
+        const colors = { info: 'bg-blue-500', success: 'bg-emerald-500', error: 'bg-rose-500' };
+        const el = document.createElement('div');
+        el.className = `glass-card rounded-2xl px-4 py-3 text-xs font-bold text-pink-950 flex items-center gap-2.5 shadow-2xl border border-pink-200/60 pointer-events-auto fade-in`;
+        el.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${colors[type]} flex-shrink-0"></span><span>${msg}</span>`;
+        document.getElementById('toastContainer').appendChild(el);
+        setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-10px)';
+            el.style.transition = 'all 0.3s ease';
+            setTimeout(() => el.remove(), 300);
+        }, 3500);
+    }
 
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordedAudioBlob = null;
-        let recordingInterval = null;
-        let recordingSeconds = 0;
-        let currentSelectedPhotoFile = null;
-        let currentSelectedPhotoData = null;
+    function triggerHaptic() {
+        if (navigator.vibrate) navigator.vibrate(20);
+    }
 
-        const BIBLE_SUGGESTIONS = [
-            { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios...", ref: "Filipenses 4:6-7" },
-            { text: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref: "Salmos 119:105" },
-            { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
-            { text: "El amor es sufrido, es benigno; el amor no tiene envidia, el amor no es jactancioso...", ref: "1 Corintios 13:4" },
-            { text: "Confía en el Señor con todo tu corazón, y no te apoyes en tu propia prudencia.", ref: "Proverbios 3:5" }
-        ];
-
-        window.onload = function() {
-            lucide.createIcons();
-            initSupabase();
-            loadActiveUser();
-            renderVerseReadingStatus();
-            renderFeed();
-            renderHabits();
-            renderBitacora();
-            renderVerseModalSuggestions();
-            renderNotificationsBadge();
-        };
-
-        function saveLocalState() {
-            localStorage.setItem('aura_entries', JSON.stringify(state.entries));
-            localStorage.setItem('aura_habits', JSON.stringify(state.habits));
-            localStorage.setItem('aura_notifications', JSON.stringify(state.notifications));
-        }
-
-        async function loadSupabaseData() {
-            if (!supabaseClient) return;
+    /* ===== LIFECYCLE & PERSISTENT SESSION ===== */
+    window.onload = async function() {
+        lucide.createIcons();
+        
+        // Permanent persistent session from localStorage
+        const savedUser = localStorage.getItem('aura_cloud_user');
+        if (savedUser) {
             try {
-                const { data: dbEntries } = await supabaseClient.from('entries').select('*').order('created_at', { ascending: false });
-                if (dbEntries && dbEntries.length > 0) {
-                    state.entries = dbEntries.map(e => ({
-                        id: e.id,
-                        userKey: e.user_id,
-                        userName: e.author_name,
-                        userAvatar: e.author_avatar,
-                        time: new Date(e.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        text: e.text,
-                        photo: e.photo_url,
-                        audio: e.audio_url,
-                        likes: e.likes || { '❤️': 0 },
-                        comments: e.comments || []
-                    }));
-                    renderFeed();
-                    renderBitacora();
-                }
-
-                const { data: dbHabits } = await supabaseClient.from('habits').select('*');
-                if (dbHabits && dbHabits.length > 0) {
-                    state.habits = dbHabits.map(h => ({
-                        id: h.id,
-                        userKey: h.user_key,
-                        text: h.text,
-                        done: h.done
-                    }));
-                    renderHabits();
-                }
+                currentUser = JSON.parse(savedUser);
+                await loadAllProfiles();
+                showApp();
+                await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+                setupRealtime();
             } catch(err) {
-                console.log('Supabase:', err);
+                console.error("Error al restaurar sesión:", err);
+                showAuth();
             }
+        } else {
+            showAuth();
+        }
+        document.getElementById('loadingScreen').style.display = 'none';
+    };
+
+    function showAuth() {
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('loadingScreen').style.display = 'none';
+        lucide.createIcons();
+    }
+
+    async function showApp() {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        updateHeader();
+        setVerseDate();
+        renderVerse();
+        renderVerseStatus();
+        lucide.createIcons();
+    }
+
+    /* ===== AUTHENTICATION ===== */
+    function setAuthMode(mode) {
+        const login = document.getElementById('loginForm');
+        const reg = document.getElementById('registerForm');
+        const tabL = document.getElementById('authTabLogin');
+        const tabR = document.getElementById('authTabRegister');
+        if (mode === 'login') {
+            login.style.display = 'block'; reg.style.display = 'none';
+            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600';
+            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950';
+        } else {
+            login.style.display = 'none'; reg.style.display = 'block';
+            tabR.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-pink-600';
+            tabL.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all text-pink-950/60 hover:text-pink-950';
+        }
+        lucide.createIcons();
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pw = document.getElementById('loginPassword').value.trim();
+        if (!email) return toast('Ingresa tu correo', 'error');
+
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Iniciando...';
+
+        const { data, error } = await sb.from('profiles').select('*').eq('email', email).single();
+        if (error || !data) {
+            btn.disabled = false; btn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Iniciar Sesión'; lucide.createIcons();
+            return toast('Cuenta no encontrada en la nube', 'error');
+        }
+        if (data.password !== pw) {
+            btn.disabled = false; btn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Iniciar Sesión'; lucide.createIcons();
+            return toast('Contraseña incorrecta', 'error');
         }
 
-        function loadActiveUser() {
-            const key = state.currentUserKey;
-            const customProfile = localStorage.getItem('aura_custom_profile_' + key);
-            if (customProfile) {
-                state.currentUser = JSON.parse(customProfile);
-            } else {
-                state.currentUser = PROFILES[key] || PROFILES.sofia;
-            }
-            updateHeaderProfile();
+        currentUser = data;
+        localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
+        await loadAllProfiles();
+        showApp();
+        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        setupRealtime();
+        toast(`¡Bienvenida/o, ${data.name}! 🌸`, 'success');
+        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    }
+
+    async function handleRegister() {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const pw = document.getElementById('registerPassword').value.trim();
+        if (!name || !email) return toast('Completa tu nombre y correo', 'error');
+        if (pw.length < 6) return toast('Mínimo 6 caracteres de contraseña', 'error');
+
+        const btn = document.getElementById('registerBtn');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Creando perfil...';
+
+        const avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+        const { data, error } = await sb.from('profiles').insert({ name, email, password: pw, avatar_url: avatar }).select().single();
+
+        if (error) {
+            btn.disabled = false; btn.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i> Crear mi Cuenta'; lucide.createIcons();
+            return toast('Error al registrar: ' + error.message, 'error');
         }
 
-        function updateHeaderProfile() {
-            const user = state.currentUser;
-            document.getElementById('headerUserAvatar').src = user.avatar;
-            document.getElementById('headerUserName').innerText = user.name;
-            document.getElementById('formUserAvatar').src = user.avatar;
-            document.getElementById('currentUserBadge').innerText = `Publicando como: ${user.name}`;
+        currentUser = data;
+        localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
+        await loadAllProfiles();
+        showApp();
+        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        setupRealtime();
+        toast(`¡Cuenta creada con éxito! 💖`, 'success');
+    }
+
+    async function quickLogin(email, pw) {
+        const { data, error } = await sb.from('profiles').select('*').eq('email', email).single();
+        if (error || !data) return toast('Perfil no encontrado. Asegúrate de ejecutar el SQL en Supabase.', 'error');
+        if (data.password !== pw) return toast('Contraseña incorrecta', 'error');
+
+        currentUser = data;
+        localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
+        await loadAllProfiles();
+        showApp();
+        await Promise.all([loadPosts(), loadHabits(), loadStories()]);
+        setupRealtime();
+        toast(`¡Hola, ${data.name}! 🌸`, 'success');
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('aura_cloud_user');
+        currentUser = null;
+        closeProfileMenu();
+        showAuth();
+        toast('Sesión cerrada correctamente', 'info');
+    }
+
+    /* ===== PROFILES & HEADER ===== */
+    async function loadAllProfiles() {
+        const { data } = await sb.from('profiles').select('*');
+        if (data) data.forEach(p => allProfiles[p.id] = p);
+    }
+
+    function getProfile(id) {
+        return allProfiles[id] || { name: 'Aura', avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=aura' };
+    }
+
+    function updateHeader() {
+        document.getElementById('headerAvatar').src = currentUser.avatar_url;
+        document.getElementById('headerName').innerText = currentUser.name;
+        document.getElementById('postAvatar').src = currentUser.avatar_url;
+        document.getElementById('postAsLabel').innerText = `Publicando como: ${currentUser.name}`;
+    }
+
+    function openProfileMenu() {
+        document.getElementById('profileAvatar').src = currentUser.avatar_url;
+        document.getElementById('profileName').innerText = currentUser.name;
+        document.getElementById('profileEmail').innerText = currentUser.email;
+        document.getElementById('editName').value = currentUser.name;
+        document.getElementById('profileMenuModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeProfileMenu() { document.getElementById('profileMenuModal').classList.add('hidden'); }
+
+    async function handleEditAvatar(e) {
+        const file = e.target.files[0]; if (!file) return;
+        toast('Subiendo nueva foto...', 'info');
+        const path = `avatars/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+        const { error } = await sb.storage.from('photos').upload(path, file);
+        if (error) return toast('Error al subir foto: ' + error.message, 'error');
+        const { data: urlData } = sb.storage.from('photos').getPublicUrl(path);
+        currentUser.avatar_url = urlData.publicUrl;
+        document.getElementById('profileAvatar').src = currentUser.avatar_url;
+        toast('Foto actualizada ✨', 'success');
+    }
+
+    async function saveProfile() {
+        const name = document.getElementById('editName').value.trim();
+        if (name) currentUser.name = name;
+        const { error } = await sb.from('profiles').update({ name: currentUser.name, avatar_url: currentUser.avatar_url }).eq('id', currentUser.id);
+        if (error) return toast('Error al guardar', 'error');
+        localStorage.setItem('aura_cloud_user', JSON.stringify(currentUser));
+        allProfiles[currentUser.id] = currentUser;
+        updateHeader();
+        closeProfileMenu();
+        loadPosts();
+        toast('Perfil guardado con éxito 💖', 'success');
+    }
+
+    /* ===== TABS & DOCK SWITCHING ===== */
+    function switchTab(tab) {
+        document.getElementById('viewFeed').classList.toggle('hidden', tab !== 'feed');
+        document.getElementById('viewGallery').classList.toggle('hidden', tab !== 'gallery');
+        document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
+
+        ['dockFeed', 'dockGallery', 'dockHabits'].forEach(id => {
+            document.getElementById(id).className = 'flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-950/50 hover:text-pink-950 font-medium';
+        });
+
+        const map = {
+            feed: 'dockFeed',
+            gallery: 'dockGallery',
+            habits: 'dockHabits'
+        };
+        if (map[tab]) {
+            document.getElementById(map[tab]).className = 'flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all text-pink-600 bg-pink-100/70 font-bold shadow-sm';
         }
 
-        function switchQuickProfile(key) {
-            state.currentUserKey = key;
-            localStorage.setItem('aura_active_user', key);
-            loadActiveUser();
-            closeAuthModal();
-            renderFeed();
-            renderHabits();
-            renderVerseReadingStatus();
-            renderNotificationsBadge();
-        }
+        if (tab === 'gallery') loadGallery();
+        if (tab === 'habits') loadHabits();
+        lucide.createIcons();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
-        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-
-        function openProfileModal() {
-            document.getElementById('profileNameInput').value = state.currentUser.name;
-            document.getElementById('profileAvatarInput').value = state.currentUser.avatar;
-            document.getElementById('newPasswordInput').value = '';
-            document.getElementById('profileModal').classList.remove('hidden');
-        }
-        function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
-
-        /* Device Gallery Avatar Selection */
-        function handleAvatarFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const avatarDataUrl = e.target.result;
-                document.getElementById('profileAvatarInput').value = avatarDataUrl;
+    /* ===== BIBLE VERSE SECTION ===== */
+    function setVerseDate() {
+        const d = new Date();
+        const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+        const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        document.getElementById('verseDate').innerText = `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`;
+    }
+    function renderVerse() {
+        const v = VERSES[verseIdx];
+        document.getElementById('verseText').innerText = `"${v.text}"`;
+        document.getElementById('verseRef').innerText = `— ${v.ref}`;
+    }
+    function shuffleVerse() {
+        verseIdx = (verseIdx + 1) % VERSES.length;
+        renderVerse();
+        triggerHaptic();
+    }
+    function renderVerseStatus() {
+        const container = document.getElementById('verseStatusButtons');
+        container.innerHTML = '';
+        ['roxana', 'angel'].forEach(k => {
+            const name = k === 'roxana' ? 'Roxana' : 'Ángel';
+            const ok = verseReadStatus[k];
+            const btn = document.createElement('button');
+            btn.onclick = () => {
+                verseReadStatus[k] = !verseReadStatus[k];
+                renderVerseStatus();
+                if (verseReadStatus[k]) confetti({ particleCount: 30, spread: 50 });
             };
-            reader.readAsDataURL(file);
-        }
+            btn.className = ok 
+                ? 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300/60 shadow-sm cursor-pointer'
+                : 'flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold glass text-pink-950/50 hover:text-pink-950 cursor-pointer';
+            btn.innerHTML = ok ? `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> ${name}` : `<i data-lucide="circle" class="w-3.5 h-3.5"></i> ${name}`;
+            container.appendChild(btn);
+        });
+        lucide.createIcons();
+    }
 
-        function selectPresetAvatar(url) {
-            document.getElementById('profileAvatarInput').value = url;
-        }
+    /* ===== VOICE RECORDER (MediaRecorder API) ===== */
+    async function startRecordingAudio() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            recordSeconds = 0;
 
-        function saveUserProfile() {
-            const name = document.getElementById('profileNameInput').value.trim();
-            const avatar = document.getElementById('profileAvatarInput').value.trim();
-            const newPassword = document.getElementById('newPasswordInput').value.trim();
-
-            if (name) state.currentUser.name = name;
-            if (avatar) state.currentUser.avatar = avatar;
-
-            if (newPassword) {
-                alert("¡Contraseña actualizada con éxito!");
-            }
-
-            localStorage.setItem('aura_custom_profile_' + state.currentUserKey, JSON.stringify(state.currentUser));
-            updateHeaderProfile();
-            closeProfileModal();
-            renderFeed();
-            renderHabits();
-        }
-
-        /* Notifications System 🔔 */
-        function openNotificationsModal() {
-            const list = document.getElementById('notificationsList');
-            list.innerHTML = '';
-
-            const userNotifs = state.notifications.filter(n => n.userKey === state.currentUserKey || n.userKey === 'all');
-
-            if (userNotifs.length === 0) {
-                list.innerHTML = '<p class="text-xs text-center py-6 opacity-60">No tienes notificaciones por el momento.</p>';
-            } else {
-                userNotifs.forEach(n => {
-                    n.read = true;
-                    const div = document.createElement('div');
-                    div.className = "flex items-center gap-3 p-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/5";
-                    div.innerHTML = `
-                        <img src="${n.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" class="w-8 h-8 rounded-lg object-cover">
-                        <div class="flex-1">
-                            <p class="text-xs font-medium opacity-90 leading-tight">${n.text}</p>
-                            <p class="text-[10px] opacity-50 mt-0.5">${n.time}</p>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-
-            saveLocalState();
-            renderNotificationsBadge();
-            document.getElementById('notificationsModal').classList.remove('hidden');
-        }
-
-        function closeNotificationsModal() {
-            document.getElementById('notificationsModal').classList.add('hidden');
-        }
-
-        function renderNotificationsBadge() {
-            const badge = document.getElementById('notifBadge');
-            const unread = state.notifications.filter(n => (n.userKey === state.currentUserKey || n.userKey === 'all') && !n.read).length;
-
-            if (unread > 0) {
-                badge.innerText = unread;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        function addNotification(targetUserKey, text, avatar) {
-            state.notifications.unshift({
-                id: Date.now(),
-                userKey: targetUserKey,
-                text: text,
-                time: 'Hace un momento',
-                read: false,
-                avatar: avatar
-            });
-            saveLocalState();
-            renderNotificationsBadge();
-        }
-
-        async function handleSupabaseLogin() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!email) return alert("Por favor ingresa tu correo electrónico.");
-
-            const username = email.split('@')[0];
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.auth.signInWithPassword({ email, password: password || '123456' });
-                } catch(e){}
-            }
-
-            state.currentUser = {
-                id: 'user_' + username,
-                name: username,
-                email: email,
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-            };
-
-            localStorage.setItem('aura_custom_profile_' + state.currentUserKey, JSON.stringify(state.currentUser));
-            updateHeaderProfile();
-            closeAuthModal();
-            renderFeed();
-            renderHabits();
-        }
-
-        async function handleSupabaseSignUp() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!email) return alert("Por favor ingresa tu correo electrónico.");
-
-            const username = email.split('@')[0];
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.auth.signUp({ email, password: password || '123456' });
-                } catch(e){}
-            }
-
-            state.currentUser = {
-                id: 'user_' + username,
-                name: username,
-                email: email,
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-            };
-
-            localStorage.setItem('aura_custom_profile_' + state.currentUserKey, JSON.stringify(state.currentUser));
-            updateHeaderProfile();
-            closeAuthModal();
-            renderFeed();
-            renderHabits();
-        }
-
-        function toggleTheme() {
-            const body = document.body;
-            if (state.theme === 'palo-rosa') {
-                state.theme = 'gamer';
-                body.classList.remove('theme-palo-rosa');
-                body.classList.add('theme-gamer');
-                document.getElementById('themeLabel').innerText = 'Tema: Gamer Dark';
-            } else {
-                state.theme = 'palo-rosa';
-                body.classList.remove('theme-gamer');
-                body.classList.add('theme-palo-rosa');
-                document.getElementById('themeLabel').innerText = 'Tema: Palo Rosa';
-            }
-        }
-
-        function switchTab(tab) {
-            state.activeTab = tab;
-            document.getElementById('viewFeed').classList.add('hidden');
-            document.getElementById('viewHabits').classList.add('hidden');
-            document.getElementById('viewBitacora').classList.add('hidden');
-
-            document.getElementById('tabFeed').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-70 hover:opacity-100";
-            document.getElementById('tabHabits').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-70 hover:opacity-100";
-            document.getElementById('tabBitacora').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all opacity-70 hover:opacity-100";
-
-            if (tab === 'feed') {
-                document.getElementById('viewFeed').classList.remove('hidden');
-                document.getElementById('tabFeed').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-stone-800 text-stone-800 dark:text-white shadow-sm";
-            } else if (tab === 'habits') {
-                document.getElementById('viewHabits').classList.remove('hidden');
-                document.getElementById('tabHabits').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-stone-800 text-stone-800 dark:text-white shadow-sm";
-            } else if (tab === 'bitacora') {
-                document.getElementById('viewBitacora').classList.remove('hidden');
-                document.getElementById('tabBitacora').className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-stone-800 text-stone-800 dark:text-white shadow-sm";
-                renderBitacora();
-            }
-            lucide.createIcons();
-        }
-
-        function renderVerseReadingStatus() {
-            const container = document.getElementById('verseReadingStatusContainer');
-            container.innerHTML = '';
-
-            ['sofia', 'mateo'].forEach(key => {
-                const profile = PROFILES[key];
-                const isChecked = state.verseCheckedMap[key];
-                const btn = document.createElement('button');
-                btn.onclick = () => toggleVerseCheck(key);
-                
-                if (isChecked) {
-                    btn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all cursor-pointer text-xs font-medium bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20";
-                    btn.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i><span>${profile.name} Leído</span>`;
-                } else {
-                    btn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all cursor-pointer text-xs font-medium bg-black/5 dark:bg-white/5 opacity-60 hover:opacity-100";
-                    btn.innerHTML = `<i data-lucide="circle" class="w-3.5 h-3.5"></i><span>${profile.name} Pendiente</span>`;
-                }
-                container.appendChild(btn);
-            });
-            lucide.createIcons();
-        }
-
-        function toggleVerseCheck(userKey) {
-            state.verseCheckedMap[userKey] = !state.verseCheckedMap[userKey];
-            renderVerseReadingStatus();
-        }
-
-        function handlePhotoSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            currentSelectedPhotoFile = file;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentSelectedPhotoData = e.target.result;
-                document.getElementById('photoPreviewImg').src = currentSelectedPhotoData;
-                document.getElementById('photoPreviewContainer').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function removePhotoPreview() {
-            currentSelectedPhotoFile = null;
-            currentSelectedPhotoData = null;
-            document.getElementById('photoInput').value = '';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-        }
-
-        async function toggleAudioRecording() {
-            const recorderBox = document.getElementById('audioRecorderBox');
-            const label = document.getElementById('recordAudioLabel');
-
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                clearInterval(recordingInterval);
-                recorderBox.classList.add('hidden');
-                label.innerText = 'Voz';
-                return;
-            }
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-
-                mediaRecorder.ondataavailable = event => { audioChunks.push(event.data); };
-                mediaRecorder.onstop = () => {
-                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                    const audioUrl = URL.createObjectURL(recordedAudioBlob);
-                    document.getElementById('audioPreviewPlayer').src = audioUrl;
-                    document.getElementById('audioPreviewContainer').classList.remove('hidden');
-                };
-
-                mediaRecorder.start();
-                recorderBox.classList.remove('hidden');
-                label.innerText = 'Detener';
-
-                recordingSeconds = 0;
-                document.getElementById('recordingTimer').innerText = '00:00';
-                recordingInterval = setInterval(() => {
-                    recordingSeconds++;
-                    const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
-                    const secs = String(recordingSeconds % 60).padStart(2, '0');
-                    document.getElementById('recordingTimer').innerText = `${mins}:${secs}`;
-                }, 1000);
-
-            } catch (err) {
-                simulateAudioRecording();
-            }
-        }
-
-        function simulateAudioRecording() {
-            document.getElementById('audioRecorderBox').classList.remove('hidden');
-            document.getElementById('recordAudioLabel').innerText = 'Grabando...';
-            setTimeout(() => {
-                document.getElementById('audioRecorderBox').classList.add('hidden');
-                document.getElementById('recordAudioLabel').innerText = 'Voz';
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(recordedAudioBlob);
+                document.getElementById('audioPreviewElement').src = audioUrl;
                 document.getElementById('audioPreviewContainer').classList.remove('hidden');
-            }, 3000);
-        }
-
-        function removeAudioPreview() {
-            recordedAudioBlob = null;
-            document.getElementById('audioPreviewContainer').classList.add('hidden');
-        }
-
-        async function submitNewEntry() {
-            const textInput = document.getElementById('entryInput');
-            const text = textInput.value.trim();
-
-            if (!text && !currentSelectedPhotoData && !recordedAudioBlob) return;
-
-            let uploadedPhotoUrl = currentSelectedPhotoData;
-            let uploadedAudioUrl = null;
-
-            if (recordedAudioBlob) {
-                uploadedAudioUrl = URL.createObjectURL(recordedAudioBlob);
-            }
-
-            if (supabaseClient && currentSelectedPhotoFile) {
-                try {
-                    const filename = `photo_${Date.now()}_${currentSelectedPhotoFile.name}`;
-                    const { data, error } = await supabaseClient.storage.from('aura_media').upload(filename, currentSelectedPhotoFile);
-                    if (!error && data) {
-                        const publicRes = supabaseClient.storage.from('aura_media').getPublicUrl(filename);
-                        if (publicRes?.data?.publicUrl) uploadedPhotoUrl = publicRes.data.publicUrl;
-                    }
-                } catch(e){}
-            }
-
-            const user = state.currentUser;
-
-            const newEntry = {
-                id: Date.now(),
-                userKey: state.currentUserKey,
-                userName: user.name,
-                userAvatar: user.avatar,
-                time: 'Hace un momento',
-                text: text || 'Compartió un elemento multimedia:',
-                photo: uploadedPhotoUrl,
-                audio: uploadedAudioUrl,
-                likes: { '❤️': 1 },
-                comments: []
+                document.getElementById('voiceRecorderBar').classList.add('hidden');
+                clearInterval(recordInterval);
             };
 
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('entries').insert([{
-                        author_name: user.name,
-                        author_avatar: user.avatar,
-                        text: text || 'Compartió un elemento multimedia:',
-                        photo_url: uploadedPhotoUrl,
-                        audio_url: uploadedAudioUrl,
-                        likes: { '❤️': 1 }
-                    }]);
-                } catch(e){}
+            mediaRecorder.start();
+            document.getElementById('voiceRecorderBar').classList.remove('hidden');
+            recordInterval = setInterval(() => {
+                recordSeconds++;
+                const mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                const secs = String(recordSeconds % 60).padStart(2, '0');
+                document.getElementById('recordTimer').innerText = `${mins}:${secs}`;
+            }, 1000);
+            triggerHaptic();
+        } catch(err) {
+            toast('Permiso de micrófono no disponible: ' + err.message, 'error');
+        }
+    }
+
+    function stopRecordingAudio() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        }
+    }
+
+    function discardRecordedAudio() {
+        recordedAudioBlob = null;
+        document.getElementById('audioPreviewContainer').classList.add('hidden');
+        document.getElementById('audioPreviewElement').src = '';
+    }
+
+    /* ===== POST PHOTO HANDLER ===== */
+    function handlePostPhoto(e) {
+        const file = e.target.files[0]; if (!file) return;
+        postPhotoFile = file;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            document.getElementById('postPhotoImg').src = ev.target.result;
+            document.getElementById('postPhotoPreview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+    function removePostPhoto() {
+        postPhotoFile = null;
+        document.getElementById('postPhotoPreview').classList.add('hidden');
+        document.getElementById('postPhotoInput').value = '';
+    }
+
+    /* ===== SUBMIT POST ===== */
+    async function submitPost() {
+        const text = document.getElementById('postInput').value.trim();
+        if (!text && !postPhotoFile && !recordedAudioBlob) return toast('Escribe algo o adjunta foto/audio', 'info');
+
+        const btn = document.getElementById('publishBtn');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Publicando...';
+
+        let photoUrl = null;
+        if (postPhotoFile) {
+            const path = `posts/${currentUser.id}_${Date.now()}.${postPhotoFile.name.split('.').pop()}`;
+            const { error: upErr } = await sb.storage.from('photos').upload(path, postPhotoFile);
+            if (!upErr) {
+                const { data } = sb.storage.from('photos').getPublicUrl(path);
+                photoUrl = data.publicUrl;
             }
-
-            state.entries.unshift(newEntry);
-            saveLocalState();
-
-            textInput.value = '';
-            removePhotoPreview();
-            removeAudioPreview();
-
-            renderFeed();
-            switchTab('feed');
         }
 
-        function renderFeed() {
-            const list = document.getElementById('feedList');
-            list.innerHTML = '';
+        let audioUrl = null;
+        if (recordedAudioBlob) {
+            const path = `audios/${currentUser.id}_${Date.now()}.webm`;
+            const { error: upAudioErr } = await sb.storage.from('photos').upload(path, recordedAudioBlob);
+            if (!upAudioErr) {
+                const { data } = sb.storage.from('photos').getPublicUrl(path);
+                audioUrl = data.publicUrl;
+            }
+        }
 
-            state.entries.forEach(entry => {
-                const card = document.createElement('article');
-                card.className = "borderless-card borderless-card-interactive rounded-2xl p-5 transition-all space-y-3";
+        const { error } = await sb.from('posts').insert({
+            user_id: currentUser.id,
+            text: text || '📸 Compartió un momento lindo',
+            photo_url: photoUrl,
+            audio_url: audioUrl,
+            reactions: {}
+        });
 
-                const badgeColor = entry.userKey === 'sofia' ? 'text-pink-600 dark:text-pink-300' : 'text-amber-600 dark:text-amber-300';
-                const avatar = entry.userAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
-                const comments = entry.comments || [];
+        btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Publicar</span>'; lucide.createIcons();
+        if (error) return toast('Error al publicar: ' + error.message, 'error');
 
-                let photoHtml = entry.photo ? `<div class="rounded-xl overflow-hidden max-h-64 my-2.5"><img src="${entry.photo}" class="w-full h-auto object-cover rounded-xl"></div>` : '';
-                
-                let audioHtml = entry.audio ? `
-                    <div class="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 flex items-center gap-2.5 my-2.5">
-                        <i data-lucide="volume-2" class="w-4 h-4 text-pink-500"></i>
-                        <audio controls src="${entry.audio}" class="w-full h-7"></audio>
-                    </div>` : '';
+        document.getElementById('postInput').value = '';
+        removePostPhoto();
+        discardRecordedAudio();
+        await loadPosts();
+        toast('¡Momento publicado en la nube! 💖', 'success');
+        confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
+    }
 
-                let commentsListHtml = '';
-                comments.forEach(c => {
-                    commentsListHtml += `
-                        <div class="flex items-start gap-2.5 p-2 rounded-xl bg-black/5 dark:bg-white/5">
-                            <img src="${c.userAvatar}" class="w-6 h-6 rounded-lg object-cover mt-0.5">
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[11px] font-bold">${c.userName}</span>
-                                    <span class="text-[9px] opacity-50">${c.time}</span>
-                                </div>
-                                <p class="text-xs opacity-90 leading-tight mt-0.5">${c.text}</p>
-                            </div>
+    /* ===== LOAD & RENDER POSTS ===== */
+    async function loadPosts() {
+        const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+        if (error) { console.error(error); return; }
+
+        const postIds = posts.map(p => p.id);
+        let comments = [];
+        if (postIds.length > 0) {
+            const { data: c } = await sb.from('comments').select('*').in('post_id', postIds).order('created_at', { ascending: true });
+            if (c) comments = c;
+        }
+
+        renderFeed(posts, comments);
+    }
+
+    function renderFeed(posts, comments) {
+        const list = document.getElementById('feedList'); list.innerHTML = '';
+        if (posts.length === 0) {
+            list.innerHTML = '<div class="text-center py-14 glass-card rounded-[2.5rem]"><p class="text-xs font-semibold text-pink-950/50">Aún no hay publicaciones compartidas.<br>¡Sé el primero en compartir algo hoy! 🌸</p></div>';
+            return;
+        }
+
+        posts.forEach(post => {
+            const author = getProfile(post.user_id);
+            const postComments = comments.filter(c => c.post_id === post.id);
+            const isOwner = post.user_id === currentUser.id;
+            const timeAgo = formatTime(post.created_at);
+            const reactions = post.reactions || {};
+
+            let commentsHtml = postComments.map(c => {
+                const cp = getProfile(c.user_id);
+                return `<div class="flex items-start gap-2.5 p-2.5 rounded-2xl glass-subtle">
+                    <img src="${cp.avatar_url}" class="w-6 h-6 rounded-full object-cover mt-0.5 border border-pink-300">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-pink-950">${cp.name}</span>
+                            <span class="text-[9px] text-pink-900/40">${formatTime(c.created_at)}</span>
                         </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <img src="${avatar}" class="w-8 h-8 rounded-xl object-cover border border-white/60 shadow-sm">
-                            <div>
-                                <h4 class="font-display font-bold text-xs sm:text-sm ${badgeColor}">${entry.userName}</h4>
-                                <p class="text-[10px] opacity-60">${entry.time}</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/5 font-mono opacity-70">Dato Curioso</span>
+                        <p class="text-xs text-pink-950/85 mt-0.5">${c.text}</p>
                     </div>
+                </div>`;
+            }).join('');
 
-                    <p class="text-xs sm:text-sm leading-relaxed opacity-90">${entry.text}</p>
-
-                    ${photoHtml}
-                    ${audioHtml}
-
-                    <div class="flex items-center justify-between pt-2.5 border-t border-black/5 dark:border-white/5 text-xs">
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="addReaction(${entry.id}, '❤️')" class="px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 transition-all cursor-pointer">❤️ ${entry.likes['❤️'] || 0}</button>
-                            <button onclick="addReaction(${entry.id}, '💡')" class="px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 transition-all cursor-pointer">💡 ${entry.likes['💡'] || 0}</button>
-                            <button onclick="addReaction(${entry.id}, '🙌')" class="px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 transition-all cursor-pointer">🙌 ${entry.likes['🙌'] || 0}</button>
-                            <button onclick="toggleCommentsDrawer(${entry.id})" class="px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 transition-all cursor-pointer flex items-center gap-1">
-                                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> <span>${comments.length}</span>
-                            </button>
+            const card = document.createElement('article');
+            card.className = 'glass-card glass-hover rounded-[2.2rem] p-5 sm:p-6 space-y-3.5 fade-in';
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="${author.avatar_url}" class="w-9 h-9 rounded-2xl object-cover story-ring-active shadow-sm">
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-extrabold ${isOwner ? 'text-pink-600' : 'text-purple-600'}">${author.name}</h4>
+                            <p class="text-[10px] text-pink-900/40 font-medium">${timeAgo}</p>
                         </div>
-                        <button onclick="shareEntry(event, ${entry.id})" class="text-xs opacity-60 hover:opacity-100 flex items-center gap-1">
-                            <i data-lucide="bookmark" class="w-3 h-3"></i> Guardar
+                    </div>
+                    <span class="text-[10px] px-2.5 py-1 rounded-full glass font-bold text-pink-600">✨ Momento</span>
+                </div>
+
+                <p class="text-xs sm:text-sm leading-relaxed text-pink-950/90 font-medium">${post.text}</p>
+
+                ${post.photo_url ? `
+                    <div class="rounded-2xl overflow-hidden max-h-72 shadow-md cursor-pointer group" onclick="openLightbox('${post.photo_url}')">
+                        <img src="${post.photo_url}" class="w-full h-auto object-cover rounded-2xl group-hover:scale-102 transition-all duration-300">
+                    </div>` : ''}
+
+                ${post.audio_url ? `
+                    <div class="glass p-3 rounded-2xl flex items-center gap-3 border border-purple-200">
+                        <div class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-md">
+                            <i data-lucide="mic" class="w-4 h-4"></i>
+                        </div>
+                        <audio controls class="flex-1 h-8 rounded-xl" src="${post.audio_url}"></audio>
+                    </div>` : ''}
+
+                <!-- Reactions Bar -->
+                <div class="flex items-center justify-between pt-2 border-t border-pink-200/40 text-xs">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button onclick="react('${post.id}','❤️')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">❤️ ${reactions['❤️']||0}</button>
+                        <button onclick="react('${post.id}','🔥')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">🔥 ${reactions['🔥']||0}</button>
+                        <button onclick="react('${post.id}','✨')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">✨ ${reactions['✨']||0}</button>
+                        <button onclick="react('${post.id}','💡')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold active:scale-90">💡 ${reactions['💡']||0}</button>
+                        <button onclick="toggleComments('${post.id}')" class="glass px-2.5 py-1 rounded-xl hover:bg-white transition-all cursor-pointer text-xs font-bold flex items-center gap-1 text-pink-700">
+                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> ${postComments.length}
                         </button>
                     </div>
+                </div>
 
-                    <!-- Comments Section -->
-                    <div id="commentsDrawer_${entry.id}" class="hidden pt-3 border-t border-black/5 dark:border-white/5 space-y-2.5">
-                        <div class="space-y-2 max-h-48 overflow-y-auto">${commentsListHtml || '<p class="text-[11px] opacity-50 py-1">Sin comentarios aún. ¡Sé el primero en comentar!</p>'}</div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="text" id="commentInput_${entry.id}" placeholder="Escribe un comentario..." class="flex-1 px-3 py-1.5 rounded-xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 text-xs outline-none focus:ring-2 focus:ring-pink-400">
-                            <button onclick="submitComment(${entry.id})" class="px-3 py-1.5 rounded-xl bg-pink-500 text-white font-semibold text-xs shadow hover:opacity-90 transition-all">Enviar</button>
-                        </div>
+                <!-- Comments Drawer -->
+                <div id="comments_${post.id}" class="hidden pt-3 border-t border-pink-200/40 space-y-2.5">
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        ${commentsHtml || '<p class="text-[11px] text-pink-900/40 text-center py-2">Sé el primero en dejar un comentario cariñoso 💬</p>'}
                     </div>
-                `;
-
-                list.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        function toggleCommentsDrawer(entryId) {
-            const drawer = document.getElementById('commentsDrawer_' + entryId);
-            if (drawer) drawer.classList.toggle('hidden');
-        }
-
-        function submitComment(entryId) {
-            const input = document.getElementById('commentInput_' + entryId);
-            const text = input.value.trim();
-            if (!text) return;
-
-            const entry = state.entries.find(e => e.id === entryId);
-            if (entry) {
-                if (!entry.comments) entry.comments = [];
-                const user = state.currentUser;
-
-                entry.comments.push({
-                    id: Date.now(),
-                    userName: user.name,
-                    userAvatar: user.avatar,
-                    text: text,
-                    time: 'Hace un momento'
-                });
-
-                // Generate notification for post owner if commenter is someone else
-                const targetKey = entry.userKey === 'sofia' ? 'mateo' : 'sofia';
-                addNotification(targetKey, `${user.name} comentó en tu publicación: "${text}"`, user.avatar);
-
-                saveLocalState();
-                renderFeed();
-            }
-        }
-
-        async function addReaction(entryId, emoji) {
-            const entry = state.entries.find(e => e.id === entryId);
-            if (entry) {
-                entry.likes[emoji] = (entry.likes[emoji] || 0) + 1;
-                
-                const user = state.currentUser;
-                const targetKey = entry.userKey === 'sofia' ? 'mateo' : 'sofia';
-                addNotification(targetKey, `${user.name} reaccionó ${emoji} a tu publicación`, user.avatar);
-
-                saveLocalState();
-                renderFeed();
-
-                if (supabaseClient) {
-                    try {
-                        await supabaseClient.from('entries').update({ likes: entry.likes }).eq('id', entryId);
-                    } catch(e){}
-                }
-            }
-        }
-
-        function shareEntry(ev, id) {
-            const el = ev.currentTarget;
-            el.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> Guardado';
-            lucide.createIcons();
-        }
-
-        function renderHabits() {
-            const container = document.getElementById('habitsColumnsContainer');
-            container.innerHTML = '';
-
-            const keys = ['sofia', 'mateo'];
-            keys.forEach(key => {
-                const profile = PROFILES[key];
-                const habitsList = state.habits.filter(h => h.userKey === key);
-                const doneCount = habitsList.filter(h => h.done).length;
-                const percent = habitsList.length > 0 ? Math.round((doneCount / habitsList.length) * 100) : 0;
-
-                const column = document.createElement('div');
-                column.className = "p-4 rounded-xl bg-white/40 dark:bg-black/20 borderless-card";
-                
-                let habitItemsHtml = '';
-                habitsList.forEach(h => {
-                    habitItemsHtml += `
-                        <div class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 dark:bg-white/5 transition-all">
-                            <label class="flex items-center gap-2.5 text-xs font-medium cursor-pointer w-full">
-                                <input type="checkbox" ${h.done ? 'checked' : ''} onchange="toggleHabit('${h.id}')" class="w-3.5 h-3.5 rounded text-pink-500 focus:ring-pink-400">
-                                <span class="${h.done ? 'line-through opacity-50' : ''}">${h.text}</span>
-                            </label>
-                            <button onclick="deleteHabit('${h.id}')" class="text-xs opacity-40 hover:opacity-100 p-1">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-
-                column.innerHTML = `
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <img src="${profile.avatar}" class="w-5 h-5 rounded-lg object-cover">
-                            <h3 class="font-display font-bold text-xs sm:text-sm">${profile.name}</h3>
-                        </div>
-                        <span class="text-xs font-mono font-bold text-pink-600 dark:text-amber-300">${doneCount}/${habitsList.length} (${percent}%)</span>
+                    <div class="flex gap-2">
+                        <input type="text" id="ci_${post.id}" placeholder="Escribe un comentario..." class="input-glass-luxe flex-1 px-4 py-2 rounded-xl text-xs font-medium" onkeypress="if(event.key==='Enter')postComment('${post.id}')">
+                        <button onclick="postComment('${post.id}')" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Enviar</button>
                     </div>
-                    <div class="space-y-2.5">${habitItemsHtml || '<p class="text-xs opacity-50 py-2">Sin metas aún</p>'}</div>
-                `;
+                </div>
+            `;
+            list.appendChild(card);
+        });
+        lucide.createIcons();
+    }
 
-                container.appendChild(column);
-            });
+    async function react(postId, emoji) {
+        triggerHaptic();
+        confetti({ particleCount: 15, spread: 40 });
+        const { data: post } = await sb.from('posts').select('reactions').eq('id', postId).single();
+        if (!post) return;
+        const r = post.reactions || {};
+        r[emoji] = (r[emoji] || 0) + 1;
+        await sb.from('posts').update({ reactions: r }).eq('id', postId);
+        await loadPosts();
+    }
 
-            lucide.createIcons();
-        }
+    function toggleComments(id) {
+        document.getElementById('comments_' + id)?.classList.toggle('hidden');
+    }
 
-        async function toggleHabit(id) {
-            const habit = state.habits.find(h => String(h.id) === String(id));
-            if (habit) {
-                habit.done = !habit.done;
-                saveLocalState();
-                renderHabits();
+    async function postComment(postId) {
+        const input = document.getElementById('ci_' + postId);
+        const text = input.value.trim(); if (!text) return;
+        const { error } = await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, text });
+        if (error) return toast('Error al comentar', 'error');
+        input.value = '';
+        await loadPosts();
+        toast('Comentario enviado ✨', 'success');
+    }
 
-                if (supabaseClient) {
-                    try {
-                        await supabaseClient.from('habits').update({ done: habit.done }).eq('id', id);
-                    } catch(e){}
-                }
-            }
-        }
+    /* ===== STORIES & MOMENTS ===== */
+    async function handleStoryUpload(e) {
+        const file = e.target.files[0]; if (!file) return;
+        toast('Subiendo momento...', 'info');
+        const path = `stories/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+        const { error: upErr } = await sb.storage.from('photos').upload(path, file);
+        if (upErr) return toast('Error: ' + upErr.message, 'error');
+        const { data: urlData } = sb.storage.from('photos').getPublicUrl(path);
 
-        async function promptAddHabit() {
-            const text = prompt("Ingresa la nueva meta para " + state.currentUser.name + ":");
-            if (text) {
-                const newHabit = {
-                    id: Date.now(),
-                    userKey: state.currentUserKey,
-                    text: text,
-                    done: false
-                };
-                state.habits.push(newHabit);
-                saveLocalState();
-                renderHabits();
+        await sb.from('stories').insert({
+            user_id: currentUser.id,
+            photo_url: urlData.publicUrl,
+            caption: 'Momento de hoy ✨'
+        });
 
-                if (supabaseClient) {
-                    try {
-                        await supabaseClient.from('habits').insert([{
-                            user_key: state.currentUserKey,
-                            text: text,
-                            done: false
-                        }]);
-                    } catch(e){}
-                }
-            }
-        }
+        toast('¡Momento compartido! 📸', 'success');
+        confetti({ particleCount: 30, spread: 50 });
+        loadStories();
+    }
 
-        async function deleteHabit(id) {
-            state.habits = state.habits.filter(h => String(h.id) !== String(id));
-            saveLocalState();
-            renderHabits();
+    async function loadStories() {
+        const { data: stories } = await sb.from('stories').select('*').order('created_at', { ascending: false }).limit(6);
+        const container = document.getElementById('dynamicStories');
+        container.innerHTML = '';
+        if (!stories || stories.length === 0) return;
 
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('habits').delete().eq('id', id);
-                } catch(e){}
-            }
-        }
+        stories.forEach(s => {
+            const author = getProfile(s.user_id);
+            const el = document.createElement('div');
+            el.className = 'flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0';
+            el.onclick = () => openStoryViewer(s, author);
+            el.innerHTML = `
+                <div class="w-14 h-14 rounded-2xl p-0.5 story-ring-active shadow-md hover:scale-105 transition-all">
+                    <img src="${s.photo_url}" class="w-full h-full rounded-2xl object-cover">
+                </div>
+                <span class="text-[10px] font-bold text-pink-950/80 truncate max-w-[60px]">${author.name}</span>
+            `;
+            container.appendChild(el);
+        });
+    }
 
-        function renderBitacora(filter = 'all') {
-            const grid = document.getElementById('bitacoraGrid');
-            grid.innerHTML = '';
+    function openStoryViewer(story, author) {
+        document.getElementById('storyViewerBg').style.backgroundImage = `url('${story.photo_url}')`;
+        document.getElementById('storyViewerAvatar').src = author.avatar_url;
+        document.getElementById('storyViewerName').innerText = author.name;
+        document.getElementById('storyViewerTime').innerText = formatTime(story.created_at);
+        document.getElementById('storyViewerCaption').innerText = story.caption || 'Momento compartido ✨';
+        document.getElementById('storyViewerModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeStoryViewer() {
+        document.getElementById('storyViewerModal').classList.add('hidden');
+    }
 
-            const btnAll = document.getElementById('btnFilterAll');
-            const btnPhotos = document.getElementById('btnFilterPhotos');
-            const btnAudio = document.getElementById('btnFilterAudio');
+    /* ===== HABITS / METAS ===== */
+    async function loadHabits() {
+        const { data } = await sb.from('habits').select('*').order('created_at', { ascending: true });
+        if (!data) return;
+        renderHabits(data);
+    }
 
-            if (btnAll) btnAll.className = filter === 'all' ? "px-2.5 py-1 rounded-lg font-semibold bg-white dark:bg-stone-800 shadow-sm" : "px-2.5 py-1 rounded-lg opacity-70 hover:opacity-100";
-            if (btnPhotos) btnPhotos.className = filter === 'photos' ? "px-2.5 py-1 rounded-lg font-semibold bg-white dark:bg-stone-800 shadow-sm" : "px-2.5 py-1 rounded-lg opacity-70 hover:opacity-100";
-            if (btnAudio) btnAudio.className = filter === 'audio' ? "px-2.5 py-1 rounded-lg font-semibold bg-white dark:bg-stone-800 shadow-sm" : "px-2.5 py-1 rounded-lg opacity-70 hover:opacity-100";
+    function renderHabits(habits) {
+        const container = document.getElementById('habitsContainer');
+        container.innerHTML = '';
+        const profiles = Object.values(allProfiles);
 
-            let filtered = state.entries;
-            if (filter === 'photos') filtered = state.entries.filter(e => e.photo);
-            if (filter === 'audio') filtered = state.entries.filter(e => e.audio);
+        profiles.forEach(p => {
+            const list = habits.filter(h => h.user_id === p.id);
+            if (list.length === 0 && p.id !== currentUser.id) return;
+            const done = list.filter(h => h.is_done).length;
+            const pct = list.length ? Math.round((done / list.length) * 100) : 0;
+            const isMe = p.id === currentUser.id;
 
-            if (filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-8 opacity-60 text-xs">No hay publicaciones para este filtro.</div>';
-                return;
-            }
-
-            filtered.forEach(entry => {
-                const item = document.createElement('div');
-                item.className = "borderless-card rounded-xl p-3.5 flex flex-col justify-between space-y-2.5";
-                
-                let mediaContent = '';
-                if (entry.photo) {
-                    mediaContent += `<img src="${entry.photo}" class="w-full h-32 object-cover rounded-lg mb-1.5">`;
-                }
-                if (entry.audio) {
-                    mediaContent += `<audio controls src="${entry.audio}" class="w-full h-7 my-1.5"></audio>`;
-                }
-
-                item.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1.5">
-                            <span class="font-bold ${entry.userKey === 'sofia' ? 'text-pink-600 dark:text-pink-300' : 'text-amber-600 dark:text-amber-300'}">${entry.userName}</span>
-                            <span class="opacity-50 text-[10px]">${entry.time}</span>
-                        </div>
-                        ${mediaContent}
-                        <p class="text-xs opacity-90 line-clamp-3">${entry.text}</p>
+            const card = document.createElement('div');
+            card.className = 'glass rounded-3xl p-4 sm:p-5 space-y-3 border border-pink-200/50 shadow-sm';
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <img src="${p.avatar_url}" class="w-7 h-7 rounded-xl object-cover border border-pink-300">
+                        <span class="text-xs sm:text-sm font-extrabold text-pink-950">${p.name}</span>
                     </div>
-                `;
-                grid.appendChild(item);
-            });
-            lucide.createIcons();
-        }
+                    <span class="text-xs font-mono font-extrabold ${pct >= 50 ? 'text-emerald-600' : 'text-pink-600'}">${done}/${list.length} (${pct}%)</span>
+                </div>
+                ${list.map(h => `
+                    <div class="flex items-center justify-between p-2.5 rounded-2xl glass-subtle">
+                        <label class="flex items-center gap-2.5 text-xs font-bold text-pink-950/80 cursor-pointer flex-1">
+                            <input type="checkbox" ${h.is_done ? 'checked' : ''} onchange="toggleHabit('${h.id}', this.checked)" class="w-4 h-4 rounded-md accent-pink-500 cursor-pointer" ${!isMe ? 'disabled' : ''}>
+                            <span class="${h.is_done ? 'line-through opacity-40' : ''}">${h.text}</span>
+                        </label>
+                        ${isMe ? `<button onclick="deleteHabit('${h.id}')" class="opacity-30 hover:opacity-100 p-1 text-rose-500 cursor-pointer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                    </div>
+                `).join('')}
+            `;
+            container.appendChild(card);
+        });
+        lucide.createIcons();
+    }
 
-        function filterBitacora(filter) { renderBitacora(filter); }
-        function openVerseModal() { document.getElementById('verseModal').classList.remove('hidden'); }
-        function closeVerseModal() { document.getElementById('verseModal').classList.add('hidden'); }
+    async function toggleHabit(id, done) {
+        triggerHaptic();
+        await sb.from('habits').update({ is_done: done }).eq('id', id);
+        await loadHabits();
+    }
 
-        function renderVerseModalSuggestions() {
-            const container = document.getElementById('verseSuggestionsList');
-            container.innerHTML = '';
-            BIBLE_SUGGESTIONS.forEach((v) => {
-                const div = document.createElement('div');
-                div.className = "p-2.5 rounded-xl bg-white/40 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 cursor-pointer transition-all border border-black/5 dark:border-white/5";
-                div.onclick = () => selectVerse(v);
-                div.innerHTML = `
-                    <p class="text-xs italic font-medium">"${v.text}"</p>
-                    <p class="text-[11px] font-bold text-pink-600 dark:text-amber-400 mt-1">— ${v.ref}</p>
-                `;
-                container.appendChild(div);
-            });
-        }
+    async function deleteHabit(id) {
+        await sb.from('habits').delete().eq('id', id);
+        await loadHabits();
+    }
 
-        function selectVerse(verse) {
-            state.currentVerse = verse;
-            document.getElementById('verseText').innerText = `"${verse.text}"`;
-            document.getElementById('verseRef').innerText = `— ${verse.ref}`;
-            closeVerseModal();
+    async function addHabit() {
+        const text = prompt('Escribe una nueva meta para compartir:');
+        if (!text) return;
+        await sb.from('habits').insert({ user_id: currentUser.id, text, is_done: false });
+        await loadHabits();
+        toast('Meta creada con éxito ✨', 'success');
+        confetti({ particleCount: 20 });
+    }
+
+    /* ===== GALLERY SECTION ===== */
+    async function loadGallery() {
+        const grid = document.getElementById('galleryGrid');
+        grid.innerHTML = '<div class="col-span-full text-center py-8"><div class="spinner mx-auto"></div></div>';
+        const { data: posts } = await sb.from('posts').select('*').not('photo_url', 'is', null).order('created_at', { ascending: false });
+        grid.innerHTML = '';
+        if (!posts || posts.length === 0) {
+            grid.innerHTML = '<p class="col-span-full text-center py-10 text-xs font-semibold text-pink-900/40">No hay fotos compartidas aún.</p>';
+            return;
         }
+        posts.forEach(p => {
+            const author = getProfile(p.user_id);
+            const el = document.createElement('div');
+            el.className = 'glass rounded-2xl overflow-hidden group cursor-pointer shadow-md hover:scale-102 transition-all';
+            el.onclick = () => openLightbox(p.photo_url);
+            el.innerHTML = `
+                <img src="${p.photo_url}" class="w-full h-36 sm:h-44 object-cover">
+                <div class="p-2.5 flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-pink-950">${author.name}</span>
+                    <span class="text-[9px] text-pink-900/40">${formatTime(p.created_at)}</span>
+                </div>
+            `;
+            grid.appendChild(el);
+        });
+    }
+
+    function openLightbox(url) {
+        const modal = document.getElementById('storyViewerModal');
+        document.getElementById('storyViewerBg').style.backgroundImage = `url('${url}')`;
+        document.getElementById('storyViewerName').innerText = 'Recuerdo';
+        document.getElementById('storyViewerTime').innerText = '';
+        document.getElementById('storyViewerCaption').innerText = 'Aura Recuerdos 💕';
+        modal.classList.remove('hidden');
+    }
+
+    /* ===== REALTIME SUBSCRIPTIONS ===== */
+    function setupRealtime() {
+        sb.channel('aura-realtime-cloud')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
+                if (payload.new && payload.new.user_id !== currentUser.id) {
+                    const author = getProfile(payload.new.user_id);
+                    toast(`${author.name} compartió algo nuevo 🌸`, 'info');
+                    confetti({ particleCount: 25, spread: 50 });
+                }
+                loadPosts();
+            })
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
+                if (payload.new && payload.new.user_id !== currentUser.id) {
+                    const author = getProfile(payload.new.user_id);
+                    toast(`${author.name} comentó 💬`, 'info');
+                }
+                loadPosts();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'habits' }, () => {
+                loadHabits();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, () => {
+                loadStories();
+            })
+            .subscribe();
+    }
+
+    /* ===== TIME HELPER ===== */
+    function formatTime(iso) {
+        const d = new Date(iso);
+        const now = new Date();
+        const diff = (now - d) / 1000;
+        if (diff < 60) return 'Ahora';
+        if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+        if (diff < 86400) return `Hace ${Math.floor(diff / 3600)}h`;
+        if (diff < 172800) return 'Ayer';
+        return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+    }
     </script>
 </body>
 </html>
