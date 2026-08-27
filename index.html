@@ -510,7 +510,7 @@
     <div id="mainApp" class="relative z-10 max-w-2xl mx-auto px-3 sm:px-5 pt-4 sm:pt-6 pb-36" style="display:none;">
 
         <!-- Header -->
-        <header class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
+        <header id="mainAppHeader" class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
             <div class="flex items-center gap-2.5 sm:gap-3">
                 <!-- Luxury Matte Black 'R' Header Emblem -->
                 <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-neutral-800 via-[#18171b] to-black p-[1.5px] shadow-[0_4px_16px_rgba(0,0,0,0.6),0_0_15px_rgba(249,115,22,0.35)] border border-orange-500/40 flex items-center justify-center flex-shrink-0">
@@ -764,8 +764,8 @@
         </section>
 
         <!-- ========================== VIEW: CHAT PRIVADO (Ángel & Roxana) ========================== -->
-        <section id="viewChat" class="hidden fade-in mb-24" style="overflow:hidden;">
-            <div class="glass-card rounded-[2.5rem] p-4 sm:p-5 shadow-2xl flex flex-col border border-pink-200/50 dark:border-orange-500/20" style="height:calc(100vh - 225px); max-height:620px; min-height:420px;">
+        <section id="viewChat" class="hidden fade-in flex-1 flex flex-col mb-16">
+            <div class="glass-card rounded-[2.5rem] p-3.5 sm:p-5 shadow-2xl flex flex-col border border-pink-200/50 dark:border-orange-500/20 overflow-hidden" style="height: calc(100dvh - 105px); min-height: 520px;">
                 <!-- Chat Partner Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-pink-200/40 dark:border-orange-500/20 px-1">
                     <div class="flex items-center gap-3">
@@ -803,14 +803,17 @@
 
                 <!-- Chat Message Input Dock & Voice Recorder -->
                 <div class="pt-0.5 relative">
-                    <!-- Quoted Message Reply Banner -->
-                    <div id="chatReplyBanner" class="hidden flex items-center justify-between p-2 px-3 mb-1.5 rounded-2xl glass-card border-l-4 border-pink-500 dark:border-orange-400 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-md shadow-lg transition-all animate-slide-up">
-                        <div class="flex flex-col flex-1 min-w-0 pr-2">
-                            <div class="flex items-center gap-1.5 text-[10.5px] font-bold text-pink-600 dark:text-orange-400">
-                                <i data-lucide="reply" class="w-3 h-3"></i>
-                                <span id="chatReplyAuthor">Respondiendo</span>
+                    <!-- Quoted Message Reply Banner (Ultra-Subtle & Elegant Glass) -->
+                    <div id="chatReplyBanner" class="hidden flex items-center justify-between p-2 px-3 mb-2 rounded-2xl glass-subtle border border-pink-200/50 dark:border-white/10 bg-white/75 dark:bg-neutral-900/75 backdrop-blur-xl shadow-md transition-all animate-slide-up">
+                        <div class="flex items-center gap-2.5 flex-1 min-w-0 pr-2">
+                            <div class="w-1 h-7 rounded-full bg-gradient-to-b from-pink-500 to-rose-400 dark:from-orange-400 dark:to-amber-500 flex-shrink-0"></div>
+                            <div class="flex flex-col min-w-0">
+                                <div class="flex items-center gap-1 text-[10.5px] font-bold text-pink-600 dark:text-orange-400">
+                                    <i data-lucide="reply" class="w-3 h-3"></i>
+                                    <span id="chatReplyAuthor">Respondiendo</span>
+                                </div>
+                                <p id="chatReplyPreview" class="text-xs truncate opacity-75 mt-0.5 text-neutral-800 dark:text-neutral-200 font-normal"></p>
                             </div>
-                            <p id="chatReplyPreview" class="text-xs truncate opacity-75 mt-0.5 text-neutral-800 dark:text-neutral-200"></p>
                         </div>
                         <button onclick="cancelReplyToMessage()" class="w-6 h-6 rounded-full hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center cursor-pointer text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors" title="Cancelar respuesta">
                             <i data-lucide="x" class="w-3.5 h-3.5"></i>
@@ -876,6 +879,21 @@
                         Cancelar
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ========================== MODAL: LIGHTBOX FOTO CHAT DEDICADO ========================== -->
+        <div id="chatPhotoLightboxModal" class="hidden fixed inset-0 z-[110] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-2 sm:p-4 fade-in" onclick="closeChatPhotoLightbox()">
+            <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+                <a id="chatLightboxDownloadBtn" href="" download="aura-foto.jpg" class="glass w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg cursor-pointer" onclick="event.stopPropagation()" title="Descargar imagen">
+                    <i data-lucide="download" class="w-4.5 h-4.5"></i>
+                </a>
+                <button onclick="closeChatPhotoLightbox()" class="glass w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg cursor-pointer" title="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="max-w-4xl max-h-[88vh] flex items-center justify-center overflow-hidden rounded-3xl" onclick="event.stopPropagation()">
+                <img id="chatLightboxImg" src="" class="max-w-full max-h-[88vh] object-contain rounded-2xl shadow-2xl animate-scale-up">
             </div>
         </div>
 
@@ -1527,19 +1545,85 @@
         });
     }
 
-    /* ===== TOAST NOTIFICATIONS ===== */
-    function toast(msg, type = 'info') {
-        const colors = { info: 'bg-blue-500', success: 'bg-emerald-500', error: 'bg-rose-500' };
+    /* ===== PROFESSIONAL IN-APP NOTIFICATION & TOAST ENGINE ===== */
+    function showInAppNotification({ title, message, avatar, icon = 'bell', onClick = null, duration = 4500 }) {
+        playNotificationSound();
+        triggerHaptic();
+
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
         const el = document.createElement('div');
-        el.className = `glass-card rounded-2xl px-4 py-3 text-xs font-bold flex items-center gap-2.5 shadow-2xl border border-pink-200/60 dark:border-orange-500/30 pointer-events-auto fade-in`;
-        el.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${colors[type]} flex-shrink-0"></span><span>${msg}</span>`;
-        document.getElementById('toastContainer').appendChild(el);
+        el.className = `pointer-events-auto flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl glass-card border border-pink-200/60 dark:border-orange-500/30 bg-white/95 dark:bg-[#131217]/95 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.6)] cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all transform animate-slide-down select-none max-w-sm w-full`;
+        
+        const avatarUrl = avatar || (currentUser?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=aura');
+        
+        el.innerHTML = `
+            <div class="relative flex-shrink-0">
+                <img src="${avatarUrl}" class="w-10 h-10 rounded-2xl object-cover border border-pink-300 dark:border-orange-400/60 shadow-sm">
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 dark:from-orange-500 dark:to-amber-500 flex items-center justify-center text-white shadow-sm border-2 border-white dark:border-neutral-900">
+                    <i data-lucide="${icon}" class="w-2.5 h-2.5"></i>
+                </div>
+            </div>
+            <div class="flex-1 min-w-0 pr-1">
+                <div class="flex items-center justify-between gap-1 mb-0.5">
+                    <h4 class="text-xs font-bold text-neutral-900 dark:text-neutral-100 truncate">${escapeHtml(title)}</h4>
+                    <span class="text-[9px] font-mono opacity-50 flex-shrink-0">Ahora</span>
+                </div>
+                <p class="text-[11.5px] text-neutral-600 dark:text-neutral-300 font-medium leading-tight truncate">${escapeHtml(message)}</p>
+            </div>
+            <button class="w-6 h-6 rounded-full hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors flex-shrink-0" onclick="event.stopPropagation(); this.closest('.pointer-events-auto').remove();" title="Cerrar">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+        `;
+
+        if (onClick) {
+            el.onclick = () => {
+                onClick();
+                el.remove();
+            };
+        }
+
+        container.appendChild(el);
+        lucide.createIcons();
+
         setTimeout(() => {
+            if (!el.parentNode) return;
             el.style.opacity = '0';
             el.style.transform = 'translateY(-10px)';
             el.style.transition = 'all 0.3s ease';
             setTimeout(() => el.remove(), 300);
-        }, 3500);
+        }, duration);
+    }
+
+    function toast(msg, type = 'info') {
+        const icons = {
+            success: { icon: 'check-circle-2', color: 'text-emerald-500 dark:text-emerald-400', badge: 'bg-emerald-500/15' },
+            error: { icon: 'alert-circle', color: 'text-rose-500 dark:text-rose-400', badge: 'bg-rose-500/15' },
+            info: { icon: 'info', color: 'text-pink-600 dark:text-orange-400', badge: 'bg-pink-500/15 dark:bg-orange-500/15' }
+        };
+        const cfg = icons[type] || icons.info;
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const el = document.createElement('div');
+        el.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-2xl glass-card border border-pink-200/60 dark:border-orange-500/30 bg-white/95 dark:bg-[#131217]/95 backdrop-blur-xl shadow-lg transition-all transform animate-slide-down max-w-sm w-full`;
+        el.innerHTML = `
+            <div class="w-6 h-6 rounded-xl ${cfg.badge} ${cfg.color} flex items-center justify-center flex-shrink-0">
+                <i data-lucide="${cfg.icon}" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-100 flex-1 truncate">${escapeHtml(msg)}</span>
+        `;
+        container.appendChild(el);
+        lucide.createIcons();
+
+        setTimeout(() => {
+            if (!el.parentNode) return;
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-8px)';
+            el.style.transition = 'all 0.3s ease';
+            setTimeout(() => el.remove(), 300);
+        }, 3200);
     }
 
     /* ===== HAPTIC VIBRATION HELPER ===== */
@@ -1947,6 +2031,22 @@
         document.getElementById('viewGallery').classList.toggle('hidden', tab !== 'gallery');
         document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
         document.getElementById('viewProfile').classList.toggle('hidden', tab !== 'profile');
+
+        // Toggle Top Header: Hide in Chat view for maximum immersion and vertical space
+        const header = document.getElementById('mainAppHeader');
+        const mainApp = document.getElementById('mainApp');
+        if (header) {
+            header.style.display = (tab === 'chat') ? 'none' : 'flex';
+        }
+        if (mainApp) {
+            if (tab === 'chat') {
+                mainApp.classList.remove('pt-4', 'sm:pt-6');
+                mainApp.classList.add('pt-1', 'sm:pt-2');
+            } else {
+                mainApp.classList.remove('pt-1', 'sm:pt-2');
+                mainApp.classList.add('pt-4', 'sm:pt-6');
+            }
+        }
 
         // Lock body scroll when chat is active to prevent page scrolling
         document.body.style.overflow = (tab === 'chat') ? 'hidden' : '';
@@ -2903,12 +3003,26 @@
     }
 
     function openLightbox(url) {
-        const modal = document.getElementById('storyViewerModal');
-        document.getElementById('storyViewerBg').style.backgroundImage = `url('${url}')`;
-        document.getElementById('storyViewerName').innerText = 'Recuerdo';
-        document.getElementById('storyViewerTime').innerText = '';
-        document.getElementById('storyViewerCaption').innerText = 'Aura Recuerdos 💕';
-        modal.classList.remove('hidden');
+        openChatPhotoLightbox(url);
+    }
+
+    function openChatPhotoLightbox(url) {
+        if (!url) return;
+        triggerHaptic();
+        const modal = document.getElementById('chatPhotoLightboxModal');
+        const img = document.getElementById('chatLightboxImg');
+        const dl = document.getElementById('chatLightboxDownloadBtn');
+        if (modal && img) {
+            img.src = url;
+            if (dl) dl.href = url;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+    }
+
+    function closeChatPhotoLightbox() {
+        const modal = document.getElementById('chatPhotoLightboxModal');
+        if (modal) modal.classList.add('hidden');
     }
 
     /* ===== INTIMATE CHAT ENGINE (Ángel & Roxana) ===== */
@@ -3449,8 +3563,12 @@
                     previewSnippet = '📸 Foto';
                     contentHtml = `
                         ${replyQuoteHtml}
-                        <div class="rounded-2xl overflow-hidden cursor-pointer my-1 max-w-[240px] shadow-md border border-white/20" onclick="openLightbox('${photoUrl}')">
-                            <img src="${photoUrl}" class="w-full h-auto object-cover rounded-2xl hover:scale-105 transition-transform duration-300">
+                        <div class="relative rounded-2xl overflow-hidden cursor-pointer shadow-md my-0.5 max-w-[260px] group/img" onclick="openChatPhotoLightbox('${photoUrl}')">
+                            <img src="${photoUrl}" class="w-full max-h-72 object-cover rounded-2xl group-hover/img:scale-103 transition-transform duration-300">
+                            <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[8.5px] text-white font-mono flex items-center gap-1 shadow-sm">
+                                <span>${timeStr}</span>
+                                ${isMe ? '<i data-lucide="check-check" class="w-3 h-3 text-white"></i>' : ''}
+                            </div>
                         </div>
                     `;
                 } else {
@@ -3480,12 +3598,14 @@
                                 </button>
                             </div>
 
-                            <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-br-sm bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
+                            <div class="${isPhoto ? 'p-1 rounded-2xl rounded-br-sm' : (isAudio ? 'px-2.5 py-1.5 rounded-2xl rounded-br-sm' : 'px-3.5 py-2 rounded-2xl rounded-br-sm')} max-w-[82%] bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
                                 ${contentHtml}
+                                ${!isPhoto ? `
                                 <div class="flex items-center justify-end gap-1 text-[8.5px] text-white/80 font-mono">
                                     <span>${timeStr}</span>
                                     <i data-lucide="check-check" class="w-3 h-3"></i>
                                 </div>
+                                ` : ''}
                             </div>
                         </div>
                     `;
@@ -3496,11 +3616,13 @@
                              ontouchmove="handleMsgTouchMove(event, this)"
                              ontouchend="handleMsgTouchEnd(event, this, '${m.id}', '${senderDisplayName}', '${safePreview}')">
                             <img src="${partner.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-pink-300 dark:border-orange-400 mb-1 flex-shrink-0 shadow-sm">
-                            <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-bl-sm glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
+                            <div class="${isPhoto ? 'p-1 rounded-2xl rounded-bl-sm' : (isAudio ? 'px-2.5 py-1.5 rounded-2xl rounded-bl-sm' : 'px-3.5 py-2 rounded-2xl rounded-bl-sm')} max-w-[82%] glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
                                 ${contentHtml}
+                                ${!isPhoto ? `
                                 <div class="flex items-center justify-end text-[8.5px] opacity-50 font-mono">
                                     <span>${timeStr}</span>
                                 </div>
+                                ` : ''}
                             </div>
 
                             <!-- Action Buttons (Reply & Delete) -->
@@ -3643,13 +3765,19 @@
                     const isAudio = data.text && data.text.startsWith('[AUDIO');
                     const isPhoto = data.text && data.text.startsWith('[PHOTO]');
                     let preview = data.text || '';
-                    if (isAudio) preview = '🎙️ Te envió una nota de voz';
-                    else if (isPhoto) preview = '📸 Te envió una foto';
+                    if (isAudio) preview = 'Nota de voz';
+                    else if (isPhoto) preview = 'Foto adjunta';
 
                     if (currentActiveTab !== 'chat' || document.hidden) {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
-                        toast(`${author.name}: ${preview}`, 'info');
-                        sendNativeNotification(`Mensaje de ${author.name} 💬`, preview, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: preview,
+                            avatar: author.avatar_url,
+                            icon: isAudio ? 'mic' : (isPhoto ? 'image' : 'message-circle'),
+                            onClick: () => switchTab('chat')
+                        });
+                        sendNativeNotification(author.name, preview, author.avatar_url);
                     } else {
                         playNotificationSound();
                     }
@@ -3659,12 +3787,15 @@
                 const data = payload.payload;
                 if (data && data.user_id !== currentUser.id) {
                     const author = getProfile(data.user_id) || getPartnerProfile();
-                    toast(`${author.name} publicó algo nuevo`, 'info');
-                    sendNativeNotification(
-                        'Nueva Publicación ✨',
-                        data.has_photo ? `${author.name} compartió una foto` : `${author.name}: ${(data.text || '').substring(0, 60)}`,
-                        author.avatar_url
-                    );
+                    const preview = data.has_photo ? 'Compartió una nueva foto' : (data.text || 'Publicó algo nuevo en el diario');
+                    showInAppNotification({
+                        title: author.name,
+                        message: preview,
+                        avatar: author.avatar_url,
+                        icon: data.has_photo ? 'image' : 'sparkles',
+                        onClick: () => switchTab('feed')
+                    });
+                    sendNativeNotification(author.name, preview, author.avatar_url);
                     confetti({ particleCount: 25, spread: 50 });
                     loadPosts();
                 }
@@ -3677,10 +3808,20 @@
                     if (payload.new && payload.new.user_id !== currentUser.id) {
                         const author = getProfile(payload.new.user_id) || getPartnerProfile();
                         const cleanMsg = payload.new.text.replace(/^\[CHAT\]\s*/, '');
+                        const isAudio = cleanMsg.startsWith('[AUDIO');
+                        const isPhoto = cleanMsg.startsWith('[PHOTO]');
+                        const preview = isAudio ? 'Nota de voz' : (isPhoto ? 'Foto adjunta' : cleanMsg);
+
                         if (currentActiveTab !== 'chat' || document.hidden) {
                             document.getElementById('dockChatBadge')?.classList.remove('hidden');
-                            toast(`${author.name}: ${cleanMsg.startsWith('[AUDIO') ? '🎙️ Nota de voz' : cleanMsg}`, 'info');
-                            sendNativeNotification(`Mensaje de ${author.name} 💬`, cleanMsg.startsWith('[AUDIO') ? '🎙️ Te envió una nota de voz' : cleanMsg, author.avatar_url);
+                            showInAppNotification({
+                                title: author.name,
+                                message: preview,
+                                avatar: author.avatar_url,
+                                icon: isAudio ? 'mic' : (isPhoto ? 'image' : 'message-circle'),
+                                onClick: () => switchTab('chat')
+                            });
+                            sendNativeNotification(author.name, preview, author.avatar_url);
                         } else {
                             playNotificationSound();
                         }
@@ -3689,22 +3830,37 @@
                     const author = getProfile(payload.new.user_id) || getPartnerProfile();
                     const isStory = payload.new.text?.startsWith('[STORY]');
                     if (isStory) {
-                        toast(`${author.name} subió una historia`, 'info');
-                        sendNativeNotification('Nueva Historia 📸', `${author.name} compartió un momento`, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: 'Compartió un momento en sus historias',
+                            avatar: author.avatar_url,
+                            icon: 'camera',
+                            onClick: () => switchTab('feed')
+                        });
+                        sendNativeNotification(author.name, 'Compartió una nueva historia', author.avatar_url);
                         loadStories();
                     } else if (payload.eventType === 'INSERT') {
                         const hasPhoto = !!payload.new.photo_url;
-                        toast(`${author.name} publicó algo nuevo`, 'info');
-                        sendNativeNotification(
-                            'Nueva Publicación ✨',
-                            hasPhoto ? `${author.name} compartió una foto` : `${author.name}: ${(payload.new.text || '').substring(0, 60)}`,
-                            author.avatar_url
-                        );
+                        const preview = hasPhoto ? 'Compartió una nueva foto' : (payload.new.text || 'Publicó algo nuevo');
+                        showInAppNotification({
+                            title: author.name,
+                            message: preview,
+                            avatar: author.avatar_url,
+                            icon: hasPhoto ? 'image' : 'sparkles',
+                            onClick: () => switchTab('feed')
+                        });
+                        sendNativeNotification(author.name, preview, author.avatar_url);
                         confetti({ particleCount: 25, spread: 50 });
                         loadPosts();
                     } else if (payload.eventType === 'UPDATE' && payload.new.reactions) {
-                        toast(`${author.name} reaccionó a una publicación`, 'info');
-                        sendNativeNotification('Nueva Reacción ❤️', `${author.name} reaccionó a tu publicación`, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: 'Reaccionó a tu publicación',
+                            avatar: author.avatar_url,
+                            icon: 'heart',
+                            onClick: () => switchTab('feed')
+                        });
+                        sendNativeNotification(author.name, 'Reaccionó a tu publicación', author.avatar_url);
                         loadPosts();
                     }
                 } else {
@@ -3735,11 +3891,18 @@
                 if (payload.new && payload.new.sender_id !== currentUser.id) {
                     const author = getProfile(payload.new.sender_id) || getPartnerProfile();
                     const isAudio = payload.new.text && payload.new.text.startsWith('[AUDIO');
-                    const previewText = isAudio ? '🎙️ Te envió una nota de voz' : payload.new.text;
+                    const isPhoto = payload.new.text && payload.new.text.startsWith('[PHOTO]');
+                    const previewText = isAudio ? 'Nota de voz' : (isPhoto ? 'Foto adjunta' : payload.new.text);
                     if (currentActiveTab !== 'chat' || document.hidden) {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
-                        toast(`${author.name}: ${previewText}`, 'info');
-                        sendNativeNotification(`Mensaje de ${author.name} 💬`, previewText, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: previewText,
+                            avatar: author.avatar_url,
+                            icon: isAudio ? 'mic' : (isPhoto ? 'image' : 'message-circle'),
+                            onClick: () => switchTab('chat')
+                        });
+                        sendNativeNotification(author.name, previewText, author.avatar_url);
                     } else {
                         playNotificationSound();
                     }
@@ -3748,20 +3911,38 @@
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
                 if (payload.new && payload.new.user_id !== currentUser.id) {
                     const author = getProfile(payload.new.user_id);
-                    toast(`${author.name} comentó en una publicación`, 'info');
-                    sendNativeNotification('Nuevo Comentario 💬', `${author.name}: ${(payload.new.text || '').substring(0, 80)}`, author.avatar_url);
+                    showInAppNotification({
+                        title: author.name,
+                        message: payload.new.text || 'Comentó en una publicación',
+                        avatar: author.avatar_url,
+                        icon: 'message-square',
+                        onClick: () => switchTab('feed')
+                    });
+                    sendNativeNotification(author.name, payload.new.text || 'Comentó en una publicación', author.avatar_url);
+                    loadPosts();
                 }
-                loadPosts();
             })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'habits' }, payload => {
                 if (payload.new && payload.new.user_id !== currentUser.id) {
                     const author = getProfile(payload.new.user_id);
                     if (payload.eventType === 'INSERT') {
-                        toast(`${author.name} agregó una nueva meta`, 'info');
-                        sendNativeNotification('Nueva Meta 🎯', `${author.name} agregó: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: `Nueva meta: ${(payload.new.text || '').substring(0, 60)}`,
+                            avatar: author.avatar_url,
+                            icon: 'target',
+                            onClick: () => switchTab('habits')
+                        });
+                        sendNativeNotification(author.name, `Nueva meta: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
                     } else if (payload.eventType === 'UPDATE' && payload.new.is_done) {
-                        toast(`${author.name} completó una meta ✓`, 'success');
-                        sendNativeNotification('Meta Completada ✨', `${author.name} completó: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
+                        showInAppNotification({
+                            title: author.name,
+                            message: `Completó la meta: ${(payload.new.text || '').substring(0, 60)}`,
+                            avatar: author.avatar_url,
+                            icon: 'check-circle-2',
+                            onClick: () => switchTab('habits')
+                        });
+                        sendNativeNotification(author.name, `Completó la meta: ${(payload.new.text || '').substring(0, 60)}`, author.avatar_url);
                         confetti({ particleCount: 20, spread: 40 });
                     }
                 }
@@ -3770,8 +3951,14 @@
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'stories' }, payload => {
                 if (payload.new && payload.new.user_id !== currentUser.id) {
                     const author = getProfile(payload.new.user_id);
-                    toast(`${author.name} subió una historia`, 'info');
-                    sendNativeNotification('Nueva Historia 📸', `${author.name} compartió un momento`, author.avatar_url);
+                    showInAppNotification({
+                        title: author.name,
+                        message: 'Compartió un nuevo momento en sus historias',
+                        avatar: author.avatar_url,
+                        icon: 'camera',
+                        onClick: () => switchTab('feed')
+                    });
+                    sendNativeNotification(author.name, 'Compartió un nuevo momento en sus historias', author.avatar_url);
                 }
                 loadStories();
             })
