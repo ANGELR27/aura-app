@@ -3117,15 +3117,18 @@
         renderChatMessages();
     }
 
-    let lastChatHash = '';
+    let lastChatHash = '__UNINITIALIZED__';
 
     function renderChatMessages() {
         const list = document.getElementById('chatMessagesList');
         if (!list) return;
 
         // Build a hash to detect if content actually changed (prevents flickering)
-        const newHash = currentChatMessages.map(m => (m.id || '') + (m.text || '')).join('|');
-        if (newHash === lastChatHash) return;
+        const newHash = (currentChatMessages && currentChatMessages.length > 0) 
+            ? currentChatMessages.map(m => (m.id || '') + (m.text || '')).join('|')
+            : '__EMPTY__';
+
+        if (newHash === lastChatHash && !list.innerHTML.includes('Cargando')) return;
         lastChatHash = newHash;
 
         if (!currentChatMessages || currentChatMessages.length === 0) {
