@@ -2502,11 +2502,11 @@
     let partnerTypingResetTimeout = null;
     let lastTypingBroadcast = 0;
 
-    // Audio Voice Note state
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let recordTimerInterval = null;
-    let recordStartTime = 0;
+    // Audio Voice Note state for Chat
+    let chatMediaRecorder = null;
+    let chatAudioChunks = [];
+    let chatRecordTimerInterval = null;
+    let chatRecordStartTime = 0;
     let currentPlayingAudio = null;
 
     function getPartnerProfile() {
@@ -2527,7 +2527,7 @@
 
     /* ===== VOICE RECORDER SYSTEM ===== */
     async function toggleAudioRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
+        if (chatMediaRecorder && chatMediaRecorder.state === 'recording') {
             stopAndSendAudioRecording();
         } else {
             startAudioRecording();
@@ -2542,25 +2542,25 @@
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioChunks = [];
+            chatAudioChunks = [];
             
             const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
                 ? { mimeType: 'audio/webm;codecs=opus' }
                 : (MediaRecorder.isTypeSupported('audio/mp4') ? { mimeType: 'audio/mp4' } : {});
 
-            mediaRecorder = new MediaRecorder(stream, options);
-            mediaRecorder.ondataavailable = (e) => {
+            chatMediaRecorder = new MediaRecorder(stream, options);
+            chatMediaRecorder.ondataavailable = (e) => {
                 if (e.data && e.data.size > 0) {
-                    audioChunks.push(e.data);
+                    chatAudioChunks.push(e.data);
                 }
             };
 
-            mediaRecorder.onstop = () => {
+            chatMediaRecorder.onstop = () => {
                 stream.getTracks().forEach(track => track.stop());
             };
 
-            mediaRecorder.start(100);
-            recordStartTime = Date.now();
+            chatMediaRecorder.start(100);
+            chatRecordStartTime = Date.now();
 
             document.getElementById('chatNormalInputContainer').classList.add('hidden');
             document.getElementById('chatRecordingContainer').classList.remove('hidden');
@@ -2568,8 +2568,8 @@
             const timerEl = document.getElementById('chatRecordTimer');
             if (timerEl) timerEl.innerText = '0:00';
 
-            recordTimerInterval = setInterval(() => {
-                const elapsedSec = Math.floor((Date.now() - recordStartTime) / 1000);
+            chatRecordTimerInterval = setInterval(() => {
+                const elapsedSec = Math.floor((Date.now() - chatRecordStartTime) / 1000);
                 const mins = Math.floor(elapsedSec / 60);
                 const secs = elapsedSec % 60;
                 if (timerEl) timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -2583,12 +2583,12 @@
 
     function cancelAudioRecording() {
         triggerHaptic();
-        clearInterval(recordTimerInterval);
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.onstop = () => {};
-            mediaRecorder.stop();
+        clearInterval(chatRecordTimerInterval);
+        if (chatMediaRecorder && chatMediaRecorder.state === 'recording') {
+            chatMediaRecorder.onstop = () => {};
+            chatMediaRecorder.stop();
         }
-        audioChunks = [];
+        chatAudioChunks = [];
         document.getElementById('chatNormalInputContainer').classList.remove('hidden');
         document.getElementById('chatRecordingContainer').classList.add('hidden');
         toast('Grabación cancelada', 'info');
@@ -2596,17 +2596,17 @@
 
     async function stopAndSendAudioRecording() {
         triggerHaptic();
-        clearInterval(recordTimerInterval);
-        const durationSec = Math.max(1, Math.floor((Date.now() - recordStartTime) / 1000));
+        clearInterval(chatRecordTimerInterval);
+        const durationSec = Math.max(1, Math.floor((Date.now() - chatRecordStartTime) / 1000));
 
-        if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+        if (!chatMediaRecorder || chatMediaRecorder.state !== 'recording') return;
 
         document.getElementById('chatNormalInputContainer').classList.remove('hidden');
         document.getElementById('chatRecordingContainer').classList.add('hidden');
 
-        mediaRecorder.onstop = async () => {
-            const mime = mediaRecorder.mimeType || 'audio/webm';
-            const audioBlob = new Blob(audioChunks, { type: mime });
+        chatMediaRecorder.onstop = async () => {
+            const mime = chatMediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(chatAudioChunks, { type: mime });
             
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
@@ -2617,7 +2617,7 @@
             };
         };
 
-        mediaRecorder.stop();
+        chatMediaRecorder.stop();
     }
 
     function togglePlayVoiceNote(btn, audioSrc) {
