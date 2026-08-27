@@ -424,17 +424,17 @@
             <section class="glass-card rounded-[2rem] p-3.5 fade-in">
                 <div class="flex items-center justify-between mb-2.5 px-1">
                     <span class="text-[11px] font-extrabold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
-                        <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día
+                        <i data-lucide="flame" class="w-3.5 h-3.5 text-orange-500 fill-orange-500"></i> Momentos del Día (Historias)
                     </span>
-                    <span class="text-[10px] font-bold text-pink-600 dark:text-orange-400">Hoy</span>
+                    <span class="text-[10px] font-bold text-pink-600 dark:text-orange-400">24 horas</span>
                 </div>
                 <div class="flex items-center gap-3 overflow-x-auto pb-1 pt-1 px-1 scrollbar-none" id="storiesList">
                     <label class="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
                         <div class="w-14 h-14 rounded-2xl glass-subtle border-2 border-dashed border-pink-400 dark:border-orange-400 flex items-center justify-center text-pink-500 dark:text-orange-400 group-hover:scale-105 transition-all shadow-sm">
-                            <i data-lucide="plus" class="w-6 h-6"></i>
+                            <i data-lucide="camera" class="w-6 h-6"></i>
                         </div>
                         <span class="text-[10px] font-bold opacity-75">Subir foto</span>
-                        <input type="file" accept="image/*" class="hidden" onchange="handleStoryUpload(event)">
+                        <input type="file" id="storyFileInput" accept="image/*" class="hidden" onchange="prepareStoryModal(event)">
                     </label>
                     <div id="dynamicStories" class="flex items-center gap-3"></div>
                 </div>
@@ -661,6 +661,37 @@
                 <button onclick="closeNewHabitModal()" class="btn-ghost-pill flex-1 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancelar</button>
                 <button onclick="confirmAddHabit()" class="btn-gradient flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer shadow-md">
                     <i data-lucide="check" class="w-4 h-4"></i> Guardar Meta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== CUSTOM GLASS MODAL: SUBIR MOMENTO / HISTORIA ========================== -->
+    <div id="storyUploadModal" class="fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-4 shadow-2xl border border-pink-200/60 dark:border-orange-500/30">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-pink-100 dark:bg-orange-950 text-pink-600 dark:text-orange-400 flex items-center justify-center">
+                        <i data-lucide="camera" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-base">Nuevo Momento (24h)</h3>
+                </div>
+                <button onclick="closeStoryUploadModal()" class="p-1.5 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer"><i data-lucide="x" class="w-4 h-4 opacity-60"></i></button>
+            </div>
+            
+            <div class="rounded-2xl overflow-hidden max-h-56 border border-pink-200/50 dark:border-orange-500/20 shadow-md">
+                <img id="storyPreviewImg" src="" class="w-full h-auto object-cover max-h-56">
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold opacity-60 uppercase tracking-wider mb-1 block">Mensaje o Dedicatoria</label>
+                <input type="text" id="storyCaptionInput" placeholder="Ej: Pensando en ti 💕" class="input-glass-luxe w-full px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-medium">
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button onclick="closeStoryUploadModal()" class="btn-ghost-pill flex-1 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancelar</button>
+                <button onclick="submitStoryModal()" id="btnSubmitStory" class="btn-gradient flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer shadow-md">
+                    <i data-lucide="send" class="w-4 h-4"></i> Compartir
                 </button>
             </div>
         </div>
@@ -1692,20 +1723,72 @@
         toast('Comentario enviado ✨', 'success');
     }
 
-    /* ===== STORIES & MOMENTS ===== */
-    async function handleStoryUpload(e) {
-        const file = e.target.files[0]; if (!file) return;
-        toast('Subiendo momento...', 'info');
-        const compressedBase64 = await compressImageFile(file, 1080, 0.85);
+    /* ===== STORIES & MOMENTS (24h) ===== */
+    let pendingStoryBase64 = null;
 
-        await sb.from('stories').insert({ user_id: currentUser.id, photo_url: compressedBase64, caption: 'Momento de hoy ✨' });
+    async function prepareStoryModal(e) {
+        const file = e.target.files[0]; if (!file) return;
+        toast('Cargando foto...', 'info');
+        pendingStoryBase64 = await compressImageFile(file, 1080, 0.85);
+        document.getElementById('storyPreviewImg').src = pendingStoryBase64;
+        document.getElementById('storyCaptionInput').value = '';
+        document.getElementById('storyUploadModal').classList.remove('hidden');
+        document.getElementById('storyFileInput').value = '';
+        lucide.createIcons();
+    }
+
+    function closeStoryUploadModal() {
+        pendingStoryBase64 = null;
+        document.getElementById('storyUploadModal').classList.add('hidden');
+    }
+
+    async function submitStoryModal() {
+        if (!pendingStoryBase64) return;
+        const caption = document.getElementById('storyCaptionInput').value.trim() || 'Momento compartido ✨';
+        const btn = document.getElementById('btnSubmitStory');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner mr-2"></span> Compartiendo...';
+
+        try {
+            await sb.from('stories').insert({
+                user_id: currentUser.id,
+                photo_url: pendingStoryBase64,
+                caption: caption
+            });
+        } catch(err) {
+            console.warn("Story cloud insert error, fallback:", err);
+        }
+
+        // Save in local backup as well
+        const localStories = JSON.parse(localStorage.getItem('aura_local_stories') || '[]');
+        localStories.unshift({
+            id: 'local_' + Date.now(),
+            user_id: currentUser.id,
+            photo_url: pendingStoryBase64,
+            caption: caption,
+            created_at: new Date().toISOString()
+        });
+        localStorage.setItem('aura_local_stories', JSON.stringify(localStories.slice(0, 10)));
+
+        btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Compartir';
+        closeStoryUploadModal();
+        await loadStories();
         toast('¡Momento compartido! 📸', 'success');
-        confetti({ particleCount: 30 });
-        loadStories();
+        confetti({ particleCount: 35, spread: 60 });
     }
 
     async function loadStories() {
-        const { data: stories } = await sb.from('stories').select('*').order('created_at', { ascending: false }).limit(6);
+        let stories = [];
+        try {
+            const { data } = await sb.from('stories').select('*').order('created_at', { ascending: false }).limit(8);
+            if (data && data.length > 0) stories = data;
+        } catch(e) {
+            console.warn("Could not fetch remote stories:", e);
+        }
+
+        if (stories.length === 0) {
+            stories = JSON.parse(localStorage.getItem('aura_local_stories') || '[]');
+        }
+
         const container = document.getElementById('dynamicStories');
         container.innerHTML = '';
         if (!stories || stories.length === 0) return;
