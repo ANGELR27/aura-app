@@ -913,20 +913,20 @@
 
                 <!-- PARTNER ACTIONS (Reactions & Comment for the viewer only) -->
                 <div id="storyViewerPartnerActions" class="space-y-2.5">
-                    <!-- High-End Reaction Buttons Dock -->
-                    <div class="glass rounded-2xl p-1.5 flex items-center justify-around gap-1 backdrop-blur-2xl border border-white/35 shadow-2xl">
-                        <button onclick="sendStoryReaction('🤪')" class="w-10 h-10 rounded-xl glass-subtle hover:bg-white/30 active:scale-90 hover:scale-115 transition-all text-xl flex items-center justify-center cursor-pointer shadow-sm border border-white/20" title="Locura">🤪</button>
-                        <button onclick="sendStoryReaction('❤️')" class="w-10 h-10 rounded-xl glass-subtle hover:bg-white/30 active:scale-90 hover:scale-115 transition-all text-xl flex items-center justify-center cursor-pointer shadow-sm border border-white/20" title="Corazón">❤️</button>
-                        <button onclick="sendStoryReaction('🥳')" class="w-10 h-10 rounded-xl glass-subtle hover:bg-white/30 active:scale-90 hover:scale-115 transition-all text-xl flex items-center justify-center cursor-pointer shadow-sm border border-white/20" title="Fiesta">🥳</button>
-                        <button onclick="sendStoryReaction('🔥')" class="w-10 h-10 rounded-xl glass-subtle hover:bg-white/30 active:scale-90 hover:scale-115 transition-all text-xl flex items-center justify-center cursor-pointer shadow-sm border border-white/20" title="Fuego">🔥</button>
-                        <button onclick="sendStoryReaction('😂')" class="w-10 h-10 rounded-xl glass-subtle hover:bg-white/30 active:scale-90 hover:scale-115 transition-all text-xl flex items-center justify-center cursor-pointer shadow-sm border border-white/20" title="Risa">😂</button>
+                    <!-- High-End Continuous Translucent Emojis Dock (No individual boxes) -->
+                    <div class="rounded-full bg-black/35 backdrop-blur-2xl border border-white/20 px-4 py-2 flex items-center justify-around shadow-xl">
+                        <button onclick="sendStoryReaction('🤪')" class="text-2xl hover:scale-135 active:scale-95 transition-transform duration-200 cursor-pointer select-none" title="Locura">🤪</button>
+                        <button onclick="sendStoryReaction('❤️')" class="text-2xl hover:scale-135 active:scale-95 transition-transform duration-200 cursor-pointer select-none" title="Corazón">❤️</button>
+                        <button onclick="sendStoryReaction('🥳')" class="text-2xl hover:scale-135 active:scale-95 transition-transform duration-200 cursor-pointer select-none" title="Fiesta">🥳</button>
+                        <button onclick="sendStoryReaction('🔥')" class="text-2xl hover:scale-135 active:scale-95 transition-transform duration-200 cursor-pointer select-none" title="Fuego">🔥</button>
+                        <button onclick="sendStoryReaction('😂')" class="text-2xl hover:scale-135 active:scale-95 transition-transform duration-200 cursor-pointer select-none" title="Risa">😂</button>
                     </div>
 
-                    <!-- Sleek Quick Comment Input -->
-                    <div class="flex items-center gap-2">
-                        <input type="text" id="storyCommentInput" placeholder="Enviar mensaje flotante..." class="input-glass-luxe flex-1 px-4 py-3 rounded-2xl text-xs font-medium text-white placeholder:text-white/60 bg-black/40 border border-white/30 backdrop-blur-xl focus:border-white focus:bg-black/60 shadow-lg" onkeypress="if(event.key==='Enter')sendStoryComment()">
-                        <button onclick="sendStoryComment()" class="btn-gradient w-11 h-11 rounded-2xl text-white cursor-pointer shadow-xl active:scale-90 transition-all flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="send" class="w-4 h-4"></i>
+                    <!-- Sleek Integrated Quick Comment Pill -->
+                    <div class="relative flex items-center rounded-full bg-black/40 backdrop-blur-2xl border border-white/20 shadow-xl focus-within:border-white/50 focus-within:bg-black/60 transition-all p-1 pl-4">
+                        <input type="text" id="storyCommentInput" placeholder="Enviar mensaje flotante..." class="flex-1 bg-transparent text-xs font-medium text-white placeholder:text-white/50 outline-none pr-2 py-2" onkeypress="if(event.key==='Enter')sendStoryComment()">
+                        <button onclick="sendStoryComment()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white text-white hover:text-neutral-900 active:scale-90 transition-all flex items-center justify-center cursor-pointer flex-shrink-0" title="Enviar">
+                            <i data-lucide="arrow-up" class="w-4 h-4 stroke-[2.5]"></i>
                         </button>
                     </div>
                 </div>
