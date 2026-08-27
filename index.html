@@ -881,20 +881,20 @@
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
 
-                        <!-- Floating Glass Dropdown Menu -->
-                        <div id="storyOptionsMenu" class="hidden absolute right-0 top-11 w-52 glass-card rounded-2xl p-1.5 shadow-2xl border border-white/30 backdrop-blur-3xl z-50 space-y-1 fade-in">
-                            <button onclick="saveStoryToGallery()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-white hover:bg-white/20 transition-all flex items-center gap-2 cursor-pointer">
-                                <i data-lucide="image-down" class="w-4 h-4 text-emerald-400"></i>
-                                <span>Guardar en Galería</span>
+                        <!-- Floating Glass Dropdown Menu (Minimalist & Clean) -->
+                        <div id="storyOptionsMenu" class="hidden absolute right-0 top-11 w-48 rounded-2xl p-1.5 shadow-[0_15px_40px_rgba(0,0,0,0.6)] border border-white/20 bg-neutral-900/90 backdrop-blur-2xl z-50 space-y-0.5 fade-in">
+                            <button onclick="saveStoryToGallery()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-neutral-200 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5 cursor-pointer">
+                                <i data-lucide="bookmark" class="w-3.5 h-3.5 opacity-75"></i>
+                                <span>Guardar en galería</span>
                             </button>
-                            <button onclick="highlightStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-white hover:bg-white/20 transition-all flex items-center gap-2 cursor-pointer">
-                                <i data-lucide="star" class="w-4 h-4 text-amber-400"></i>
-                                <span>Destacar Momento ⭐</span>
+                            <button onclick="highlightStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-neutral-200 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5 cursor-pointer">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 opacity-75"></i>
+                                <span>Destacar momento</span>
                             </button>
-                            <div id="storyDeleteOptionDivider" class="border-t border-white/15 my-1"></div>
-                            <button id="btnDeleteStoryOption" onclick="deleteCurrentStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-rose-400 hover:bg-rose-500/20 transition-all flex items-center gap-2 cursor-pointer">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                <span>Eliminar Historia</span>
+                            <div id="storyDeleteOptionDivider" class="border-t border-white/10 my-1"></div>
+                            <button id="btnDeleteStoryOption" onclick="deleteCurrentStory()" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-all flex items-center gap-2.5 cursor-pointer">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5 opacity-80"></i>
+                                <span>Eliminar historia</span>
                             </button>
                         </div>
                     </div>
@@ -2011,10 +2011,10 @@
             });
             await loadPosts();
             confetti({ particleCount: 30, spread: 60 });
-            toast('¡Guardado en recuerdos para siempre! 💖', 'success');
+            toast('Guardado en la galería', 'success');
         } catch(e) {
             console.error(e);
-            toast('Guardado en recuerdos ✨', 'success');
+            toast('Guardado en la galería', 'success');
         }
     }
 
@@ -2022,13 +2022,13 @@
         document.getElementById('storyOptionsMenu').classList.add('hidden');
         triggerHaptic();
         confetti({ particleCount: 40, spread: 70 });
-        toast('¡Momento destacado agregado a tus favoritos! ⭐', 'success');
+        toast('Momento destacado guardado', 'success');
     }
 
     async function deleteCurrentStory() {
         if (!currentViewingStory) return;
         closeStoryViewer();
-        toast('Eliminando momento...', 'info');
+        toast('Eliminando...', 'info');
 
         try {
             await sb.from('stories').delete().eq('id', currentViewingStory.id);
@@ -2041,7 +2041,7 @@
         localStorage.setItem('aura_local_stories', JSON.stringify(updated));
 
         await loadStories();
-        toast('Momento eliminado 🗑️', 'info');
+        toast('Historia eliminada', 'info');
     }
 
     /* ===== STORY FLOATING REACTIONS (Locura, Corazón, Fiesta, etc.) ===== */
