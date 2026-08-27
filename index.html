@@ -1317,23 +1317,32 @@
         }
 
         const iconUrl = icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>';
+        const isMsg = title.includes('Mensaje') || title.includes('Chat') || title.includes('💬') || title.includes('Nota');
         const notifOptions = {
             body: body,
             icon: iconUrl,
             badge: iconUrl,
-            tag: 'aura-' + Date.now(),
+            tag: 'aura-msg-' + Date.now(),
             renotify: true,
-            vibrate: [200, 100, 200]
+            vibrate: [200, 100, 200],
+            data: { url: window.location.origin + window.location.pathname },
+            actions: isMsg ? [
+                { action: 'reply', type: 'text', title: '💌 Responder', placeholder: 'Escribe un mensaje...' },
+                { action: 'open_chat', title: '💬 Ver Chat' }
+            ] : [
+                { action: 'open_app', title: '✨ Abrir Aura' }
+            ]
         };
 
-        // 1. Post to Service Worker (background reliability)
+        // 1. Post to Service Worker (background reliability & quick reply support)
         if (navigator.serviceWorker && navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
                 type: 'SHOW_NOTIFICATION',
                 title: title,
                 body: body,
                 icon: iconUrl,
-                tag: notifOptions.tag
+                tag: notifOptions.tag,
+                actions: notifOptions.actions
             });
         }
 
@@ -1350,7 +1359,11 @@
         // 2. Standard fallback
         try {
             const notif = new Notification(title, notifOptions);
-            notif.onclick = () => { window.focus(); notif.close(); };
+            notif.onclick = () => { 
+                window.focus(); 
+                if (isMsg) switchTab('chat');
+                notif.close(); 
+            };
             setTimeout(() => notif.close(), 6000);
         } catch(e) {
             console.warn('Notification constructor fallback:', e);
@@ -1387,6 +1400,17 @@
                 setupRealtime();
                 requestNotificationPermission();
                 checkNotificationBanner();
+
+                // Handle direct notification link action
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('tab') === 'chat') {
+                    switchTab('chat');
+                }
+                if (urlParams.get('reply')) {
+                    switchTab('chat');
+                    handleSendChatMessage(decodeURIComponent(urlParams.get('reply')));
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
             } catch(err) {
                 console.error(err);
                 showAuth();
