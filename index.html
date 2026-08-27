@@ -684,7 +684,7 @@
                         </div>
                         <div>
                             <h3 id="chatPartnerName" class="font-display font-extrabold text-sm sm:text-base leading-tight"></h3>
-                            <p class="text-[10px] opacity-60 font-medium flex items-center gap-1">
+                            <p id="chatPartnerStatus" class="text-[10px] opacity-60 font-medium flex items-center gap-1 transition-all">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Chat Íntimo & Privado
                             </p>
                         </div>
@@ -712,13 +712,34 @@
                     <button onclick="insertChatEmoji('🔥')" class="text-lg hover:scale-130 transition-transform cursor-pointer p-0.5">🔥</button>
                 </div>
 
-                <!-- Chat Message Input Dock -->
+                <!-- Chat Message Input Dock & Voice Recorder -->
                 <div class="pt-0.5">
-                    <div class="relative flex items-center rounded-2xl bg-black/5 dark:bg-white/5 border border-pink-200/60 dark:border-orange-500/30 p-1 pl-3.5 focus-within:border-pink-500 dark:focus-within:border-orange-400 transition-all shadow-inner">
-                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-2 py-2" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
-                        <button onclick="handleSendChatMessage()" class="btn-gradient w-9 h-9 rounded-xl text-white flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all flex-shrink-0" title="Enviar">
+                    <!-- Standard Input Bar -->
+                    <div id="chatNormalInputContainer" class="relative flex items-center rounded-2xl bg-black/5 dark:bg-white/5 border border-pink-200/60 dark:border-orange-500/30 p-1 pl-3 focus-within:border-pink-500 dark:focus-within:border-orange-400 transition-all shadow-inner gap-1.5">
+                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-1 py-2" oninput="handleChatTypingInput()" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
+                        <button id="chatMicBtn" onclick="toggleAudioRecording()" class="w-9 h-9 rounded-xl bg-pink-100 dark:bg-orange-950/60 text-pink-600 dark:text-orange-400 flex items-center justify-center cursor-pointer shadow-sm active:scale-95 transition-all flex-shrink-0 hover:scale-105" title="Grabar nota de voz">
+                            <i data-lucide="mic" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="handleSendChatMessage()" class="btn-gradient w-9 h-9 rounded-xl text-white flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all flex-shrink-0 hover:scale-105" title="Enviar">
                             <i data-lucide="send" class="w-4 h-4"></i>
                         </button>
+                    </div>
+
+                    <!-- Voice Recording Live Bar (Shown while recording) -->
+                    <div id="chatRecordingContainer" class="hidden flex items-center justify-between rounded-2xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-400/40 p-2 px-3 shadow-md">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+                            <span class="text-xs font-bold text-rose-500">Grabando...</span>
+                            <span id="chatRecordTimer" class="text-xs font-mono font-bold text-rose-500 opacity-90">0:00</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="cancelAudioRecording()" class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center cursor-pointer hover:bg-rose-500/30 active:scale-90 transition-all" title="Cancelar grabación">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="stopAndSendAudioRecording()" class="btn-gradient w-8 h-8 rounded-xl text-white flex items-center justify-center cursor-pointer shadow-md active:scale-90 transition-all" title="Enviar nota de voz">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1320,11 +1341,19 @@
         initTheme();
         lucide.createIcons();
 
-        // Register Service Worker
+        // Register Service Worker & Interactive Notifications Listener
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then(reg => {
                 console.log('SW Registered:', reg.scope);
             }).catch(e => console.warn('SW err:', e));
+
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'NOTIFICATION_REPLY' && event.data.text) {
+                    handleSendChatMessage(event.data.text);
+                } else if (event.data && event.data.type === 'SWITCH_TAB') {
+                    switchTab(event.data.tab || 'chat');
+                }
+            });
         }
 
         const savedUser = localStorage.getItem('aura_cloud_user');
@@ -2468,6 +2497,17 @@
 
     /* ===== INTIMATE CHAT ENGINE (Ángel & Roxana) ===== */
     let currentChatMessages = [];
+    let realtimeChannelGlobal = null;
+    let typingTimeout = null;
+    let partnerTypingResetTimeout = null;
+    let lastTypingBroadcast = 0;
+
+    // Audio Voice Note state
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordTimerInterval = null;
+    let recordStartTime = 0;
+    let currentPlayingAudio = null;
 
     function getPartnerProfile() {
         const profiles = Object.values(allProfiles);
@@ -2485,6 +2525,179 @@
         };
     }
 
+    /* ===== VOICE RECORDER SYSTEM ===== */
+    async function toggleAudioRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            stopAndSendAudioRecording();
+        } else {
+            startAudioRecording();
+        }
+    }
+
+    async function startAudioRecording() {
+        triggerHaptic();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            return toast('Tu dispositivo no soporta grabación de voz', 'error');
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioChunks = [];
+            
+            const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                ? { mimeType: 'audio/webm;codecs=opus' }
+                : (MediaRecorder.isTypeSupported('audio/mp4') ? { mimeType: 'audio/mp4' } : {});
+
+            mediaRecorder = new MediaRecorder(stream, options);
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    audioChunks.push(e.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start(100);
+            recordStartTime = Date.now();
+
+            document.getElementById('chatNormalInputContainer').classList.add('hidden');
+            document.getElementById('chatRecordingContainer').classList.remove('hidden');
+
+            const timerEl = document.getElementById('chatRecordTimer');
+            if (timerEl) timerEl.innerText = '0:00';
+
+            recordTimerInterval = setInterval(() => {
+                const elapsedSec = Math.floor((Date.now() - recordStartTime) / 1000);
+                const mins = Math.floor(elapsedSec / 60);
+                const secs = elapsedSec % 60;
+                if (timerEl) timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 500);
+
+        } catch(err) {
+            console.error('Mic access error:', err);
+            toast('Permiso de micrófono denegado o no disponible', 'error');
+        }
+    }
+
+    function cancelAudioRecording() {
+        triggerHaptic();
+        clearInterval(recordTimerInterval);
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.onstop = () => {};
+            mediaRecorder.stop();
+        }
+        audioChunks = [];
+        document.getElementById('chatNormalInputContainer').classList.remove('hidden');
+        document.getElementById('chatRecordingContainer').classList.add('hidden');
+        toast('Grabación cancelada', 'info');
+    }
+
+    async function stopAndSendAudioRecording() {
+        triggerHaptic();
+        clearInterval(recordTimerInterval);
+        const durationSec = Math.max(1, Math.floor((Date.now() - recordStartTime) / 1000));
+
+        if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+
+        document.getElementById('chatNormalInputContainer').classList.remove('hidden');
+        document.getElementById('chatRecordingContainer').classList.add('hidden');
+
+        mediaRecorder.onstop = async () => {
+            const mime = mediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(audioChunks, { type: mime });
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = async () => {
+                const base64Audio = reader.result;
+                const audioPayload = `[AUDIO:${durationSec}]${base64Audio}`;
+                await handleSendChatMessage(audioPayload);
+            };
+        };
+
+        mediaRecorder.stop();
+    }
+
+    function togglePlayVoiceNote(btn, audioSrc) {
+        triggerHaptic();
+        let player = btn._audioPlayer;
+        if (!player) {
+            player = new Audio(audioSrc);
+            btn._audioPlayer = player;
+        }
+
+        const icon = btn.querySelector('.voice-play-icon');
+
+        if (currentPlayingAudio && currentPlayingAudio !== player) {
+            currentPlayingAudio.pause();
+            currentPlayingAudio.currentTime = 0;
+            document.querySelectorAll('.voice-play-icon').forEach(ic => {
+                ic.setAttribute('data-lucide', 'play');
+            });
+            lucide.createIcons();
+        }
+
+        if (player.paused) {
+            player.play();
+            currentPlayingAudio = player;
+            if (icon) {
+                icon.setAttribute('data-lucide', 'pause');
+                lucide.createIcons();
+            }
+            player.onended = () => {
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'play');
+                    lucide.createIcons();
+                }
+                currentPlayingAudio = null;
+            };
+        } else {
+            player.pause();
+            if (icon) {
+                icon.setAttribute('data-lucide', 'play');
+                lucide.createIcons();
+            }
+            currentPlayingAudio = null;
+        }
+    }
+
+    /* ===== TYPING BROADCAST ===== */
+    function handleChatTypingInput() {
+        const now = Date.now();
+        if (now - lastTypingBroadcast > 1500) {
+            lastTypingBroadcast = now;
+            try {
+                realtimeChannelGlobal?.send({
+                    type: 'broadcast',
+                    event: 'typing',
+                    payload: { user_id: currentUser.id, name: currentUser.name }
+                });
+            } catch(e) {}
+        }
+    }
+
+    function showPartnerTyping(partnerName) {
+        const statusEl = document.getElementById('chatPartnerStatus');
+        if (!statusEl) return;
+
+        statusEl.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-pink-500 dark:bg-orange-400 animate-bounce"></span>
+            <span class="text-pink-500 dark:text-orange-400 font-bold animate-pulse">${partnerName} está escribiendo... ✨</span>
+        `;
+
+        clearTimeout(partnerTypingResetTimeout);
+        partnerTypingResetTimeout = setTimeout(() => {
+            if (statusEl) {
+                statusEl.innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Chat Íntimo & Privado
+                `;
+            }
+        }, 3500);
+    }
+
+    /* ===== CHAT SYNC & DEDUPLICATION ===== */
     async function loadChatMessages() {
         const partner = getPartnerProfile();
         const nameEl = document.getElementById('chatPartnerName');
@@ -2504,33 +2717,40 @@
             console.warn("Messages query error:", e);
         }
 
-        // 2. Query remote 'posts' table with [CHAT] tag
-        try {
-            const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(100);
-            if (!postErr && chatPosts && chatPosts.length > 0) {
-                const mapped = chatPosts.filter(p => p.text?.includes('[CHAT]')).map(p => ({
-                    id: p.id,
-                    sender_id: p.user_id,
-                    text: p.text.replace(/^\[CHAT\]\s*/, ''),
-                    created_at: p.created_at
-                }));
-                serverMessages = serverMessages.concat(mapped);
+        // 2. Query remote 'posts' table with [CHAT] tag (only if messages table returned nothing)
+        if (serverMessages.length === 0) {
+            try {
+                const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(100);
+                if (!postErr && chatPosts && chatPosts.length > 0) {
+                    const mapped = chatPosts.filter(p => p.text?.includes('[CHAT]')).map(p => ({
+                        id: p.id,
+                        sender_id: p.user_id,
+                        text: p.text.replace(/^\[CHAT\]\s*/, ''),
+                        created_at: p.created_at
+                    }));
+                    serverMessages = serverMessages.concat(mapped);
+                }
+            } catch(e) {
+                console.warn("Chat posts query:", e);
             }
-        } catch(e) {
-            console.warn("Chat posts query:", e);
         }
 
         // 3. Merge with local cached messages so messages are NEVER lost
         const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
         const combined = [...localChat, ...currentChatMessages, ...serverMessages];
 
-        // 4. Deduplicate by unique key (id or content+time)
+        // 4. Strict Deduplication: group identical text from same sender within 25-second bucket
         const seen = new Set();
         currentChatMessages = combined.filter(m => {
             if (!m || !m.text) return false;
-            const key = m.id || (m.sender_id + '_' + m.text);
+            const cleanText = m.text.replace(/^\[CHAT\]\s*/, '').trim();
+            const sender = m.sender_id || m.user_id || 'me';
+            const timeBucket = m.created_at ? Math.floor(new Date(m.created_at).getTime() / 25000) : 'recent';
+            // Use cleanText signature (first 80 chars) to prevent double bubbles of same text
+            const key = `${sender}__${cleanText.substring(0, 80)}__${timeBucket}`;
             if (seen.has(key)) return false;
             seen.add(key);
+            m.text = cleanText;
             return true;
         }).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
@@ -2547,8 +2767,8 @@
         if (!list) return;
 
         // Build a hash to detect if content actually changed (prevents flickering)
-        const newHash = currentChatMessages.map(m => m.id || m.text).join('|');
-        if (newHash === lastChatHash) return; // Skip re-render if nothing changed
+        const newHash = currentChatMessages.map(m => (m.id || '') + (m.text || '')).join('|');
+        if (newHash === lastChatHash) return;
         lastChatHash = newHash;
 
         if (!currentChatMessages || currentChatMessages.length === 0) {
@@ -2570,11 +2790,45 @@
             const msgDate = m.created_at ? new Date(m.created_at) : new Date();
             const timeStr = msgDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 
+            const isAudio = m.text && m.text.startsWith('[AUDIO');
+            let contentHtml = '';
+
+            if (isAudio) {
+                const match = m.text.match(/^\[AUDIO:?(\d+)?\](.*)$/);
+                const duration = match && match[1] ? `${match[1]}s` : 'Nota de voz';
+                const audioData = match ? match[2] : m.text.replace('[AUDIO]', '');
+
+                contentHtml = `
+                    <div class="flex items-center gap-2.5 py-1">
+                        <button onclick="togglePlayVoiceNote(this, '${audioData}')" class="w-8 h-8 rounded-full ${isMe ? 'bg-white/20 text-white' : 'bg-pink-500 dark:bg-orange-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0 shadow-sm" title="Reproducir audio">
+                            <i data-lucide="play" class="w-4 h-4 voice-play-icon"></i>
+                        </button>
+                        <div class="flex-1 min-w-[110px] space-y-1">
+                            <div class="flex items-center gap-0.5 h-3 opacity-85">
+                                <span class="w-1 h-2 bg-current rounded-full"></span>
+                                <span class="w-1 h-3 bg-current rounded-full animate-pulse"></span>
+                                <span class="w-1 h-1.5 bg-current rounded-full"></span>
+                                <span class="w-1 h-3.5 bg-current rounded-full"></span>
+                                <span class="w-1 h-2 bg-current rounded-full animate-pulse"></span>
+                                <span class="w-1 h-4 bg-current rounded-full"></span>
+                                <span class="w-1 h-2.5 bg-current rounded-full"></span>
+                                <span class="w-1 h-1 bg-current rounded-full"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-[9px] ${isMe ? 'text-white/80' : 'opacity-60'} font-mono">
+                                <span>🎙️ Nota de voz (${duration})</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentHtml = `<p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${escapeHtml(m.text)}</p>`;
+            }
+
             if (isMe) {
                 html += `
                     <div class="flex justify-end items-end gap-1.5 slide-up">
-                        <div class="max-w-[80%] rounded-2xl rounded-br-sm px-3.5 py-2.5 bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
-                            <p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${escapeHtml(m.text)}</p>
+                        <div class="max-w-[82%] rounded-2xl rounded-br-sm px-3.5 py-2 bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
+                            ${contentHtml}
                             <div class="flex items-center justify-end gap-1 text-[9px] text-white/80 font-mono">
                                 <span>${timeStr}</span>
                                 <i data-lucide="check-check" class="w-3 h-3"></i>
@@ -2586,8 +2840,8 @@
                 html += `
                     <div class="flex justify-start items-end gap-2 slide-up">
                         <img src="${partner.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-pink-300 dark:border-orange-400 mb-1 flex-shrink-0 shadow-sm">
-                        <div class="max-w-[80%] rounded-2xl rounded-bl-sm px-3.5 py-2.5 glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
-                            <p class="text-xs sm:text-sm font-medium opacity-90 leading-relaxed break-words">${escapeHtml(m.text)}</p>
+                        <div class="max-w-[82%] rounded-2xl rounded-bl-sm px-3.5 py-2 glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
+                            ${contentHtml}
                             <div class="flex items-center justify-end text-[9px] opacity-50 font-mono">
                                 <span>${timeStr}</span>
                             </div>
@@ -2608,6 +2862,7 @@
         input.value += emoji;
         input.focus();
         triggerHaptic();
+        handleChatTypingInput();
     }
 
     async function sendQuickHeart() {
@@ -2639,26 +2894,30 @@
         renderChatMessages();
 
         // 1. Insert into remote 'messages' table
+        let insertedOk = false;
         try {
-            await sb.from('messages').insert({
+            const { error: msgErr } = await sb.from('messages').insert({
                 sender_id: currentUser.id,
                 receiver_id: partner.id,
                 text: text
             });
+            if (!msgErr) insertedOk = true;
         } catch(e) {
             console.warn("Messages insert error:", e);
         }
 
-        // 2. Dual fallback on remote 'posts' table with [CHAT] tag
-        try {
-            await sb.from('posts').insert({
-                user_id: currentUser.id,
-                text: `[CHAT] ${text}`,
-                photo_url: null,
-                reactions: {}
-            });
-        } catch(e) {
-            console.warn("Chat post insert error:", e);
+        // 2. Only insert into 'posts' if 'messages' failed (fallback)
+        if (!insertedOk) {
+            try {
+                await sb.from('posts').insert({
+                    user_id: currentUser.id,
+                    text: `[CHAT] ${text}`,
+                    photo_url: null,
+                    reactions: {}
+                });
+            } catch(e) {
+                console.warn("Chat post fallback insert error:", e);
+            }
         }
 
         // Re-sync with server after short delay
@@ -2673,7 +2932,14 @@
 
     /* ===== REALTIME SUBSCRIPTIONS & BACKGROUND SYNC ===== */
     function setupRealtime() {
-        sb.channel('aura-realtime-cloud')
+        realtimeChannelGlobal = sb.channel('aura-realtime-cloud');
+
+        realtimeChannelGlobal
+            .on('broadcast', { event: 'typing' }, payload => {
+                if (payload.payload && payload.payload.user_id !== currentUser.id) {
+                    showPartnerTyping(payload.payload.name || 'Tu pareja');
+                }
+            })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
                 const isChat = payload.new?.text?.includes('[CHAT]');
 
@@ -2684,8 +2950,8 @@
                         const cleanMsg = payload.new.text.replace(/^\[CHAT\]\s*/, '');
                         if (currentActiveTab !== 'chat') {
                             document.getElementById('dockChatBadge')?.classList.remove('hidden');
-                            toast(`${author.name}: ${cleanMsg}`, 'info');
-                            sendNativeNotification(`Mensaje de ${author.name} 💬`, cleanMsg, author.avatar_url);
+                            toast(`${author.name}: ${cleanMsg.startsWith('[AUDIO') ? '🎙️ Nota de voz' : cleanMsg}`, 'info');
+                            sendNativeNotification(`Mensaje de ${author.name} 💬`, cleanMsg.startsWith('[AUDIO') ? '🎙️ Te envió una nota de voz' : cleanMsg, author.avatar_url);
                         } else {
                             playNotificationSound();
                         }
@@ -2721,10 +2987,12 @@
                 loadChatMessages();
                 if (payload.new && payload.new.sender_id !== currentUser.id) {
                     const author = getProfile(payload.new.sender_id);
+                    const isAudio = payload.new.text && payload.new.text.startsWith('[AUDIO');
+                    const previewText = isAudio ? '🎙️ Te envió una nota de voz' : payload.new.text;
                     if (currentActiveTab !== 'chat') {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
-                        toast(`${author.name}: ${payload.new.text}`, 'info');
-                        sendNativeNotification(`Mensaje de ${author.name} 💬`, payload.new.text, author.avatar_url);
+                        toast(`${author.name}: ${previewText}`, 'info');
+                        sendNativeNotification(`Mensaje de ${author.name} 💬`, previewText, author.avatar_url);
                     } else {
                         playNotificationSound();
                     }
@@ -2771,7 +3039,7 @@
             }
         });
 
-        // Periodic background poll every 15 seconds when chat is active (longer to avoid flicker)
+        // Periodic background poll every 15 seconds when chat is active
         setInterval(() => {
             if (currentActiveTab === 'chat') {
                 loadChatMessages();
