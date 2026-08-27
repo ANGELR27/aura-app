@@ -1690,13 +1690,15 @@
             }
         }
 
-        const { error } = await sb.from('posts').insert({
+        const insertData = {
             user_id: currentUser.id,
             text: text || (photoUrl ? '📸 Compartió una foto linda' : '🎙️ Compartió una nota de voz'),
             photo_url: photoUrl,
-            audio_url: audioUrl,
             reactions: {}
-        });
+        };
+        if (audioUrl) insertData.audio_url = audioUrl;
+
+        const { error } = await sb.from('posts').insert(insertData);
 
         btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Publicar</span>'; lucide.createIcons();
         if (error) return toast('Error al publicar: ' + error.message, 'error');
@@ -1866,7 +1868,6 @@
                     user_id: currentUser.id,
                     text: '[STORY] Momento compartido ✨',
                     photo_url: compressedBase64,
-                    audio_url: null,
                     reactions: {}
                 });
             } catch(err) {
@@ -2046,7 +2047,6 @@
                 user_id: currentUser.id,
                 text: currentViewingStory.caption || '📸 Recuerdo guardado desde Historias',
                 photo_url: currentViewingStory.photo_url,
-                audio_url: null,
                 reactions: {}
             });
             await loadPosts();
