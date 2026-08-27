@@ -1654,26 +1654,33 @@
         if (savedUser) {
             try {
                 currentUser = JSON.parse(savedUser);
-                await loadAllProfiles();
-                showApp();
-                await Promise.all([loadPosts(), loadHabits(), loadStories(), loadChatMessages(), loadBibleChapter(currentBibleBookId, currentBibleChapter)]);
-                setupRealtime();
-                requestNotificationPermission();
-                checkNotificationBanner();
-
-                // Handle direct notification link action
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.get('tab') === 'chat') {
-                    switchTab('chat');
-                }
-                if (urlParams.get('reply')) {
-                    switchTab('chat');
-                    handleSendChatMessage(decodeURIComponent(urlParams.get('reply')));
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            } catch(err) {
-                console.error(err);
+            } catch(e) {
                 showAuth();
+                document.getElementById('loadingScreen').style.display = 'none';
+                return;
+            }
+
+            try { await loadAllProfiles(); } catch(e) { console.warn('loadAllProfiles:', e); }
+            showApp();
+
+            // Load each module independently so one failure doesn't break the app
+            try { loadPosts(); } catch(e) { console.warn('loadPosts:', e); }
+            try { loadHabits(); } catch(e) { console.warn('loadHabits:', e); }
+            try { loadChatMessages(); } catch(e) { console.warn('loadChatMessages:', e); }
+            try { loadBibleChapter(currentBibleBookId, currentBibleChapter); } catch(e) { console.warn('loadBible:', e); }
+            try { setupRealtime(); } catch(e) { console.warn('setupRealtime:', e); }
+            try { requestNotificationPermission(); } catch(e) {}
+            try { checkNotificationBanner(); } catch(e) {}
+
+            // Handle direct notification link action
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'chat') {
+                switchTab('chat');
+            }
+            if (urlParams.get('reply')) {
+                switchTab('chat');
+                handleSendChatMessage(decodeURIComponent(urlParams.get('reply')));
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         } else {
             showAuth();
