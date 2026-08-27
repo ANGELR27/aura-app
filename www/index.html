@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aura">
     <meta name="theme-color" content="#f43f7d" id="themeColorMeta">
-    <link rel="icon" type="image/svg+xml" href="https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d">
-    <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230e0d11'/><rect x='2' y='2' width='96' height='96' rx='26' fill='none' stroke='%23f97316' stroke-opacity='0.6' stroke-width='3'/><circle cx='78' cy='22' r='24' fill='%23ea580c' opacity='0.4' filter='blur(8px)'/><text x='50%' y='68%' font-family='serif' font-weight='900' font-style='italic' font-size='56' fill='%23fbbf24' text-anchor='middle'>R</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230e0d11'/><rect x='2' y='2' width='96' height='96' rx='26' fill='none' stroke='%23f97316' stroke-opacity='0.6' stroke-width='3'/><circle cx='78' cy='22' r='24' fill='%23ea580c' opacity='0.4' filter='blur(8px)'/><text x='50%' y='68%' font-family='serif' font-weight='900' font-style='italic' font-size='56' fill='%23fbbf24' text-anchor='middle'>R</text></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -303,9 +303,11 @@
     <!-- ========================== LOADING SPINNER ========================== -->
     <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-100/90 via-purple-50/90 to-blue-50/90 dark:from-neutral-950/95 dark:via-neutral-900/95 dark:to-neutral-950/95 backdrop-blur-md">
         <div class="text-center space-y-4 slide-up">
-            <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center shadow-xl">
-                <div class="w-full h-full rounded-full bg-white dark:bg-neutral-900 flex items-center justify-center">
-                    <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
+            <!-- Luxury Matte Black 'R' Emblem -->
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-neutral-800 via-[#18171b] to-black p-[2px] shadow-[0_8px_30px_rgba(0,0,0,0.7),0_0_25px_rgba(249,115,22,0.4)] border border-orange-500/40 flex items-center justify-center">
+                <div class="w-full h-full rounded-[22px] bg-[#0c0c0e] flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute -top-4 -right-4 w-12 h-12 bg-orange-500/30 rounded-full blur-lg"></div>
+                    <span class="font-serif italic font-black text-3xl bg-gradient-to-tr from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(249,115,22,0.6)] select-none">R</span>
                 </div>
             </div>
             <div class="flex items-center justify-center gap-2">
@@ -319,9 +321,11 @@
     <div id="authScreen" class="fixed inset-0 z-40 flex items-center justify-center p-4 overflow-y-auto" style="display:none;">
         <div class="glass-card rounded-[2.5rem] p-7 sm:p-9 max-w-md w-full slide-up space-y-6 my-auto">
             <div class="text-center space-y-2">
-                <div class="w-16 h-16 mx-auto story-ring-active flex items-center justify-center">
-                    <div class="w-full h-full rounded-full bg-white dark:bg-neutral-900 flex items-center justify-center">
-                        <span class="text-2xl font-display font-black bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
+                <!-- Luxury Matte Black 'R' Emblem -->
+                <div class="w-18 h-18 mx-auto rounded-3xl bg-gradient-to-br from-neutral-800 via-[#18171b] to-black p-[2px] shadow-[0_8px_30px_rgba(0,0,0,0.7),0_0_25px_rgba(249,115,22,0.4)] border border-orange-500/40 flex items-center justify-center">
+                    <div class="w-full h-full rounded-[22px] bg-[#0c0c0e] flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 w-10 h-10 bg-orange-500/30 rounded-full blur-lg"></div>
+                        <span class="font-serif italic font-black text-3xl bg-gradient-to-tr from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(249,115,22,0.6)] select-none">R</span>
                     </div>
                 </div>
                 <h1 class="text-2xl font-display font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 dark:from-orange-400 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent">Aura</h1>
@@ -417,9 +421,11 @@
         <!-- Header -->
         <header class="glass-card rounded-[2rem] p-3 sm:p-4 mb-5 flex items-center justify-between fade-in sticky top-3 z-30 shadow-lg shadow-pink-500/5">
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-10 h-10 rounded-2xl story-ring-active flex items-center justify-center flex-shrink-0 shadow-md">
-                    <div class="w-full h-full rounded-xl bg-white dark:bg-neutral-900 flex items-center justify-center">
-                        <span class="font-display font-black text-lg bg-gradient-to-tr from-pink-500 via-rose-500 to-purple-600 dark:from-orange-400 dark:to-amber-500 bg-clip-text text-transparent">A</span>
+                <!-- Luxury Matte Black 'R' Header Emblem -->
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-neutral-800 via-[#18171b] to-black p-[1.5px] shadow-[0_4px_16px_rgba(0,0,0,0.6),0_0_15px_rgba(249,115,22,0.35)] border border-orange-500/40 flex items-center justify-center flex-shrink-0">
+                    <div class="w-full h-full rounded-[14px] bg-[#0c0c0e] flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-orange-500/30 rounded-full blur-sm"></div>
+                        <span class="font-serif italic font-black text-xl bg-gradient-to-tr from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-transparent drop-shadow select-none">R</span>
                     </div>
                 </div>
                 <div>
