@@ -673,8 +673,8 @@
         </section>
 
         <!-- ========================== VIEW: CHAT PRIVADO (Ángel & Roxana) ========================== -->
-        <section id="viewChat" class="hidden space-y-4 fade-in">
-            <div class="glass-card rounded-[2.5rem] p-4 sm:p-5 shadow-2xl flex flex-col h-[74vh] max-h-[620px] border border-pink-200/50 dark:border-orange-500/20">
+        <section id="viewChat" class="hidden fade-in" style="overflow:hidden;">
+            <div class="glass-card rounded-[2.5rem] p-4 sm:p-5 shadow-2xl flex flex-col border border-pink-200/50 dark:border-orange-500/20" style="height:calc(100vh - 160px); max-height:680px;">
                 <!-- Chat Partner Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-pink-200/40 dark:border-orange-500/20 px-1">
                     <div class="flex items-center gap-3">
@@ -1195,6 +1195,17 @@
         }, 3500);
     }
 
+    /* ===== HAPTIC VIBRATION HELPER ===== */
+    function triggerHaptic(duration = 25) {
+        try {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(duration);
+            }
+        } catch(e) {
+            // Ignore if vibration is not allowed or supported
+        }
+    }
+
     /* ===== AUDIO CHIME SYNTHESIZER ===== */
     function playNotificationSound() {
         try {
@@ -1507,6 +1518,10 @@
         document.getElementById('viewChat').classList.toggle('hidden', tab !== 'chat');
         document.getElementById('viewGallery').classList.toggle('hidden', tab !== 'gallery');
         document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
+
+        // Lock body scroll when chat is active to prevent page scrolling
+        document.body.style.overflow = (tab === 'chat') ? 'hidden' : '';
+        document.documentElement.style.overflow = (tab === 'chat') ? 'hidden' : '';
 
         ['dockFeed', 'dockBible', 'dockChat', 'dockGallery', 'dockHabits'].forEach(id => {
             const btn = document.getElementById(id);
@@ -2525,9 +2540,16 @@
         renderChatMessages();
     }
 
+    let lastChatHash = '';
+
     function renderChatMessages() {
         const list = document.getElementById('chatMessagesList');
         if (!list) return;
+
+        // Build a hash to detect if content actually changed (prevents flickering)
+        const newHash = currentChatMessages.map(m => m.id || m.text).join('|');
+        if (newHash === lastChatHash) return; // Skip re-render if nothing changed
+        lastChatHash = newHash;
 
         if (!currentChatMessages || currentChatMessages.length === 0) {
             list.innerHTML = `
@@ -2749,12 +2771,12 @@
             }
         });
 
-        // Periodic background poll every 8 seconds when chat is active
+        // Periodic background poll every 15 seconds when chat is active (longer to avoid flicker)
         setInterval(() => {
             if (currentActiveTab === 'chat') {
                 loadChatMessages();
             }
-        }, 8000);
+        }, 15000);
     }
 
     /* ===== UTILS ===== */
