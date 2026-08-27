@@ -169,36 +169,65 @@
             transform: translateY(0) scale(0.98);
         }
 
-        /* Tactile Obsidian Matte 3D Buttons & Capsule Elements (Reference Design) */
-        .tactile-pill {
-            background: radial-gradient(circle at 50% 10%, #26252c 0%, #16151a 70%, #0d0d10 100%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 2px rgba(0, 0, 0, 0.9);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .tactile-pill:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.45);
-            transform: translateY(-1px);
-        }
-        .tactile-pill:active {
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 1.5px 2px rgba(0, 0, 0, 0.8);
-            transform: translateY(1px);
-        }
-
-        .tactile-active-rim {
-            background: radial-gradient(circle at 50% 15%, #34333d 0%, #1a1920 70%, #100f14 100%);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            box-shadow: 0 0 18px rgba(249, 115, 22, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.8);
-        }
-
-        /* Glass Liquid Specular Rim */
+        /* Glass Liquid Specular Rim (Adapts to Light / Dark) */
         .glass-liquid-rim {
-            background: rgba(18, 17, 22, 0.82);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(24px) saturate(190%);
+            -webkit-backdrop-filter: blur(24px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 30px -6px rgba(244, 114, 182, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.95);
+        }
+        .dark .glass-liquid-rim {
+            background: rgba(18, 17, 22, 0.85);
             backdrop-filter: blur(28px) saturate(210%);
             -webkit-backdrop-filter: blur(28px) saturate(210%);
             border: 1px solid rgba(255, 255, 255, 0.14);
             box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 1.5px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tactile 3D Buttons (Adapts to Light / Dark) */
+        .tactile-pill {
+            background: radial-gradient(circle at 50% 10%, #ffffff 0%, #fdf2f8 65%, #fce7f3 100%);
+            border: 1px solid rgba(244, 114, 182, 0.35);
+            color: #db2777;
+            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.18), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(244, 114, 182, 0.25);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tactile-pill:hover {
+            border-color: rgba(244, 114, 182, 0.6);
+            box-shadow: 0 6px 14px rgba(244, 114, 182, 0.3), inset 0 1.5px 2px #ffffff;
+            transform: translateY(-1px);
+        }
+        .tactile-pill:active {
+            box-shadow: 0 2px 5px rgba(244, 114, 182, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+            transform: translateY(1px);
+        }
+
+        .dark .tactile-pill {
+            background: radial-gradient(circle at 50% 10%, #26252c 0%, #16151a 70%, #0d0d10 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #d4d4d8;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 2px rgba(0, 0, 0, 0.9);
+        }
+        .dark .tactile-pill:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+        }
+        .dark .tactile-pill:active {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 1.5px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .tactile-active-rim {
+            background: radial-gradient(circle at 50% 15%, #f43f5e 0%, #e11d48 65%, #be123c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4), inset 0 1.5px 2px rgba(255, 255, 255, 0.7), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+        }
+        .dark .tactile-active-rim {
+            background: radial-gradient(circle at 50% 15%, #f97316 0%, #ea580c 65%, #c2410c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #ffffff !important;
+            box-shadow: 0 0 18px rgba(249, 115, 22, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.8);
         }
 
         /* Facebook-Style Profile Banner */
@@ -775,22 +804,22 @@
                 <!-- Chat Message Input Dock & Voice Recorder -->
                 <div class="pt-0.5">
                     <!-- Standard Input Bar (Minimalist Liquid Glass Pill) -->
-                    <div id="chatNormalInputContainer" class="relative flex items-center rounded-full glass-liquid-rim p-1 pl-3.5 focus-within:border-white/40 transition-all gap-1.5 shadow-xl">
+                    <div id="chatNormalInputContainer" class="relative flex items-center rounded-full glass-liquid-rim p-1 pl-3 focus-within:border-pink-400/60 dark:focus-within:border-white/40 transition-all gap-1.5 shadow-xl">
                         <!-- Image Attachment Button -->
-                        <button onclick="document.getElementById('chatImageFileInput').click()" class="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex-shrink-0" title="Enviar Foto">
+                        <button onclick="document.getElementById('chatImageFileInput').click()" class="w-8 h-8 rounded-full flex items-center justify-center text-pink-500/80 hover:text-pink-600 hover:bg-pink-100/50 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex-shrink-0" title="Enviar Foto">
                             <i data-lucide="image" class="w-4 h-4"></i>
                         </button>
                         <input type="file" id="chatImageFileInput" accept="image/*" class="hidden" onchange="handleSendChatImage(event)">
 
-                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-1 py-1.5 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500" oninput="handleChatTypingInput()" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
+                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-1 py-1.5 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500" oninput="handleChatTypingInput()" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
 
-                        <!-- Mic Button (Tactile 3D Matte) -->
-                        <button id="chatMicBtn" onclick="toggleAudioRecording()" class="tactile-pill w-8 h-8 rounded-full text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Grabar nota de voz">
+                        <!-- Mic Button (Tactile 3D) -->
+                        <button id="chatMicBtn" onclick="toggleAudioRecording()" class="tactile-pill w-8 h-8 rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Grabar nota de voz">
                             <i data-lucide="mic" class="w-3.5 h-3.5"></i>
                         </button>
 
                         <!-- Send Button (Tactile Raised Active Button) -->
-                        <button onclick="handleSendChatMessage()" class="tactile-pill tactile-active-rim w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Enviar">
+                        <button onclick="handleSendChatMessage()" class="tactile-active-rim w-8 h-8 rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Enviar">
                             <i data-lucide="arrow-up" class="w-4 h-4 stroke-[2.5]"></i>
                         </button>
                     </div>
@@ -2286,6 +2315,19 @@
         btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Publicar</span>'; lucide.createIcons();
         if (error) return toast('Error al publicar: ' + error.message, 'error');
 
+        // Instant broadcast fallback for real-time notification
+        try {
+            realtimeChannelGlobal?.send({
+                type: 'broadcast',
+                event: 'new_post',
+                payload: {
+                    user_id: currentUser.id,
+                    text: insertData.text,
+                    has_photo: !!photoUrl
+                }
+            });
+        } catch(e) {}
+
         document.getElementById('postInput').value = '';
         removePostPhoto();
         discardRecordedAudio();
@@ -3340,6 +3382,18 @@
             }
         }
 
+        // 3. Instant Realtime Broadcast to wake up partner's device immediately
+        try {
+            realtimeChannelGlobal?.send({
+                type: 'broadcast',
+                event: 'new_message',
+                payload: {
+                    sender_id: currentUser.id,
+                    text: text
+                }
+            });
+        } catch(e) {}
+
         // Re-sync with server after short delay
         setTimeout(() => loadChatMessages(), 1000);
     }
@@ -3352,6 +3406,10 @@
 
     /* ===== REALTIME SUBSCRIPTIONS & BACKGROUND SYNC ===== */
     function setupRealtime() {
+        if (realtimeChannelGlobal) {
+            try { sb.removeChannel(realtimeChannelGlobal); } catch(e) {}
+        }
+
         realtimeChannelGlobal = sb.channel('aura-realtime-cloud');
 
         realtimeChannelGlobal
@@ -3360,15 +3418,49 @@
                     showPartnerTyping(payload.payload.name || 'Tu pareja');
                 }
             })
+            .on('broadcast', { event: 'new_message' }, payload => {
+                const data = payload.payload;
+                if (data && data.sender_id !== currentUser.id) {
+                    loadChatMessages();
+                    const author = getProfile(data.sender_id) || getPartnerProfile();
+                    const isAudio = data.text && data.text.startsWith('[AUDIO');
+                    const isPhoto = data.text && data.text.startsWith('[PHOTO]');
+                    let preview = data.text || '';
+                    if (isAudio) preview = '🎙️ Te envió una nota de voz';
+                    else if (isPhoto) preview = '📸 Te envió una foto';
+
+                    if (currentActiveTab !== 'chat' || document.hidden) {
+                        document.getElementById('dockChatBadge')?.classList.remove('hidden');
+                        toast(`${author.name}: ${preview}`, 'info');
+                        sendNativeNotification(`Mensaje de ${author.name} 💬`, preview, author.avatar_url);
+                    } else {
+                        playNotificationSound();
+                    }
+                }
+            })
+            .on('broadcast', { event: 'new_post' }, payload => {
+                const data = payload.payload;
+                if (data && data.user_id !== currentUser.id) {
+                    const author = getProfile(data.user_id) || getPartnerProfile();
+                    toast(`${author.name} publicó algo nuevo`, 'info');
+                    sendNativeNotification(
+                        'Nueva Publicación ✨',
+                        data.has_photo ? `${author.name} compartió una foto` : `${author.name}: ${(data.text || '').substring(0, 60)}`,
+                        author.avatar_url
+                    );
+                    confetti({ particleCount: 25, spread: 50 });
+                    loadPosts();
+                }
+            })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
                 const isChat = payload.new?.text?.includes('[CHAT]');
 
                 if (isChat) {
                     loadChatMessages();
                     if (payload.new && payload.new.user_id !== currentUser.id) {
-                        const author = getProfile(payload.new.user_id);
+                        const author = getProfile(payload.new.user_id) || getPartnerProfile();
                         const cleanMsg = payload.new.text.replace(/^\[CHAT\]\s*/, '');
-                        if (currentActiveTab !== 'chat') {
+                        if (currentActiveTab !== 'chat' || document.hidden) {
                             document.getElementById('dockChatBadge')?.classList.remove('hidden');
                             toast(`${author.name}: ${cleanMsg.startsWith('[AUDIO') ? '🎙️ Nota de voz' : cleanMsg}`, 'info');
                             sendNativeNotification(`Mensaje de ${author.name} 💬`, cleanMsg.startsWith('[AUDIO') ? '🎙️ Te envió una nota de voz' : cleanMsg, author.avatar_url);
@@ -3377,7 +3469,7 @@
                         }
                     }
                 } else if (payload.new && payload.new.user_id !== currentUser.id) {
-                    const author = getProfile(payload.new.user_id);
+                    const author = getProfile(payload.new.user_id) || getPartnerProfile();
                     const isStory = payload.new.text?.startsWith('[STORY]');
                     if (isStory) {
                         toast(`${author.name} subió una historia`, 'info');
@@ -3387,7 +3479,7 @@
                         const hasPhoto = !!payload.new.photo_url;
                         toast(`${author.name} publicó algo nuevo`, 'info');
                         sendNativeNotification(
-                            'Nueva Publicación',
+                            'Nueva Publicación ✨',
                             hasPhoto ? `${author.name} compartió una foto` : `${author.name}: ${(payload.new.text || '').substring(0, 60)}`,
                             author.avatar_url
                         );
@@ -3406,10 +3498,10 @@
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
                 loadChatMessages();
                 if (payload.new && payload.new.sender_id !== currentUser.id) {
-                    const author = getProfile(payload.new.sender_id);
+                    const author = getProfile(payload.new.sender_id) || getPartnerProfile();
                     const isAudio = payload.new.text && payload.new.text.startsWith('[AUDIO');
                     const previewText = isAudio ? '🎙️ Te envió una nota de voz' : payload.new.text;
-                    if (currentActiveTab !== 'chat') {
+                    if (currentActiveTab !== 'chat' || document.hidden) {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
                         toast(`${author.name}: ${previewText}`, 'info');
                         sendNativeNotification(`Mensaje de ${author.name} 💬`, previewText, author.avatar_url);
