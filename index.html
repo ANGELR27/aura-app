@@ -759,9 +759,7 @@
                 </div>
 
                 <!-- Chat Message Thread Container -->
-                <div id="chatMessagesList" class="flex-1 overflow-y-auto py-3 space-y-2.5 px-1 scrollbar-none">
-                    <div class="text-center py-10 text-xs opacity-50 font-medium">Cargando mensajes... 💕</div>
-                </div>
+                <div id="chatMessagesList" class="flex-1 overflow-y-auto py-3 space-y-2.5 px-1 scrollbar-none"></div>
 
                 <!-- Quick Emojis Bar -->
                 <div class="flex items-center justify-between px-1 pt-1 pb-1.5 opacity-85 gap-1.5 overflow-x-auto scrollbar-none select-none">
@@ -3071,9 +3069,20 @@
         if (nameEl) nameEl.innerText = partner.name;
         if (avEl) avEl.src = partner.avatar_url;
 
+        // 1. Instant Cache-First Render (0ms latency)
+        if (!currentChatMessages || currentChatMessages.length === 0) {
+            try {
+                const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
+                if (localChat && localChat.length > 0) {
+                    currentChatMessages = localChat;
+                }
+            } catch(e) {}
+        }
+        renderChatMessages();
+
         let serverMessages = [];
 
-        // 1. Query remote 'messages' table
+        // 2. Query remote 'messages' table
         try {
             const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: true }).limit(100);
             if (!error && data && data.length > 0) {
@@ -3083,7 +3092,7 @@
             console.warn("Messages query error:", e);
         }
 
-        // 2. Query remote 'posts' table with [CHAT] tag (only if messages table returned nothing)
+        // 3. Query remote 'posts' table with [CHAT] tag (only if messages table returned nothing)
         if (serverMessages.length === 0) {
             try {
                 const { data: chatPosts, error: postErr } = await sb.from('posts').select('*').ilike('text', '%CHAT%').order('created_at', { ascending: true }).limit(100);
@@ -3101,11 +3110,11 @@
             }
         }
 
-        // 3. Merge with local cached messages so messages are NEVER lost
+        // 4. Merge with local cached messages so messages are NEVER lost
         const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
         const combined = [...localChat, ...currentChatMessages, ...serverMessages];
 
-        // 4. Strict Deduplication: group identical text from same sender within 25-second bucket
+        // 5. Strict Deduplication: group identical text from same sender within 25-second bucket
         const seen = new Set();
         currentChatMessages = combined.filter(m => {
             if (!m || !m.text) return false;
