@@ -2850,22 +2850,25 @@
         }
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            chatMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             chatAudioChunks = [];
             
-            const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-                ? { mimeType: 'audio/webm;codecs=opus' }
-                : (MediaRecorder.isTypeSupported('audio/mp4') ? { mimeType: 'audio/mp4' } : {});
+            let options = {};
+            if (typeof MediaRecorder.isTypeSupported === 'function') {
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    options = { mimeType: 'audio/webm;codecs=opus' };
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options = { mimeType: 'audio/mp4' };
+                } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    options = { mimeType: 'audio/webm' };
+                }
+            }
 
-            chatMediaRecorder = new MediaRecorder(stream, options);
+            chatMediaRecorder = new MediaRecorder(chatMicStream, options);
             chatMediaRecorder.ondataavailable = (e) => {
                 if (e.data && e.data.size > 0) {
                     chatAudioChunks.push(e.data);
                 }
-            };
-
-            chatMediaRecorder.onstop = () => {
-                stream.getTracks().forEach(track => track.stop());
             };
 
             chatMediaRecorder.start(100);
@@ -2897,6 +2900,10 @@
             chatMediaRecorder.onstop = () => {};
             chatMediaRecorder.stop();
         }
+        if (chatMicStream) {
+            chatMicStream.getTracks().forEach(t => t.stop());
+            chatMicStream = null;
+        }
         chatAudioChunks = [];
         document.getElementById('chatNormalInputContainer').classList.remove('hidden');
         document.getElementById('chatRecordingContainer').classList.add('hidden');
@@ -2908,32 +2915,58 @@
         clearInterval(chatRecordTimerInterval);
         const durationSec = Math.max(1, Math.floor((Date.now() - chatRecordStartTime) / 1000));
 
-        if (!chatMediaRecorder || chatMediaRecorder.state !== 'recording') return;
+        if (!chatMediaRecorder || chatMediaRecorder.state === 'inactive') return;
 
         document.getElementById('chatNormalInputContainer').classList.remove('hidden');
         document.getElementById('chatRecordingContainer').classList.add('hidden');
 
         chatMediaRecorder.onstop = async () => {
-            const mime = chatMediaRecorder.mimeType || 'audio/webm';
-            const audioBlob = new Blob(chatAudioChunks, { type: mime });
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(audioBlob);
-            reader.onloadend = async () => {
-                const base64Audio = reader.result;
-                const audioPayload = `[AUDIO:${durationSec}]${base64Audio}`;
-                await handleSendChatMessage(audioPayload);
-            };
+            try {
+                if (chatMicStream) {
+                    chatMicStream.getTracks().forEach(t => t.stop());
+                    chatMicStream = null;
+                }
+                const mime = chatMediaRecorder.mimeType || 'audio/webm';
+                const audioBlob = new Blob(chatAudioChunks, { type: mime });
+                if (audioBlob.size === 0) {
+                    toast('El micrófono no capturó audio', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = async () => {
+                    const base64Audio = reader.result;
+                    const audioPayload = `[AUDIO:${durationSec}]${base64Audio}`;
+                    await handleSendChatMessage(audioPayload);
+                    toast('¡Nota de voz enviada! 🎙️', 'success');
+                };
+            } catch(e) {
+                console.error('Audio processing error:', e);
+                toast('Error al procesar audio', 'error');
+            }
         };
 
-        chatMediaRecorder.stop();
+        try {
+            if (chatMediaRecorder.state === 'recording') {
+                chatMediaRecorder.requestData();
+                chatMediaRecorder.stop();
+            }
+        } catch(e) {
+            console.warn(e);
+        }
     }
 
-    function togglePlayVoiceNote(btn, audioSrc) {
+    function togglePlayVoiceNote(btn, audioKey) {
         triggerHaptic();
+        const audioSrc = (window._cachedAudios && window._cachedAudios[audioKey]) ? window._cachedAudios[audioKey] : audioKey;
+        if (!audioSrc) {
+            return toast('No se encontró el audio', 'error');
+        }
+
         let player = btn._audioPlayer;
         if (!player) {
             player = new Audio(audioSrc);
+            player.preload = 'auto';
             btn._audioPlayer = player;
         }
 
@@ -2949,13 +2982,28 @@
         }
 
         if (player.paused) {
-            player.play();
-            currentPlayingAudio = player;
-            if (icon) {
-                icon.setAttribute('data-lucide', 'pause');
-                lucide.createIcons();
-            }
+            player.play().then(() => {
+                currentPlayingAudio = player;
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'pause');
+                    lucide.createIcons();
+                }
+            }).catch(err => {
+                console.error('Audio playback error:', err);
+                toast('Error al reproducir audio', 'error');
+            });
+
             player.onended = () => {
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'play');
+                    lucide.createIcons();
+                }
+                currentPlayingAudio = null;
+            };
+
+            player.onerror = (err) => {
+                console.error('Audio element error:', err);
+                toast('Formato de audio no compatible en este navegador', 'error');
                 if (icon) {
                     icon.setAttribute('data-lucide', 'play');
                     lucide.createIcons();
@@ -3110,10 +3158,12 @@
                 const durationSecs = rawDuration % 60;
                 const durationStr = rawDuration > 0 ? `${durationMins}:${durationSecs < 10 ? '0' : ''}${durationSecs}` : '0:03';
                 const audioData = match ? match[2] : m.text.replace('[AUDIO]', '');
+                const audioKey = 'aud_' + (m.id || Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+                window._cachedAudios[audioKey] = audioData;
 
                 contentHtml = `
                     <div class="flex items-center gap-2 py-0.5">
-                        <button onclick="togglePlayVoiceNote(this, '${audioData}')" class="w-7 h-7 rounded-full ${isMe ? 'bg-white/25 text-white hover:bg-white/35' : 'bg-gradient-to-tr from-pink-500 to-rose-500 dark:from-orange-500 dark:to-amber-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all flex-shrink-0 shadow-sm" title="Reproducir">
+                        <button onclick="togglePlayVoiceNote(this, '${audioKey}')" class="w-7 h-7 rounded-full ${isMe ? 'bg-white/25 text-white hover:bg-white/35' : 'bg-gradient-to-tr from-pink-500 to-rose-500 dark:from-orange-500 dark:to-amber-500 text-white'} flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all flex-shrink-0 shadow-sm" title="Reproducir">
                             <i data-lucide="play" class="w-3.5 h-3.5 voice-play-icon ml-0.5"></i>
                         </button>
                         <div class="flex flex-col justify-center gap-0.5 min-w-[85px]">
