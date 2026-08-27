@@ -169,6 +169,47 @@
             transform: translateY(0) scale(0.98);
         }
 
+        /* Tactile Obsidian Matte 3D Buttons & Capsule Elements (Reference Design) */
+        .tactile-pill {
+            background: radial-gradient(circle at 50% 10%, #26252c 0%, #16151a 70%, #0d0d10 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 2px rgba(0, 0, 0, 0.9);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tactile-pill:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+            transform: translateY(-1px);
+        }
+        .tactile-pill:active {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 1.5px 2px rgba(0, 0, 0, 0.8);
+            transform: translateY(1px);
+        }
+
+        .tactile-active-rim {
+            background: radial-gradient(circle at 50% 15%, #34333d 0%, #1a1920 70%, #100f14 100%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 18px rgba(249, 115, 22, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Glass Liquid Specular Rim */
+        .glass-liquid-rim {
+            background: rgba(18, 17, 22, 0.82);
+            backdrop-filter: blur(28px) saturate(210%);
+            -webkit-backdrop-filter: blur(28px) saturate(210%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 1.5px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Facebook-Style Profile Banner */
+        .fb-cover-banner {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-radius: 2rem 2rem 0 0;
+        }
+
         .btn-ghost-pill {
             background: rgba(255, 255, 255, 0.58);
             backdrop-filter: blur(14px);
@@ -735,14 +776,24 @@
 
                 <!-- Chat Message Input Dock & Voice Recorder -->
                 <div class="pt-0.5">
-                    <!-- Standard Input Bar -->
-                    <div id="chatNormalInputContainer" class="relative flex items-center rounded-2xl bg-black/5 dark:bg-white/5 border border-pink-200/60 dark:border-orange-500/30 p-1 pl-3 focus-within:border-pink-500 dark:focus-within:border-orange-400 transition-all shadow-inner gap-1.5">
-                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-1 py-2" oninput="handleChatTypingInput()" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
-                        <button id="chatMicBtn" onclick="toggleAudioRecording()" class="w-9 h-9 rounded-xl bg-pink-100 dark:bg-orange-950/60 text-pink-600 dark:text-orange-400 flex items-center justify-center cursor-pointer shadow-sm active:scale-95 transition-all flex-shrink-0 hover:scale-105" title="Grabar nota de voz">
-                            <i data-lucide="mic" class="w-4 h-4"></i>
+                    <!-- Standard Input Bar (Minimalist Liquid Glass Pill) -->
+                    <div id="chatNormalInputContainer" class="relative flex items-center rounded-full glass-liquid-rim p-1 pl-3.5 focus-within:border-white/40 transition-all gap-1.5 shadow-xl">
+                        <!-- Image Attachment Button -->
+                        <button onclick="document.getElementById('chatImageFileInput').click()" class="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex-shrink-0" title="Enviar Foto">
+                            <i data-lucide="image" class="w-4 h-4"></i>
                         </button>
-                        <button onclick="handleSendChatMessage()" class="btn-gradient w-9 h-9 rounded-xl text-white flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all flex-shrink-0 hover:scale-105" title="Enviar">
-                            <i data-lucide="send" class="w-4 h-4"></i>
+                        <input type="file" id="chatImageFileInput" accept="image/*" class="hidden" onchange="handleSendChatImage(event)">
+
+                        <input type="text" id="chatInput" placeholder="Escribe un mensaje de amor..." class="flex-1 bg-transparent text-xs sm:text-sm font-medium outline-none pr-1 py-1.5 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500" oninput="handleChatTypingInput()" onkeypress="if(event.key==='Enter')handleSendChatMessage()">
+
+                        <!-- Mic Button (Tactile 3D Matte) -->
+                        <button id="chatMicBtn" onclick="toggleAudioRecording()" class="tactile-pill w-8 h-8 rounded-full text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Grabar nota de voz">
+                            <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                        </button>
+
+                        <!-- Send Button (Tactile Raised Active Button) -->
+                        <button onclick="handleSendChatMessage()" class="tactile-pill tactile-active-rim w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0" title="Enviar">
+                            <i data-lucide="arrow-up" class="w-4 h-4 stroke-[2.5]"></i>
                         </button>
                     </div>
 
@@ -763,6 +814,88 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ========================== VIEW: PERFIL ESTILO FACEBOOK ========================== -->
+        <section id="viewProfile" class="hidden space-y-4 fade-in pb-20">
+            <!-- Facebook Profile Card Container -->
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-pink-200/50 dark:border-orange-500/20">
+                <!-- Cover Photo Banner -->
+                <div id="fbCoverBanner" class="relative h-44 sm:h-52 bg-cover bg-center bg-neutral-800" style="background-image: url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=1000&q=80');">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <button onclick="document.getElementById('fbCoverInput').click()" class="absolute bottom-3 right-3 glass py-1.5 px-3 rounded-xl text-[11px] font-bold text-white flex items-center gap-1.5 hover:bg-white/30 cursor-pointer shadow-lg backdrop-blur-md">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> <span>Editar Portada</span>
+                    </button>
+                    <input type="file" id="fbCoverInput" accept="image/*" class="hidden" onchange="handleEditCoverPhoto(event)">
+                </div>
+
+                <!-- Profile Info & Avatar Layer -->
+                <div class="px-5 sm:px-6 pb-6 pt-0 relative">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-16 sm:-mt-20">
+                        <!-- Overlapping Avatar with Camera Badge -->
+                        <div class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl p-1 bg-white dark:bg-[#0e0d11] shadow-2xl flex-shrink-0">
+                            <img id="fbProfileAvatar" src="" class="w-full h-full object-cover rounded-[20px]">
+                            <button onclick="document.getElementById('fbAvatarInput').click()" class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-neutral-900 text-white border-2 border-white dark:border-neutral-800 flex items-center justify-center cursor-pointer shadow-md hover:scale-110 active:scale-95 transition-all">
+                                <i data-lucide="camera" class="w-4 h-4"></i>
+                            </button>
+                            <input type="file" id="fbAvatarInput" accept="image/*" class="hidden" onchange="handleEditAvatar(event)">
+                        </div>
+
+                        <!-- Action Buttons (Settings, Edit, Logout) -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button onclick="openSettingsModal()" class="tactile-pill py-2 px-3.5 rounded-2xl text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                <i data-lucide="sliders" class="w-3.5 h-3.5 text-orange-400"></i> Configuración
+                            </button>
+                            <button onclick="openProfileMenu()" class="tactile-pill py-2 px-3.5 rounded-2xl text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                            </button>
+                            <button onclick="handleLogout()" class="tactile-pill py-2 px-3 rounded-2xl text-xs font-bold text-rose-400 hover:text-rose-300 flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- User Name & Status -->
+                    <div class="mt-4 space-y-2">
+                        <div class="flex items-center gap-2">
+                            <h2 id="fbProfileName" class="font-display font-extrabold text-xl sm:text-2xl"></h2>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                        </div>
+                        <!-- Relationship Banner -->
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-rose-500/10 dark:bg-orange-500/10 border border-rose-500/20 dark:border-orange-500/20 text-xs font-bold text-rose-600 dark:text-orange-400">
+                            <i data-lucide="heart" class="w-4 h-4 fill-rose-500 text-rose-500"></i>
+                            <span>En una relación con <span id="fbPartnerName" class="underline underline-offset-2"></span></span>
+                        </div>
+                        <p id="fbProfileBio" class="text-xs sm:text-sm opacity-80 leading-relaxed font-medium">Juntos caminando de la mano con amor y fe ✨</p>
+                    </div>
+
+                    <!-- Facebook Profile Tabs Navigation -->
+                    <div class="flex items-center gap-2 mt-5 pt-4 border-t border-pink-200/40 dark:border-orange-500/20 overflow-x-auto scrollbar-none">
+                        <button onclick="switchProfileTab('posts')" id="fbTabPosts" class="py-2 px-4 rounded-xl text-xs font-bold bg-pink-100 dark:bg-orange-950/70 text-pink-600 dark:text-orange-400 shadow-sm cursor-pointer">
+                            📝 Mis Publicaciones
+                        </button>
+                        <button onclick="switchProfileTab('photos')" id="fbTabPhotos" class="py-2 px-4 rounded-xl text-xs font-bold glass opacity-60 hover:opacity-100 cursor-pointer">
+                            📸 Mis Recuerdos
+                        </button>
+                        <button onclick="switchProfileTab('habits')" id="fbTabHabits" class="py-2 px-4 rounded-xl text-xs font-bold glass opacity-60 hover:opacity-100 cursor-pointer">
+                            🎯 Mis Metas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab Contents -->
+            <div id="fbProfileTabPosts" class="space-y-4">
+                <div id="fbUserPostsContainer" class="space-y-4"></div>
+            </div>
+            <div id="fbProfileTabPhotos" class="hidden glass-card rounded-[2.2rem] p-5 shadow-xl">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider opacity-60 mb-3">Fotos Compartidas</h3>
+                <div id="fbUserPhotosGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+            </div>
+            <div id="fbProfileTabHabits" class="hidden glass-card rounded-[2.2rem] p-5 shadow-xl">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider opacity-60 mb-3">Metas Personales</h3>
+                <div id="fbUserHabitsContainer" class="space-y-3"></div>
             </div>
         </section>
 
@@ -789,7 +922,7 @@
                 <i data-lucide="target" class="w-4.5 h-4.5"></i>
                 <span class="text-[9px]">Metas</span>
             </button>
-            <button onclick="openProfileMenu()" class="flex flex-col items-center gap-0.5 px-2.5 sm:px-3 py-1.5 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
+            <button onclick="switchTab('profile')" id="dockProfile" class="flex flex-col items-center gap-0.5 px-2.5 sm:px-3 py-1.5 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium">
                 <i data-lucide="user" class="w-4.5 h-4.5"></i>
                 <span class="text-[9px]">Perfil</span>
             </button>
@@ -1056,6 +1189,84 @@
     </div>
 
 
+    <!-- ========================== SETTINGS & THEME SELECTOR MODAL ========================== -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[120] hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-[2.5rem] p-6 max-w-sm w-full slide-up space-y-5 shadow-2xl border border-pink-200/60 dark:border-orange-500/30">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center">
+                        <i data-lucide="sliders" class="w-4.5 h-4.5"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-base sm:text-lg">Configuración & Temas</h3>
+                </div>
+                <button onclick="closeSettingsModal()" class="p-2 rounded-xl glass hover:bg-white dark:hover:bg-neutral-800 cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4 opacity-60"></i>
+                </button>
+            </div>
+
+            <!-- Theme Selection Cards -->
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-extrabold uppercase tracking-wider opacity-60">Tema Visual de la Aplicación</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <!-- Obsidian Matte Luxe (Reference Design) -->
+                    <button onclick="setAppTheme('obsidian')" id="themeBtn_obsidian" class="p-3 rounded-2xl border text-left transition-all cursor-pointer bg-[#0d0d10] border-orange-500/60 shadow-[0_0_12px_rgba(249,115,22,0.25)]">
+                        <div class="w-4 h-4 rounded-full bg-orange-500 mb-2 shadow-[0_0_8px_rgba(249,115,22,0.8)]"></div>
+                        <p class="text-xs font-extrabold text-white">Negro Mate</p>
+                        <p class="text-[9px] text-neutral-400">Toque de luz glass</p>
+                    </button>
+
+                    <!-- OLED Pure Black -->
+                    <button onclick="setAppTheme('oled')" id="themeBtn_oled" class="p-3 rounded-2xl border text-left transition-all cursor-pointer bg-black border-white/20 hover:border-white/40">
+                        <div class="w-4 h-4 rounded-full bg-white mb-2"></div>
+                        <p class="text-xs font-extrabold text-white">OLED Diamante</p>
+                        <p class="text-[9px] text-neutral-400">Negro absoluto</p>
+                    </button>
+
+                    <!-- Sunset Warm Amber -->
+                    <button onclick="setAppTheme('sunset')" id="themeBtn_sunset" class="p-3 rounded-2xl border text-left transition-all cursor-pointer bg-[#181212] border-amber-500/20 hover:border-amber-500/50">
+                        <div class="w-4 h-4 rounded-full bg-amber-400 mb-2"></div>
+                        <p class="text-xs font-extrabold text-amber-200">Sunset Cálido</p>
+                        <p class="text-[9px] text-neutral-400">Tonos dorados</p>
+                    </button>
+
+                    <!-- Rose Quartz Light -->
+                    <button onclick="setAppTheme('rose')" id="themeBtn_rose" class="p-3 rounded-2xl border text-left transition-all cursor-pointer bg-gradient-to-br from-pink-50 to-rose-100 border-pink-300 text-neutral-900">
+                        <div class="w-4 h-4 rounded-full bg-pink-500 mb-2"></div>
+                        <p class="text-xs font-extrabold text-pink-900">Rosa Cuarzo</p>
+                        <p class="text-[9px] text-pink-700/70">Tema claro suave</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications & Actions -->
+            <div class="space-y-3 pt-2 border-t border-pink-200/40 dark:border-orange-500/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold">Notificaciones Push</p>
+                        <p class="text-[10px] opacity-60">Alertas de mensajes y fotos</p>
+                    </div>
+                    <button onclick="forceEnableNotifications()" class="tactile-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-orange-400 cursor-pointer">
+                        Activar 🔔
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold">Sincronización en la Nube</p>
+                        <p class="text-[10px] opacity-60">Recargar fotos, chat y metas</p>
+                    </div>
+                    <button onclick="syncAllCloudData()" class="tactile-pill px-3 py-1.5 rounded-xl text-[11px] font-bold text-neutral-200 hover:text-white cursor-pointer flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Sync
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="closeSettingsModal()" class="btn-gradient w-full py-3 rounded-xl text-xs font-bold cursor-pointer shadow-md">
+                Guardar y Cerrar
+            </button>
+        </div>
+    </div>
+
     <!-- ========================== JAVASCRIPT LOGIC ========================== -->
     <script>
     /* ===== SUPABASE REMOTE CLIENT ===== */
@@ -1164,16 +1375,21 @@
     let bibleNotesAndHighlights = JSON.parse(localStorage.getItem('aura_bible_notes') || '{}');
     let activeVerseSelection = null;
 
-    /* ===== THEME MODE (Claro / Oscuro Mate Naranja) ===== */
+    /* ===== THEME MODE (Obsidian Mate / OLED / Sunset / Rose) ===== */
     function initTheme() {
-        const savedTheme = localStorage.getItem('aura_theme') || 'light';
-        if (savedTheme === 'dark') {
+        const savedChoice = localStorage.getItem('aura_theme_choice') || (localStorage.getItem('aura_theme') === 'dark' ? 'obsidian' : 'light');
+        if (savedChoice === 'obsidian' || savedChoice === 'oled' || savedChoice === 'sunset') {
             document.body.classList.add('dark');
             document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('theme-' + savedChoice);
+            if (savedChoice === 'oled') document.body.style.backgroundColor = '#000000';
+            else if (savedChoice === 'obsidian') document.body.style.backgroundColor = '#0a0a0c';
+            else if (savedChoice === 'sunset') document.body.style.backgroundColor = '#141014';
             document.getElementById('themeColorMeta')?.setAttribute('content', '#0e0d10');
         } else {
             document.body.classList.remove('dark');
             document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('theme-rose');
             document.getElementById('themeColorMeta')?.setAttribute('content', '#f43f7d');
         }
     }
@@ -1592,17 +1808,18 @@
         document.getElementById('viewChat').classList.toggle('hidden', tab !== 'chat');
         document.getElementById('viewGallery').classList.toggle('hidden', tab !== 'gallery');
         document.getElementById('viewHabits').classList.toggle('hidden', tab !== 'habits');
+        document.getElementById('viewProfile').classList.toggle('hidden', tab !== 'profile');
 
         // Lock body scroll when chat is active to prevent page scrolling
         document.body.style.overflow = (tab === 'chat') ? 'hidden' : '';
         document.documentElement.style.overflow = (tab === 'chat') ? 'hidden' : '';
 
-        ['dockFeed', 'dockBible', 'dockChat', 'dockGallery', 'dockHabits'].forEach(id => {
+        ['dockFeed', 'dockBible', 'dockChat', 'dockGallery', 'dockHabits', 'dockProfile'].forEach(id => {
             const btn = document.getElementById(id);
             if (btn) btn.className = 'relative flex flex-col items-center gap-0.5 px-2.5 sm:px-3 py-1.5 rounded-2xl transition-all opacity-60 hover:opacity-100 font-medium';
         });
 
-        const map = { feed: 'dockFeed', bible: 'dockBible', chat: 'dockChat', gallery: 'dockGallery', habits: 'dockHabits' };
+        const map = { feed: 'dockFeed', bible: 'dockBible', chat: 'dockChat', gallery: 'dockGallery', habits: 'dockHabits', profile: 'dockProfile' };
         if (map[tab] && document.getElementById(map[tab])) {
             document.getElementById(map[tab]).className = 'relative flex flex-col items-center gap-0.5 px-2.5 sm:px-3 py-1.5 rounded-2xl transition-all text-pink-600 dark:text-orange-400 bg-pink-100/70 dark:bg-orange-950/70 font-bold shadow-sm';
         }
@@ -1611,6 +1828,7 @@
             document.getElementById('dockChatBadge')?.classList.add('hidden');
             loadChatMessages();
         }
+        if (tab === 'profile') renderFacebookProfile();
         if (tab === 'gallery') loadGallery();
         if (tab === 'habits') loadHabits();
         if (tab === 'bible') loadBibleChapter(currentBibleBookId, currentBibleChapter);
@@ -2836,6 +3054,7 @@
             const timeStr = msgDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 
             const isAudio = m.text && m.text.startsWith('[AUDIO');
+            const isPhoto = m.text && m.text.startsWith('[PHOTO]');
             let contentHtml = '';
 
             if (isAudio) {
@@ -2867,14 +3086,21 @@
                         </div>
                     </div>
                 `;
+            } else if (isPhoto) {
+                const photoUrl = m.text.replace('[PHOTO]', '').trim();
+                contentHtml = `
+                    <div class="rounded-2xl overflow-hidden cursor-pointer my-1 max-w-[240px] shadow-md border border-white/20" onclick="openLightbox('${photoUrl}')">
+                        <img src="${photoUrl}" class="w-full h-auto object-cover rounded-2xl hover:scale-105 transition-transform duration-300">
+                    </div>
+                `;
             } else {
-                contentHtml = `<p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${escapeHtml(m.text)}</p>`;
+                contentHtml = `<p class="text-xs sm:text-sm font-medium leading-relaxed break-words">${formatMessageTextWithLinks(escapeHtml(m.text))}</p>`;
             }
 
             if (isMe) {
                 html += `
                     <div class="flex justify-end items-end gap-1.5 slide-up">
-                        <div class="${isAudio ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-br-sm bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
+                        <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-br-sm bg-gradient-to-tr from-pink-600 via-rose-500 to-pink-500 dark:from-orange-500 dark:via-orange-600 dark:to-amber-500 text-white shadow-md space-y-0.5">
                             ${contentHtml}
                             <div class="flex items-center justify-end gap-1 text-[8.5px] text-white/80 font-mono">
                                 <span>${timeStr}</span>
@@ -2887,7 +3113,7 @@
                 html += `
                     <div class="flex justify-start items-end gap-2 slide-up">
                         <img src="${partner.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-pink-300 dark:border-orange-400 mb-1 flex-shrink-0 shadow-sm">
-                        <div class="${isAudio ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-bl-sm glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
+                        <div class="${isAudio || isPhoto ? 'px-2.5 py-1.5' : 'px-3.5 py-2'} max-w-[82%] rounded-2xl rounded-bl-sm glass-card border border-pink-200/50 dark:border-orange-500/20 shadow-md space-y-0.5">
                             ${contentHtml}
                             <div class="flex items-center justify-end text-[8.5px] opacity-50 font-mono">
                                 <span>${timeStr}</span>
@@ -3096,16 +3322,199 @@
         }, 15000);
     }
 
-    /* ===== UTILS ===== */
-    function formatTime(iso) {
-        const d = new Date(iso);
-        const now = new Date();
-        const diff = (now - d) / 1000;
-        if (diff < 60) return 'Ahora';
-        if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
-        if (diff < 86400) return `Hace ${Math.floor(diff / 3600)}h`;
-        if (diff < 172800) return 'Ayer';
-        return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+    /* ===== CHAT MEDIA & LINK UTILS ===== */
+    async function handleSendChatImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        triggerHaptic();
+        toast('Subiendo foto al chat... 📸', 'info');
+        try {
+            const base64 = await compressImageFile(file, 1000, 0.85);
+            await handleSendChatMessage('[PHOTO]' + base64);
+            e.target.value = '';
+            toast('¡Foto enviada! ✨', 'success');
+        } catch(err) {
+            console.error(err);
+            toast('Error al enviar la imagen', 'error');
+        }
+    }
+
+    function formatMessageTextWithLinks(text) {
+        if (!text) return '';
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, url => {
+            let domain = '';
+            try { domain = new URL(url).hostname; } catch(e) { domain = url; }
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 my-0.5 rounded-lg bg-black/20 hover:bg-black/40 text-sky-300 dark:text-orange-300 underline underline-offset-2 break-all text-xs font-semibold shadow-sm transition-all"><i data-lucide="external-link" class="w-3 h-3"></i><span>${domain}</span></a>`;
+        });
+    }
+
+    /* ===== FACEBOOK-STYLE PROFILE SECTION ===== */
+    function renderFacebookProfile() {
+        const partner = getPartnerProfile();
+        const fbAvatar = document.getElementById('fbProfileAvatar');
+        const fbName = document.getElementById('fbProfileName');
+        const fbPartner = document.getElementById('fbPartnerName');
+        const fbBio = document.getElementById('fbProfileBio');
+        const fbCover = document.getElementById('fbCoverBanner');
+
+        if (fbAvatar) fbAvatar.src = currentUser.avatar_url;
+        if (fbName) fbName.innerText = currentUser.name;
+        if (fbPartner) fbPartner.innerText = partner.name;
+        if (fbBio) fbBio.innerText = currentUser.bio || `Amando y construyendo cada día al lado de ${partner.name} 💕`;
+
+        const savedCover = localStorage.getItem('aura_fb_cover_' + currentUser.id);
+        if (savedCover && fbCover) {
+            fbCover.style.backgroundImage = `url('${savedCover}')`;
+        }
+
+        // Populate User's posts
+        const postsContainer = document.getElementById('fbUserPostsContainer');
+        if (postsContainer) {
+            const myPosts = currentPosts.filter(p => p.user_id === currentUser.id);
+            if (myPosts.length === 0) {
+                postsContainer.innerHTML = `<div class="text-center py-10 text-xs opacity-50 font-medium glass rounded-2xl p-4">Aún no has compartido publicaciones. ¡Escribe una en el Diario! ✨</div>`;
+            } else {
+                postsContainer.innerHTML = myPosts.map(p => `
+                    <div class="glass-card rounded-[2.2rem] p-5 space-y-3 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <img src="${currentUser.avatar_url}" class="w-10 h-10 rounded-2xl object-cover">
+                            <div>
+                                <p class="font-display font-extrabold text-sm">${currentUser.name}</p>
+                                <p class="text-[10px] opacity-60 font-medium">${formatDate(p.created_at)}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-medium leading-relaxed">${escapeHtml(p.text || '')}</p>
+                        ${p.image_url ? `<div class="rounded-2xl overflow-hidden shadow-md cursor-pointer" onclick="openLightbox('${p.image_url}')"><img src="${p.image_url}" class="w-full h-auto object-cover max-h-72"></div>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Populate User's photos
+        const photosGrid = document.getElementById('fbUserPhotosGrid');
+        if (photosGrid) {
+            const myPhotos = currentPosts.filter(p => p.user_id === currentUser.id && p.image_url);
+            if (myPhotos.length === 0) {
+                photosGrid.innerHTML = `<div class="col-span-3 text-center py-8 text-xs opacity-50 font-medium">No hay fotos subidas todavía.</div>`;
+            } else {
+                photosGrid.innerHTML = myPhotos.map(p => `
+                    <div class="relative rounded-2xl overflow-hidden aspect-square cursor-pointer shadow-md group" onclick="openLightbox('${p.image_url}')">
+                        <img src="${p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Populate User's habits
+        const habitsContainer = document.getElementById('fbUserHabitsContainer');
+        if (habitsContainer) {
+            habitsContainer.innerHTML = currentHabits.map(h => `
+                <div class="glass p-3.5 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base">${h.done ? '✅' : '🎯'}</span>
+                        <span class="text-xs font-bold ${h.done ? 'line-through opacity-60' : ''}">${escapeHtml(h.title)}</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${h.done ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}">${h.done ? 'Completado' : 'Pendiente'}</span>
+                </div>
+            `).join('');
+        }
+        lucide.createIcons();
+    }
+
+    function switchProfileTab(tab) {
+        document.getElementById('fbProfileTabPosts')?.classList.toggle('hidden', tab !== 'posts');
+        document.getElementById('fbProfileTabPhotos')?.classList.toggle('hidden', tab !== 'photos');
+        document.getElementById('fbProfileTabHabits')?.classList.toggle('hidden', tab !== 'habits');
+
+        const tabs = ['posts', 'photos', 'habits'];
+        tabs.forEach(t => {
+            const btn = document.getElementById('fbTab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (btn) {
+                btn.className = (t === tab) 
+                    ? 'py-2 px-4 rounded-xl text-xs font-bold bg-pink-100 dark:bg-orange-950/70 text-pink-600 dark:text-orange-400 shadow-sm cursor-pointer'
+                    : 'py-2 px-4 rounded-xl text-xs font-bold glass opacity-60 hover:opacity-100 cursor-pointer';
+            }
+        });
+    }
+
+    async function handleEditCoverPhoto(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        triggerHaptic();
+        toast('Subiendo foto de portada...', 'info');
+        try {
+            const base64 = await compressImageFile(file, 1200, 0.85);
+            localStorage.setItem('aura_fb_cover_' + currentUser.id, base64);
+            const banner = document.getElementById('fbCoverBanner');
+            if (banner) banner.style.backgroundImage = `url('${base64}')`;
+            toast('¡Foto de portada actualizada con éxito! 📸', 'success');
+        } catch(err) {
+            console.error(err);
+            toast('Error al actualizar portada', 'error');
+        }
+    }
+
+    /* ===== SETTINGS & THEMES ===== */
+    function openSettingsModal() {
+        const currentTheme = localStorage.getItem('aura_theme_choice') || 'obsidian';
+        highlightActiveThemeButton(currentTheme);
+        document.getElementById('settingsModal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+
+    function closeSettingsModal() {
+        document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function highlightActiveThemeButton(theme) {
+        ['obsidian', 'oled', 'sunset', 'rose'].forEach(t => {
+            const btn = document.getElementById('themeBtn_' + t);
+            if (btn) {
+                if (t === theme) {
+                    btn.classList.add('ring-2', 'ring-orange-500', 'scale-[1.02]');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-orange-500', 'scale-[1.02]');
+                }
+            }
+        });
+    }
+
+    function setAppTheme(theme) {
+        triggerHaptic();
+        localStorage.setItem('aura_theme_choice', theme);
+        highlightActiveThemeButton(theme);
+
+        const root = document.documentElement;
+        root.classList.remove('theme-obsidian', 'theme-oled', 'theme-sunset', 'theme-rose');
+        root.classList.add('theme-' + theme);
+
+        if (theme === 'rose') {
+            document.body.classList.remove('dark');
+            root.classList.remove('dark');
+            localStorage.setItem('aura_theme', 'light');
+        } else {
+            document.body.classList.add('dark');
+            root.classList.add('dark');
+            localStorage.setItem('aura_theme', 'dark');
+
+            if (theme === 'oled') {
+                document.body.style.backgroundColor = '#000000';
+            } else if (theme === 'obsidian') {
+                document.body.style.backgroundColor = '#0a0a0c';
+            } else if (theme === 'sunset') {
+                document.body.style.backgroundColor = '#141014';
+            }
+        }
+        toast(`Tema aplicado: ${theme.toUpperCase()} ✨`, 'success');
+    }
+
+    async function syncAllCloudData() {
+        triggerHaptic();
+        toast('Sincronizando con la nube...', 'info');
+        await Promise.all([loadPosts(), loadHabits(), loadStories(), loadChatMessages(), loadAllProfiles()]);
+        if (currentActiveTab === 'profile') renderFacebookProfile();
+        toast('¡Datos sincronizados al 100%! ☁️', 'success');
     }
     </script>
 </body>
