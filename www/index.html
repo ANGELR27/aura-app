@@ -1808,7 +1808,7 @@
 
         // Register Service Worker & Interactive Notifications Listener
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=5.0').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=6.0').then(reg => {
                 console.log('SW Registered:', reg.scope);
                 reg.update();
             }).catch(e => console.warn('SW err:', e));
@@ -3327,24 +3327,59 @@
             }
         }
 
-        // 4. Merge with local cached messages so messages are NEVER lost
+        // 4. Merge with local cached messages
         const localChat = JSON.parse(localStorage.getItem('aura_local_chat') || '[]');
         const combined = [...localChat, ...currentChatMessages, ...serverMessages];
 
-        // 5. Strict Deduplication: group identical text from same sender within 25-second bucket
-        const seen = new Set();
-        currentChatMessages = combined.filter(m => {
-            if (!m || !m.text) return false;
+        // 5. Bulletproof Deduplication:
+        // Prioritize server messages and discard matching local temp messages within 90s window
+        const sorted = combined.filter(m => m && m.text).sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+        const finalMessages = [];
+        const seenIds = new Set();
+        const serverSignatures = [];
+
+        // Collect confirmed server messages
+        sorted.forEach(m => {
+            if (m.id && !m.id.startsWith('local_')) {
+                seenIds.add(m.id);
+                serverSignatures.push({
+                    sender: m.sender_id || m.user_id || 'me',
+                    text: m.text.replace(/^\[CHAT\]\s*/, '').trim(),
+                    time: new Date(m.created_at || Date.now()).getTime()
+                });
+            }
+        });
+
+        // Filter and deduplicate
+        sorted.forEach(m => {
             const cleanText = m.text.replace(/^\[CHAT\]\s*/, '').trim();
             const sender = m.sender_id || m.user_id || 'me';
-            const timeBucket = m.created_at ? Math.floor(new Date(m.created_at).getTime() / 25000) : 'recent';
-            // Use cleanText signature (first 80 chars) to prevent double bubbles of same text
-            const key = `${sender}__${cleanText.substring(0, 80)}__${timeBucket}`;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            m.text = cleanText;
-            return true;
-        }).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            const msgTime = new Date(m.created_at || Date.now()).getTime();
+
+            // If this is a local temp bubble and server already confirmed it, discard temp bubble!
+            if (m.id && m.id.startsWith('local_')) {
+                const hasServerMatch = serverSignatures.some(s => s.sender === sender && s.text === cleanText && Math.abs(s.time - msgTime) < 90000);
+                if (hasServerMatch) return;
+            }
+
+            // Discard duplicate IDs
+            if (m.id && seenIds.has(m.id) && m.id.startsWith('local_')) return;
+
+            // Final check: prevent identical text from same sender within 40 seconds
+            const isDuplicate = finalMessages.some(r => {
+                const rSender = r.sender_id || r.user_id || 'me';
+                const rText = r.text.replace(/^\[CHAT\]\s*/, '').trim();
+                const rTime = new Date(r.created_at || Date.now()).getTime();
+                return rSender === sender && rText === cleanText && Math.abs(rTime - msgTime) < 40000;
+            });
+
+            if (!isDuplicate) {
+                m.text = cleanText;
+                finalMessages.push(m);
+            }
+        });
+
+        currentChatMessages = finalMessages;
 
         // Save persistent local storage
         localStorage.setItem('aura_local_chat', JSON.stringify(currentChatMessages.slice(-100)));

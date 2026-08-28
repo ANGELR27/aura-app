@@ -1,5 +1,5 @@
 // Aura App - Service Worker for Background Notifications & PWA
-const CACHE_NAME = 'aura-cache-v5';
+const CACHE_NAME = 'aura-cache-v6';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
