@@ -8,15 +8,15 @@
   "theme_color": "#f43f7d",
   "icons": [
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Aura&backgroundColor=f43f7d",
+      "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

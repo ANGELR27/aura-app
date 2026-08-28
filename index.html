@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aura">
     <meta name="theme-color" content="#f43f7d" id="themeColorMeta">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230e0d11'/><rect x='2' y='2' width='96' height='96' rx='26' fill='none' stroke='%23f97316' stroke-opacity='0.6' stroke-width='3'/><circle cx='78' cy='22' r='24' fill='%23ea580c' opacity='0.4' filter='blur(8px)'/><text x='50%' y='68%' font-family='serif' font-weight='900' font-style='italic' font-size='56' fill='%23fbbf24' text-anchor='middle'>R</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230e0d11'/><rect x='2' y='2' width='96' height='96' rx='26' fill='none' stroke='%23f97316' stroke-opacity='0.6' stroke-width='3'/><circle cx='78' cy='22' r='24' fill='%23ea580c' opacity='0.4' filter='blur(8px)'/><text x='50%' y='68%' font-family='serif' font-weight='900' font-style='italic' font-size='56' fill='%23fbbf24' text-anchor='middle'>R</text></svg>">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -1756,11 +1756,12 @@
             return;
         }
 
-        const iconUrl = icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>';
+        const iconUrl = icon || './icon-192.png';
+        const badgeUrl = './badge-96.png';
         const notifOptions = {
             body: body,
             icon: iconUrl,
-            badge: iconUrl,
+            badge: badgeUrl,
             tag: 'aura-msg-' + Date.now(),
             renotify: true,
             vibrate: [200, 100, 200],
@@ -1807,7 +1808,7 @@
 
         // Register Service Worker & Interactive Notifications Listener
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=4.4').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=5.0').then(reg => {
                 console.log('SW Registered:', reg.scope);
                 reg.update();
             }).catch(e => console.warn('SW err:', e));

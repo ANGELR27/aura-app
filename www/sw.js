@@ -1,5 +1,5 @@
 // Aura App - Service Worker for Background Notifications & PWA
-const CACHE_NAME = 'aura-cache-v4';
+const CACHE_NAME = 'aura-cache-v5';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
@@ -21,12 +21,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
         const { title, body, icon, tag } = event.data;
-        const iconUrl = icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="28" fill="%230e0d11"/><text x="50%25" y="68%25" font-family="serif" font-weight="900" font-style="italic" font-size="56" fill="%23fbbf24" text-anchor="middle">R</text></svg>';
+        const iconUrl = icon || './icon-192.png';
+        const badgeUrl = './badge-96.png';
         
         self.registration.showNotification(title, {
             body: body,
             icon: iconUrl,
-            badge: iconUrl,
+            badge: badgeUrl,
             tag: tag || 'aura-msg-' + Date.now(),
             renotify: true,
             vibrate: [200, 100, 200],
