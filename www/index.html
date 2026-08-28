@@ -3801,8 +3801,14 @@
                     const isAudio = data.text && data.text.startsWith('[AUDIO');
                     const isPhoto = data.text && data.text.startsWith('[PHOTO]');
                     let preview = data.text || '';
-                    if (isAudio) preview = 'Nota de voz';
-                    else if (isPhoto) preview = 'Foto adjunta';
+                    if (isAudio) {
+                        const match = data.text.match(/^\[AUDIO:?(\d+)?\]/);
+                        const rawDur = match && match[1] ? parseInt(match[1]) : 0;
+                        const durStr = rawDur > 0 ? ` (0:${rawDur < 10 ? '0' : ''}${rawDur})` : '';
+                        preview = `🎤 Mensaje de voz${durStr}`;
+                    } else if (isPhoto) {
+                        preview = '📸 Foto';
+                    }
 
                     if (currentActiveTab !== 'chat' || document.hidden) {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
@@ -3846,7 +3852,15 @@
                         const cleanMsg = payload.new.text.replace(/^\[CHAT\]\s*/, '');
                         const isAudio = cleanMsg.startsWith('[AUDIO');
                         const isPhoto = cleanMsg.startsWith('[PHOTO]');
-                        const preview = isAudio ? 'Nota de voz' : (isPhoto ? 'Foto adjunta' : cleanMsg);
+                        let preview = cleanMsg;
+                        if (isAudio) {
+                            const match = cleanMsg.match(/^\[AUDIO:?(\d+)?\]/);
+                            const rawDur = match && match[1] ? parseInt(match[1]) : 0;
+                            const durStr = rawDur > 0 ? ` (0:${rawDur < 10 ? '0' : ''}${rawDur})` : '';
+                            preview = `🎤 Mensaje de voz${durStr}`;
+                        } else if (isPhoto) {
+                            preview = '📸 Foto';
+                        }
 
                         if (currentActiveTab !== 'chat' || document.hidden) {
                             document.getElementById('dockChatBadge')?.classList.remove('hidden');
@@ -3928,7 +3942,15 @@
                     const author = getProfile(payload.new.sender_id) || getPartnerProfile();
                     const isAudio = payload.new.text && payload.new.text.startsWith('[AUDIO');
                     const isPhoto = payload.new.text && payload.new.text.startsWith('[PHOTO]');
-                    const previewText = isAudio ? 'Nota de voz' : (isPhoto ? 'Foto adjunta' : payload.new.text);
+                    let previewText = payload.new.text || '';
+                    if (isAudio) {
+                        const match = payload.new.text.match(/^\[AUDIO:?(\d+)?\]/);
+                        const rawDur = match && match[1] ? parseInt(match[1]) : 0;
+                        const durStr = rawDur > 0 ? ` (0:${rawDur < 10 ? '0' : ''}${rawDur})` : '';
+                        previewText = `🎤 Mensaje de voz${durStr}`;
+                    } else if (isPhoto) {
+                        previewText = '📸 Foto';
+                    }
                     if (currentActiveTab !== 'chat' || document.hidden) {
                         document.getElementById('dockChatBadge')?.classList.remove('hidden');
                         showInAppNotification({
